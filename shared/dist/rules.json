@@ -1,0 +1,1629 @@
+{
+ "version": "1.1.0",
+ "brands": {
+  "sbi": {
+   "name": "State Bank of India",
+   "domains": [
+    "sbi.co.in",
+    "onlinesbi.sbi",
+    "sbi.bank.in",
+    "sbicard.com",
+    "onlinesbi.com",
+    "sbi"
+   ]
+  },
+  "hdfc": {
+   "name": "HDFC Bank",
+   "domains": [
+    "hdfcbank.com",
+    "hdfc.bank.in",
+    "hdfc.com",
+    "hdfclife.com",
+    "hdfcbank.in"
+   ]
+  },
+  "icici": {
+   "name": "ICICI Bank",
+   "domains": [
+    "icicibank.com",
+    "icici.bank.in",
+    "icicidirect.com",
+    "iciciprulife.com"
+   ]
+  },
+  "axis": {
+   "name": "Axis Bank",
+   "domains": [
+    "axisbank.com",
+    "axis.bank.in"
+   ]
+  },
+  "kotak": {
+   "name": "Kotak Mahindra Bank",
+   "domains": [
+    "kotak.com",
+    "kotak.bank.in",
+    "kotaksecurities.com"
+   ]
+  },
+  "paytm": {
+   "name": "Paytm",
+   "domains": [
+    "paytm.com",
+    "paytm.in",
+    "paytmbank.com"
+   ]
+  },
+  "phonepe": {
+   "name": "PhonePe",
+   "domains": [
+    "phonepe.com"
+   ]
+  },
+  "gpay": {
+   "name": "Google Pay",
+   "domains": [
+    "google.com",
+    "google.co.in"
+   ]
+  },
+  "google": {
+   "name": "Google",
+   "domains": [
+    "google.com",
+    "google.co.in",
+    "youtube.com",
+    "gmail.com",
+    "android.com",
+    "googleusercontent.com",
+    "gstatic.com",
+    "googleapis.com",
+    "g.co",
+    "goo.gl",
+    "withgoogle.com"
+   ]
+  },
+  "amazon": {
+   "name": "Amazon",
+   "domains": [
+    "amazon.in",
+    "amazon.com",
+    "amazon.co.uk",
+    "amazon.de",
+    "amazon.ae",
+    "amazonpay.in",
+    "amazon.ca",
+    "amazon.com.au",
+    "aws.amazon.com",
+    "amazonaws.com",
+    "amzn.to",
+    "amzn.in",
+    "media-amazon.com"
+   ]
+  },
+  "flipkart": {
+   "name": "Flipkart",
+   "domains": [
+    "flipkart.com"
+   ]
+  },
+  "paypal": {
+   "name": "PayPal",
+   "domains": [
+    "paypal.com",
+    "paypal.me"
+   ]
+  },
+  "apple": {
+   "name": "Apple",
+   "domains": [
+    "apple.com",
+    "icloud.com",
+    "apple.co",
+    "mzstatic.com"
+   ]
+  },
+  "icloud": {
+   "name": "Apple iCloud",
+   "domains": [
+    "icloud.com",
+    "apple.com"
+   ]
+  },
+  "microsoft": {
+   "name": "Microsoft",
+   "domains": [
+    "microsoft.com",
+    "live.com",
+    "office.com",
+    "microsoftonline.com",
+    "outlook.com"
+   ]
+  },
+  "outlook": {
+   "name": "Microsoft Outlook",
+   "domains": [
+    "outlook.com",
+    "live.com",
+    "office.com",
+    "microsoft.com"
+   ]
+  },
+  "netflix": {
+   "name": "Netflix",
+   "domains": [
+    "netflix.com"
+   ]
+  },
+  "whatsapp": {
+   "name": "WhatsApp",
+   "domains": [
+    "whatsapp.com",
+    "whatsapp.net",
+    "wa.me"
+   ]
+  },
+  "facebook": {
+   "name": "Facebook",
+   "domains": [
+    "facebook.com",
+    "fb.com",
+    "fb.me",
+    "fbcdn.net",
+    "meta.com"
+   ]
+  },
+  "instagram": {
+   "name": "Instagram",
+   "domains": [
+    "instagram.com"
+   ]
+  },
+  "telegram": {
+   "name": "Telegram",
+   "domains": [
+    "telegram.org",
+    "t.me"
+   ]
+  },
+  "linkedin": {
+   "name": "LinkedIn",
+   "domains": [
+    "linkedin.com"
+   ]
+  },
+  "airtel": {
+   "name": "Airtel",
+   "domains": [
+    "airtel.in",
+    "airtel.com"
+   ]
+  },
+  "jio": {
+   "name": "Jio",
+   "domains": [
+    "jio.com",
+    "ril.com"
+   ]
+  },
+  "irctc": {
+   "name": "IRCTC",
+   "domains": [
+    "irctc.co.in"
+   ]
+  },
+  "incometax": {
+   "name": "Income Tax Department",
+   "domains": [
+    "incometax.gov.in",
+    "incometaxindia.gov.in"
+   ]
+  },
+  "epfo": {
+   "name": "EPFO",
+   "domains": [
+    "epfindia.gov.in",
+    "epfo.gov.in"
+   ]
+  },
+  "uidai": {
+   "name": "UIDAI (Aadhaar)",
+   "domains": [
+    "uidai.gov.in"
+   ]
+  },
+  "aadhaar": {
+   "name": "UIDAI (Aadhaar)",
+   "domains": [
+    "uidai.gov.in"
+   ]
+  },
+  "indiapost": {
+   "name": "India Post",
+   "domains": [
+    "indiapost.gov.in"
+   ]
+  },
+  "fedex": {
+   "name": "FedEx",
+   "domains": [
+    "fedex.com"
+   ]
+  },
+  "bluedart": {
+   "name": "Blue Dart",
+   "domains": [
+    "bluedart.com"
+   ]
+  },
+  "npci": {
+   "name": "NPCI",
+   "domains": [
+    "npci.org.in"
+   ]
+  },
+  "rbi": {
+   "name": "Reserve Bank of India",
+   "domains": [
+    "rbi.org.in"
+   ]
+  },
+  "licindia": {
+   "name": "LIC",
+   "domains": [
+    "licindia.in"
+   ]
+  },
+  "binance": {
+   "name": "Binance",
+   "domains": [
+    "binance.com"
+   ]
+  },
+  "coinbase": {
+   "name": "Coinbase",
+   "domains": [
+    "coinbase.com"
+   ]
+  },
+  "ebay": {
+   "name": "eBay",
+   "domains": [
+    "ebay.com",
+    "ebay.in",
+    "ebay.co.uk"
+   ]
+  },
+  "dhl": {
+   "name": "DHL",
+   "domains": [
+    "dhl.com",
+    "dhl.co.in",
+    "dhl.de"
+   ]
+  },
+  "usps": {
+   "name": "USPS",
+   "domains": [
+    "usps.com"
+   ]
+  },
+  "fastag": {
+   "name": "FASTag",
+   "domains": [
+    "npci.org.in",
+    "ihmcl.co.in",
+    "fastag.ihmcl.com"
+   ]
+  },
+  "echallan": {
+   "name": "e-Challan (Parivahan)",
+   "domains": [
+    "parivahan.gov.in"
+   ]
+  },
+  "parivahan": {
+   "name": "Parivahan",
+   "domains": [
+    "parivahan.gov.in"
+   ]
+  },
+  "pnb": {
+   "name": "Punjab National Bank",
+   "domains": [
+    "pnbindia.in",
+    "netpnb.com",
+    "pnb.bank.in"
+   ]
+  },
+  "canara": {
+   "name": "Canara Bank",
+   "domains": [
+    "canarabank.com",
+    "canarabank.in",
+    "canarabank.bank.in"
+   ]
+  },
+  "bankofbaroda": {
+   "name": "Bank of Baroda",
+   "domains": [
+    "bankofbaroda.in",
+    "bankofbaroda.co.in",
+    "bankofbaroda.bank.in",
+    "bobfinancial.com"
+   ]
+  },
+  "unionbank": {
+   "name": "Union Bank of India",
+   "domains": [
+    "unionbankofindia.co.in",
+    "unionbankofindia.bank.in"
+   ]
+  },
+  "indusind": {
+   "name": "IndusInd Bank",
+   "domains": [
+    "indusind.com",
+    "indusind.bank.in"
+   ]
+  },
+  "yesbank": {
+   "name": "Yes Bank",
+   "domains": [
+    "yesbank.in",
+    "yes.bank.in"
+   ]
+  },
+  "idfcfirst": {
+   "name": "IDFC FIRST Bank",
+   "domains": [
+    "idfcfirstbank.com",
+    "idfcfirst.bank.in"
+   ]
+  },
+  "bajajfinserv": {
+   "name": "Bajaj Finserv",
+   "domains": [
+    "bajajfinserv.in",
+    "bajajfinservmarkets.in"
+   ]
+  },
+  "mobikwik": {
+   "name": "MobiKwik",
+   "domains": [
+    "mobikwik.com"
+   ]
+  },
+  "bhim": {
+   "name": "BHIM UPI",
+   "domains": [
+    "bhimupi.org.in",
+    "npci.org.in"
+   ]
+  },
+  "myntra": {
+   "name": "Myntra",
+   "domains": [
+    "myntra.com"
+   ]
+  },
+  "meesho": {
+   "name": "Meesho",
+   "domains": [
+    "meesho.com"
+   ]
+  },
+  "swiggy": {
+   "name": "Swiggy",
+   "domains": [
+    "swiggy.com",
+    "swiggy.in"
+   ]
+  },
+  "zomato": {
+   "name": "Zomato",
+   "domains": [
+    "zomato.com"
+   ]
+  },
+  "bsnl": {
+   "name": "BSNL",
+   "domains": [
+    "bsnl.co.in",
+    "bsnl.in"
+   ]
+  },
+  "delhivery": {
+   "name": "Delhivery",
+   "domains": [
+    "delhivery.com"
+   ]
+  },
+  "dtdc": {
+   "name": "DTDC",
+   "domains": [
+    "dtdc.in",
+    "dtdc.com"
+   ]
+  },
+  "zerodha": {
+   "name": "Zerodha",
+   "domains": [
+    "zerodha.com"
+   ]
+  },
+  "groww": {
+   "name": "Groww",
+   "domains": [
+    "groww.in"
+   ]
+  },
+  "upstox": {
+   "name": "Upstox",
+   "domains": [
+    "upstox.com"
+   ]
+  },
+  "youtube": {
+   "name": "YouTube",
+   "domains": [
+    "youtube.com",
+    "youtu.be",
+    "youtube-nocookie.com"
+   ]
+  },
+  "digilocker": {
+   "name": "DigiLocker",
+   "domains": [
+    "digilocker.gov.in"
+   ]
+  },
+  "olx": {
+   "name": "OLX",
+   "domains": [
+    "olx.in",
+    "olx.com"
+   ]
+  }
+ },
+ "secondLevel": [
+  "co",
+  "com",
+  "gov",
+  "net",
+  "org",
+  "ac",
+  "edu",
+  "nic",
+  "res",
+  "bank",
+  "firm",
+  "gen",
+  "ind",
+  "mil"
+ ],
+ "shorteners": [
+  "bit.ly",
+  "tinyurl.com",
+  "t.co",
+  "goo.gl",
+  "is.gd",
+  "cutt.ly",
+  "rb.gy",
+  "shorturl.at",
+  "tiny.cc",
+  "ow.ly",
+  "rebrand.ly",
+  "s.id",
+  "t.ly",
+  "v.gd",
+  "bitly.com",
+  "shorte.st",
+  "adf.ly",
+  "tiny.one",
+  "u.to",
+  "qr.ae",
+  "lnkd.in",
+  "surl.li",
+  "clck.ru",
+  "bl.ink",
+  "buff.ly",
+  "short.gy",
+  "bit.do",
+  "x.gd",
+  "gg.gg",
+  "urlz.fr",
+  "kutt.it",
+  "2.gy",
+  "shorturl.asia",
+  "tinyurl.is",
+  "t2m.io"
+ ],
+ "freeHosts": [
+  "web.app",
+  "firebaseapp.com",
+  "pages.dev",
+  "netlify.app",
+  "vercel.app",
+  "github.io",
+  "glitch.me",
+  "weebly.com",
+  "wixsite.com",
+  "000webhostapp.com",
+  "blogspot.com",
+  "sites.google.com",
+  "ngrok.io",
+  "ngrok-free.app",
+  "trycloudflare.com",
+  "workers.dev",
+  "r2.dev",
+  "repl.co",
+  "replit.app",
+  "onrender.com",
+  "herokuapp.com",
+  "webflow.io",
+  "framer.app",
+  "godaddysites.com",
+  "square.site",
+  "mystrikingly.com",
+  "ipfs.io",
+  "dweb.link",
+  "azurewebsites.net",
+  "appspot.com",
+  "forms.gle",
+  "duckdns.org",
+  "serveo.net",
+  "carrd.co",
+  "site123.me",
+  "jimdosite.com",
+  "web.core.windows.net",
+  "blob.core.windows.net",
+  "firebasestorage.googleapis.com",
+  "storage.googleapis.com",
+  "s3.amazonaws.com",
+  "surge.sh",
+  "fly.dev",
+  "deno.dev",
+  "zohosites.in",
+  "wixstudio.io",
+  "canva.site",
+  "notion.site",
+  "tilda.ws",
+  "yolasite.com",
+  "glide.page",
+  "bubbleapps.io",
+  "weweb.io",
+  "pythonanywhere.com",
+  "github.dev",
+  "gitbook.io",
+  "webnode.page",
+  "hostingersite.com",
+  "ucraft.site"
+ ],
+ "brandSuffixes": [
+  "bank",
+  "kyc",
+  "card",
+  "cards",
+  "online",
+  "yono",
+  "reward",
+  "rewards",
+  "update",
+  "login",
+  "secure",
+  "net",
+  "netbanking",
+  "pay",
+  "care",
+  "help",
+  "support",
+  "in",
+  "india",
+  "verify",
+  "refund",
+  "app",
+  "official",
+  "service",
+  "services",
+  "customer"
+ ],
+ "riskyTlds": [
+  "xyz",
+  "top",
+  "click",
+  "zip",
+  "mov",
+  "icu",
+  "buzz",
+  "rest",
+  "cfd",
+  "sbs",
+  "monster",
+  "lol",
+  "work",
+  "live",
+  "shop",
+  "online",
+  "site",
+  "club",
+  "info",
+  "tk",
+  "ml",
+  "ga",
+  "cf",
+  "gq",
+  "cyou",
+  "quest",
+  "bond",
+  "vip",
+  "win",
+  "loan",
+  "support",
+  "help",
+  "cam",
+  "country",
+  "kim",
+  "men",
+  "party",
+  "review",
+  "stream",
+  "download",
+  "racing",
+  "date",
+  "faith",
+  "science",
+  "accountant",
+  "cricket",
+  "su",
+  "bid",
+  "trade",
+  "fit",
+  "rocks",
+  "beauty",
+  "hair",
+  "skin",
+  "makeup",
+  "autos",
+  "boats",
+  "homes",
+  "mom",
+  "lat",
+  "fun",
+  "space",
+  "website",
+  "pics",
+  "pw",
+  "ws",
+  "biz",
+  "asia",
+  "qpon",
+  "christmas"
+ ],
+ "dangerousExtensions": [
+  "apk",
+  "xapk",
+  "apks",
+  "exe",
+  "scr",
+  "msi",
+  "bat",
+  "cmd",
+  "jar",
+  "dmg",
+  "pkg",
+  "vbs",
+  "ps1",
+  "js",
+  "hta",
+  "iso",
+  "img",
+  "lnk",
+  "apkm",
+  "appx",
+  "msix",
+  "msixbundle",
+  "deb",
+  "sh",
+  "command",
+  "wsf",
+  "reg",
+  "chm",
+  "cpl",
+  "vbe",
+  "jse"
+ ],
+ "linkKeywords": [
+  "login",
+  "log-in",
+  "signin",
+  "sign-in",
+  "verify",
+  "verification",
+  "kyc",
+  "update",
+  "secure",
+  "security",
+  "account",
+  "reward",
+  "refund",
+  "otp",
+  "wallet",
+  "claim",
+  "bonus",
+  "gift",
+  "free",
+  "prize",
+  "unlock",
+  "suspend",
+  "blocked",
+  "confirm",
+  "billing",
+  "payment",
+  "pay",
+  "redeem",
+  "cashback",
+  "netbanking",
+  "banking",
+  "aadhaar",
+  "pan-card",
+  "pancard",
+  "challan",
+  "tracking",
+  "delivery",
+  "parcel",
+  "fastag",
+  "echallan",
+  "e-challan",
+  "esim",
+  "apk",
+  "customercare",
+  "customer-care",
+  "helpdesk",
+  "lottery",
+  "winner",
+  "claim-now",
+  "reward-points",
+  "kyc-update",
+  "sim-update",
+  "upi"
+ ],
+ "messageRules": [
+  {
+   "id": "otp_request",
+   "title": "Asks for your OTP, PIN, CVV or password",
+   "detail": "No real bank, app or government office ever asks you to share an OTP, UPI PIN, CVV or password. Anyone asking for it is trying to take your money.",
+   "weight": 40,
+   "patterns": [
+    "(share|send|tell|provide|give|forward|read out|confirm|batao|bataiye|bhejo|bhejiye)\\b[^.\\n]{0,40}\\b(otp|one[- ]time password|upi pin|m-?pin|atm pin|cvv|cvc|password|passcode|security code|verification code)",
+    "\\b(otp|upi pin|cvv|password|verification code)\\b[^.\\n]{0,40}\\b(share|send|tell|provide|give|forward|batao|bataiye|bhejo|bhejiye)\\b",
+    "\\bcode (you|u) (just )?received\\b",
+    "\\bsent (you )?a (6|six|4|four)[- ]digit code\\b"
+   ],
+   "advice": "Never share OTPs, PINs, CVV or passwords. If you already did, call your bank now to block your card or account."
+  },
+  {
+   "id": "upi_receive_trick",
+   "title": "Says you must pay, scan or enter a PIN to RECEIVE money",
+   "detail": "You never need to enter your UPI PIN, scan a QR code or approve a request to receive money. Entering your PIN always sends money out of your account.",
+   "weight": 45,
+   "patterns": [
+    "(enter|put|type)[^.\\n]{0,20}\\b(upi )?pin\\b[^.\\n]{0,40}\\b(receive|get|credit|claim)",
+    "scan[^.\\n]{0,30}\\bqr\\b[^.\\n]{0,40}\\b(receive|get|credit|claim|refund)",
+    "(accept|approve)[^.\\n]{0,30}\\b(collect|payment) request\\b[^.\\n]{0,40}\\b(receive|get|refund|credit)",
+    "\\bcollect request\\b[^.\\n]{0,40}\\brefund\\b",
+    "\\b(receive|get|claim|credit)\\b[^.\\n]{0,60}\\b(scan|enter|type)\\b[^.\\n]{0,30}\\b(qr|upi pin|pin)\\b"
+   ]
+  },
+  {
+   "id": "kyc_block",
+   "title": "Threatens to block your account or asks for KYC / PAN update",
+   "detail": "\"Your account will be blocked, update KYC now\" is one of the most common bank scams. Banks ask you to update KYC at a branch or inside their official app, never through an SMS link.",
+   "weight": 30,
+   "patterns": [
+    "\\b(kyc|re-?kyc|e-?kyc)\\b[^.\\n]{0,60}\\b(update|expired?|pending|suspend|block|verify|complete|incomplete)",
+    "\\b(account|a/c|acct|card|wallet|sim|number|yono|net ?banking)\\b[^.\\n]{0,40}\\b(will be |has been |is |being )?(blocked|suspended|deactivated|frozen|closed|disabled|restricted|on hold)",
+    "\\bpan( card)?\\b[^.\\n]{0,40}\\b(update|link|expired?|blocked|verify)",
+    "\\b(khata|account) band\\b"
+   ]
+  },
+  {
+   "id": "urgency",
+   "title": "Creates panic or a tight deadline",
+   "detail": "Scammers rush you so you act before you think. Real organisations give you time and a way to check.",
+   "weight": 15,
+   "patterns": [
+    "\\burgent(ly)?\\b",
+    "\\bimmediately\\b",
+    "\\bwithin (24|12|48|2|1|one|two) ?(hours?|hrs?|mins?|minutes)\\b",
+    "\\b(today|tonight) only\\b",
+    "\\blast (chance|warning|reminder|notice)\\b",
+    "\\bact (now|fast)\\b",
+    "\\bfinal notice\\b",
+    "\\bexpires? (today|tonight|soon|in)\\b",
+    "\\bturant\\b",
+    "\\bjaldi\\b",
+    "\\blimited (seats|slots|time|period|offer)\\b"
+   ]
+  },
+  {
+   "id": "prize_lottery",
+   "title": "Promises a prize, lottery, lucky draw or big cashback",
+   "detail": "You can't win a contest you never entered. Prize messages are bait to collect a \"fee\" or your bank details.",
+   "weight": 30,
+   "patterns": [
+    "\\b(you|u) (have )?(won|win|been selected)\\b",
+    "\\b(lottery|lucky draw|jackpot|kbc|kaun banega)\\b",
+    "\\bcongratulations?\\b[^.\\n]{0,60}\\b(won|winner|selected|prize|reward|gift|cash)",
+    "\\b(prize|reward) (money|amount)\\b",
+    "\\breward points?\\b[^.\\n]{0,40}\\b(expire|redeem|lapse)",
+    "\\binaam\\b"
+   ]
+  },
+  {
+   "id": "job_task",
+   "title": "Easy-money job or \"task\" offer",
+   "detail": "Paid-to-like videos, review tasks and work-from-home offers that pay small amounts first and then ask you to \"invest\" or pay a deposit are a major scam.",
+   "weight": 30,
+   "patterns": [
+    "\\b(work|job|earn) from home\\b[^.\\n]{0,60}\\b(earn|salary|income|₹|rs\\.?|inr|per day|daily|weekly)",
+    "\\bpart[- ]?time (job|work|opportunity)\\b",
+    "\\b(earn|salary|income|make)\\b[^.\\n]{0,20}(₹|rs\\.?|inr|\\$)\\s?\\d[\\d,]*[^.\\n]{0,25}\\b(daily|per day|a day|/day|per hour|weekly|per task)",
+    "\\b(like|subscribe|rate|review)\\b[^.\\n]{0,30}\\b(youtube|videos?|hotels?|products?|google maps)\\b[^.\\n]{0,40}\\b(earn|paid|pay|commission|income)",
+    "\\b(prepaid|merchant|vip) task\\b",
+    "\\btelegram\\b[^.\\n]{0,40}\\b(task|job|hr|recruit)",
+    "\\bno (experience|investment) (needed|required)\\b"
+   ]
+  },
+  {
+   "id": "investment",
+   "title": "Too-good-to-be-true investment or trading tip",
+   "detail": "Guaranteed or very high returns, \"stock tips\" groups and crypto doubling schemes are the costliest scams. No legitimate investment guarantees profit.",
+   "weight": 35,
+   "patterns": [
+    "\\bguaranteed (returns?|profits?|income)\\b",
+    "\\bdouble (your|the) (money|investment)\\b",
+    "\\b\\d{2,4}\\s?%[^.\\n]{0,25}\\b(returns?|profits?|gains?|in (a|one|1) (month|week|day))\\b",
+    "\\b(stock|trading|share market|ipo|forex|crypto|bitcoin|usdt)\\b[^.\\n]{0,40}\\b(tips?|group|signals?|guaranteed|profit|returns?|allotment|vip)",
+    "\\b(risk[- ]free|zero risk)\\b",
+    "\\b(institutional|vip|premium|special) (account|trading account|stock group|trading group)\\b",
+    "\\b(ipo|otc|block deal)\\b[^.\\n]{0,30}\\b(allot(ment|ted)?|discount|special price|guaranteed)\\b"
+   ]
+  },
+  {
+   "id": "remote_access",
+   "title": "Asks you to install a screen-sharing or remote-control app",
+   "detail": "Screen-sharing and remote-control apps let a stranger see your screen and OTPs and operate your phone. Never install one at someone else's request.",
+   "weight": 45,
+   "patterns": [
+    "\\b(anydesk|any desk|teamviewer|team viewer|quicksupport|quick support|rustdesk|airdroid|ultraviewer|alpemix|screen ?share|screen sharing|remote access)\\b"
+   ]
+  },
+  {
+   "id": "authority_threat",
+   "title": "Threatens police, CBI, customs, court or \"digital arrest\"",
+   "detail": "Police and investigating agencies never arrest anyone over a phone or video call and never ask for money to \"clear\" a case. \"Digital arrest\" is not a real legal process.",
+   "weight": 40,
+   "patterns": [
+    "\\bdigital(ly)? arrest\\b",
+    "\\b(arrest|warrant|fir|summons|legal action|case)\\b[^.\\n]{0,40}\\b(against you|in your name|on your name|on you)\\b",
+    "\\b(you|your)\\b[^.\\n]{0,30}\\b(will be|are|is being|have been) (arrested|under arrest|prosecuted|investigated)\\b",
+    "\\b(your )?case (is |has been )?(registered|filed|booked)\\b",
+    "\\bmoney laundering\\b[^.\\n]{0,60}\\b(you|your|account|aadhaar|name)\\b",
+    "\\b(your )?(aadhaar|account|sim|number)\\b[^.\\n]{0,40}\\b(used|involved) in\\b[^.\\n]{0,40}\\b(crime|fraud|laundering|illegal|case)",
+    "\\b(trai|telecom department|dot)\\b[^.\\n]{0,60}\\b(disconnect|block|suspend|deactivat)",
+    "\\b(your )?(mobile )?number will be (disconnected|blocked|deactivated|suspended)\\b"
+   ]
+  },
+  {
+   "id": "authority_mention",
+   "title": "Claims to be from police, CBI, customs or another agency",
+   "detail": "Scammers pose as officials to frighten you. Real agencies send written notices and never ask for money or OTPs over the phone or chat.",
+   "weight": 15,
+   "patterns": [
+    "\\b(this is|calling from|i am|we are|from)\\b[^.\\n]{0,20}\\b(cbi|enforcement directorate|narcotics|ncb|cyber (cell|police|crime branch)|customs|crime branch|interpol|police|rbi|trai|income tax department)\\b"
+   ]
+  },
+  {
+   "id": "bill_disconnect",
+   "title": "Says your electricity, gas or phone will be cut off",
+   "detail": "Utility companies don't send personal mobile numbers asking you to call \"tonight\" or your power will be cut. Pay bills only through the official app or website.",
+   "weight": 35,
+   "patterns": [
+    "\\b(electricity|power|light|bijli|gas)\\b[^.\\n]{0,60}\\b(disconnect|cut|cutoff|cut off|kat)",
+    "\\b(previous|last) month bill (was )?not (updated|paid)\\b",
+    "\\bcontact (electricity|our) officer\\b"
+   ]
+  },
+  {
+   "id": "parcel",
+   "title": "Fake parcel, courier or customs message",
+   "detail": "Messages about a held parcel, failed delivery or customs duty with a link or a number to call are common phishing. Check tracking only on the courier's official site.",
+   "weight": 25,
+   "patterns": [
+    "\\b(parcel|courier|package|shipment|consignment|delivery)\\b[^.\\n]{0,60}\\b(held|seized|on hold|pending|failed|returned|undeliver|incomplete address|address (is )?(incomplete|incorrect|wrong)|customs|re-?schedule|redeliver|illegal)",
+    "\\b(drugs|passports?|illegal items)\\b[^.\\n]{0,40}\\b(parcel|package|courier)"
+   ]
+  },
+  {
+   "id": "impersonation_family",
+   "title": "Unknown number claims to be a friend or family member",
+   "detail": "\"Hi Mum, this is my new number\" or a relative \"in trouble\" asking for money is a known trick. Call the person on their old number before you pay.",
+   "weight": 25,
+   "patterns": [
+    "\\bhi (mum|mom|dad|papa|mummy|beta|son|daughter)\\b",
+    "\\b(this is )?my new number\\b",
+    "\\b(lost|broke|broken) my phone\\b",
+    "\\b(in (the )?hospital|accident|stuck at (the )?airport)\\b[^.\\n]{0,60}\\b(send|transfer|pay|money|need)",
+    "\\bdon'?t (tell|inform) (anyone|mom|dad|papa|family|the bank)\\b"
+   ]
+  },
+  {
+   "id": "refund_tax",
+   "title": "Unexpected refund, tax rebate or subsidy",
+   "detail": "Tax refunds are paid straight into your registered bank account. You never have to click a link or share card details to get them.",
+   "weight": 25,
+   "patterns": [
+    "\\b(income tax|it|gst|tax)\\b[^.\\n]{0,30}\\brefund\\b",
+    "\\brefund\\b[^.\\n]{0,40}\\b(approved|pending|initiated|of (₹|rs|inr))",
+    "\\b(subsidy|scholarship|pm kisan|yojana)\\b[^.\\n]{0,60}\\b(click|link|register|fee|claim)"
+   ]
+  },
+  {
+   "id": "advance_fee",
+   "title": "Asks you to pay a fee before you get something",
+   "detail": "Registration, processing, \"GST\" or release fees to receive a job, loan, prize or parcel are the classic advance-fee scam.",
+   "weight": 30,
+   "patterns": [
+    "\\b(registration|processing|verification|security|release|clearance|activation|token|insurance|file|delivery|customs) (fee|charge|amount|deposit)\\b",
+    "\\bpay (only |just )?(₹|rs\\.?|inr|\\$)\\s?\\d[\\d,]*\\b[^.\\n]{0,40}\\b(to (receive|get|claim|release|activate|unlock))",
+    "\\bpay\\b[^.\\n]{0,40}\\b(to|for|and) (release|unlock|claim|receive)\\b"
+   ]
+  },
+  {
+   "id": "gift_card",
+   "title": "Asks for payment in gift cards or crypto",
+   "detail": "No genuine business, government office or employer asks to be paid in gift cards, vouchers or cryptocurrency.",
+   "weight": 35,
+   "patterns": [
+    "\\b(gift ?cards?|google play (card|code|voucher)|itunes (card|code)|amazon (gift )?(card|voucher)|steam card)\\b[^.\\n]{0,60}\\b(buy|pay|send|purchase|scratch|code)",
+    "\\b(pay|send|transfer)\\b[^.\\n]{0,30}\\b(bitcoin|btc|usdt|crypto|ethereum)\\b"
+   ]
+  },
+  {
+   "id": "loan",
+   "title": "Instant loan offer from an unknown sender",
+   "detail": "Unregistered instant-loan apps often steal your contacts and photos and use them for harassment. Borrow only from RBI-regulated lenders.",
+   "weight": 20,
+   "patterns": [
+    "\\b(instant|pre-?approved|guaranteed)\\b[^.\\n]{0,20}\\bloan\\b",
+    "\\bloan\\b[^.\\n]{0,40}\\b(without|no) (cibil|documents?|credit check)\\b"
+   ]
+  },
+  {
+   "id": "secrecy",
+   "title": "Tells you to keep it secret or stay on the call",
+   "detail": "Asking you not to tell family or your bank, or to stay on a call or video, is how scammers keep you isolated while they take money.",
+   "weight": 20,
+   "patterns": [
+    "\\b(keep (this|it) (secret|confidential)|don'?t (tell|share (this )?with) anyone|do not disclose|do not disconnect|don'?t disconnect|stay on (the )?(call|line|video))\\b",
+    "\\b(kisi ko mat batana|kisi ko na bataye)\\b"
+   ]
+  },
+  {
+   "id": "safe_account",
+   "title": "Asks you to move money to a \"safe\" or \"verification\" account",
+   "detail": "No bank or agency ever asks you to transfer money to another account to \"protect\" or \"verify\" it. This is always a scam.",
+   "weight": 45,
+   "patterns": [
+    "\\b(safe|secure|verification|rbi|government|escrow|holding)\\b[^.\\n]{0,15}\\baccount\\b[^.\\n]{0,40}\\b(transfer|move|deposit|send|pay)",
+    "\\b(transfer|move|deposit|send)\\b[^.\\n]{0,40}\\b(safe|secure|verification|rbi|escrow|holding) account\\b"
+   ]
+  },
+  {
+   "id": "sextortion",
+   "title": "Blackmail or threat to leak private videos or photos",
+   "detail": "Do not pay. Paying never ends it. Stop replying, keep the evidence and report it.",
+   "weight": 40,
+   "patterns": [
+    "\\b(video call|private|intimate|nude|obscene)\\b[^.\\n]{0,40}\\b(record(ed|ing)?|video|photos?)\\b[^.\\n]{0,60}\\b(leak|viral|share|send|upload|family|contacts)",
+    "\\b(leak|upload|viral)\\b[^.\\n]{0,40}\\b(your )?(video|photos?)\\b"
+   ]
+  },
+  {
+   "id": "apk_install",
+   "title": "Asks you to download an app file (APK) or app from a link",
+   "detail": "Fake bank, RTO challan, wedding invite and delivery apps sent as .apk files steal your SMS and OTPs. Install apps only from your phone's official app store.",
+   "weight": 40,
+   "patterns": [
+    "\\.(apk|xapk)\\b",
+    "\\b(download|install)\\b[^.\\n]{0,40}\\b(this )?(app|apk|application)\\b[^.\\n]{0,40}\\b(link|below|attached|from here)",
+    "\\b(wedding|marriage|shaadi|birthday|invitation|invite|e-?challan|challan|bill|kyc|reward|pm[- ]?kisan|aadhaar|bank)\\b[^.\\n]{0,25}\\b(apk|app file)\\b"
+   ]
+  },
+  {
+   "id": "call_back_number",
+   "title": "Pushes you to call or message an unknown number",
+   "detail": "Scammers move you to a phone call or chat app where they can pressure you. Look up the official number yourself instead.",
+   "weight": 10,
+   "patterns": [
+    "\\b(call|contact|whatsapp|ring|dial|sms)\\b[^.\\n]{0,30}(\\+?\\d[\\d\\s-]{8,}\\d)"
+   ]
+  },
+  {
+   "id": "sensitive_data",
+   "title": "Asks for card, bank, Aadhaar or login details",
+   "detail": "Sharing card numbers, expiry dates, Aadhaar, net-banking IDs or passwords with a stranger lets them open accounts or drain yours.",
+   "weight": 30,
+   "patterns": [
+    "\\b(share|send|enter|provide|fill|update|confirm)\\b[^.\\n]{0,40}\\b(card (number|details)|debit card|credit card|expiry|bank details|account number|aadhaar( number)?|net ?banking (id|password|details)|login details|user ?id and password|date of birth)\\b"
+   ]
+  },
+  {
+   "id": "call_forwarding",
+   "title": "Asks you to dial a call-forwarding code",
+   "weight": 45,
+   "detail": "Codes like *401*, **21* or *21* forward all your calls to another number. The scammer then receives your bank's OTP calls and chat-app verification calls. Never dial a code someone sends you.",
+   "advice": "If you already dialled it, dial ##002# right away to cancel all call forwarding, then check with your operator.",
+   "patterns": [
+    "(\\*\\*?|##?)(401|21|61|62|67|004|002)\\*\\+?\\d{6,15}",
+    "\\b(dial|press|type|enter)\\b[^.\\n]{0,30}[*#]{1,2}\\d{2,3}[*#]"
+   ]
+  },
+  {
+   "id": "wrong_transfer",
+   "title": "Says money was sent to you \"by mistake\" and asks for it back",
+   "weight": 35,
+   "detail": "A common trick: they send a fake \"credited\" SMS or screenshot (or a small real amount) and then ask you to \"return\" a bigger amount.",
+   "advice": "Check your balance in your own bank or UPI app, not the SMS or screenshot. If money really came by mistake, ask them to raise it with their bank; banks reverse wrong transfers.",
+   "patterns": [
+    "\\b(sent|transferred|paid|credited|deposited)\\b[^.\\n]{0,30}(₹|\\brs\\.?|\\binr\\b|\\b\\d{3,}|\\bmoney\\b|\\bamount\\b|\\bpayment\\b)[^.\\n]{0,30}\\b(by mistake|mistakenly|wrongly|accidentally|galti se)\\b",
+    "\\b(wrong(ly)?|mistaken(ly)?)\\b[^.\\n]{0,20}\\b(transfer|payment|transaction|upi|credit)\\b[^.\\n]{0,60}\\b(return|refund|send (it )?back|wapas)",
+    "\\b(please|pls|plz|kindly)\\b[^.\\n]{0,20}\\b(return|refund|send back|wapas (kar|bhej)\\w*)\\b[^.\\n]{0,40}(money|amount|₹|\\brs\\b|paise|paisa)"
+   ]
+  },
+  {
+   "id": "fake_payment_proof",
+   "title": "Pushes a screenshot or \"pending\" message as proof of payment",
+   "weight": 25,
+   "detail": "A screenshot or SMS isn't proof of payment. UPI payments arrive within seconds, not \"in 24 hours\".",
+   "advice": "Hand over goods or send anything back only after the money shows in your own bank or UPI app.",
+   "patterns": [
+    "\\b(payment|amount|money)\\b[^.\\n]{0,30}\\b(done|sent|successful|paid|completed)\\b[^.\\n]{0,40}\\b(screenshot|ss|check (the )?(image|photo|pic))\\b",
+    "\\b(check|see)\\b[^.\\n]{0,15}\\b(the )?(payment )?screenshot\\b",
+    "\\b(will|should|may) (reflect|be credited|come|show)\\b[^.\\n]{0,40}\\b(24|48|72) ?(hours?|hrs?)\\b",
+    "\\b(payment|amount|transaction)\\b[^.\\n]{0,20}\\b(on hold|in process|processing|pending)\\b[^.\\n]{0,60}\\b(send|deliver|give|release|ship)\\b"
+   ]
+  },
+  {
+   "id": "risky_permission",
+   "title": "Asks you to switch on a powerful phone permission",
+   "weight": 40,
+   "detail": "Accessibility, \"install unknown apps\", SMS or notification access lets an app read your screen and OTPs and tap buttons for you. Scam apps ask for exactly these.",
+   "advice": "If you already allowed it, uninstall that app, turn the permission off in Settings, and change your banking passwords from another device.",
+   "patterns": [
+    "\\b(allow|enable|turn on|give|grant|switch on|activate)\\b[^.\\n]{0,40}\\b(accessibility|install unknown apps|unknown sources|sms permission|notification access|display over other apps|device admin)"
+   ]
+  },
+  {
+   "id": "program_file",
+   "title": "Mentions a program file (.exe, .bat, .jar…)",
+   "weight": 40,
+   "detail": "Files like these run programs that can take over a computer. Real invoices, bills and photos are never sent as programs.",
+   "patterns": [
+    "\\b[\\w-]{1,40}\\.(exe|scr|bat|vbs|jar|msi|hta|ps1|cmd|wsf)\\b"
+   ]
+  },
+  {
+   "id": "telecom_disconnect",
+   "title": "Claims TRAI or the telecom department will cut your number",
+   "weight": 40,
+   "detail": "TRAI and the telecom department never call or message to disconnect your number. This is often the first step of the \"digital arrest\" scam.",
+   "patterns": [
+    "\\b(trai|dot|department of telecom(munications)?|telecom department)\\b[^.\\n]{0,80}\\b(disconnect|block|suspend|deactivat|cut|band)",
+    "\\b(your )?(mobile )?(number|sim|connection)\\b[^.\\n]{0,40}\\b(will be|is being|has been)\\b[^.\\n]{0,10}\\b(disconnected|blocked|suspended|deactivated)\\b[^.\\n]{0,40}\\b(2|two|24) ?(hours?|hrs?)\\b"
+   ]
+  },
+  {
+   "id": "press_key",
+   "title": "Recorded message asking you to \"press 9\"",
+   "weight": 20,
+   "detail": "Automated calls that say \"press 9 to speak to an officer\" connect you to a scammer.",
+   "patterns": [
+    "\\bpress (1|0|9|one|nine|zero)\\b[^.\\n]{0,40}\\b(to|for)\\b"
+   ]
+  },
+  {
+   "id": "sim_swap",
+   "title": "SIM upgrade or eSIM request",
+   "weight": 35,
+   "detail": "Scammers move your number to their phone (SIM swap or eSIM) and then receive all your bank OTPs. Your operator never asks you to reply or share a code for an upgrade.",
+   "patterns": [
+    "\\be-?sim\\b[^.\\n]{0,60}\\b(activate|activation|upgrade|convert|qr|code|request)",
+    "\\b(3g|4g)\\b[^.\\n]{0,10}\\bto\\b[^.\\n]{0,10}\\b(4g|5g)\\b[^.\\n]{0,40}\\b(upgrade|sim|sms|send|reply)",
+    "\\bsim\\b[^.\\n]{0,30}\\b(upgrade|swap|replacement|replace)\\b[^.\\n]{0,40}\\b(sms|send|reply|code|otp)"
+   ]
+  },
+  {
+   "id": "challan_fastag",
+   "title": "Traffic challan or FASTag message with a link",
+   "weight": 25,
+   "detail": "Check challans only on echallan.parivahan.gov.in or the mParivahan app, and FASTag only in your bank's or NHAI's official app. Links in SMS or chat messages often lead to fake payment pages or APKs.",
+   "patterns": [
+    "\\b(e-?challan|traffic (fine|challan|violation)|rto (fine|challan))\\b[^.\\n]{0,80}\\b(pay|link|click|download|due|pending)",
+    "\\bfastag\\b[^.\\n]{0,60}\\b(kyc|block|blacklist|deactivat|suspend|expire|update)"
+   ]
+  },
+  {
+   "id": "family_emergency",
+   "title": "Says a relative is arrested, hurt or in trouble",
+   "weight": 35,
+   "detail": "Scammers can now copy a relative's voice with AI. The panic is the trick.",
+   "advice": "Hang up and call your relative, or another family member, on the number you already have.",
+   "patterns": [
+    "\\b(your )?(son|daughter|husband|wife|brother|sister|father|mother|beta|beti|bhai|nephew|niece)\\b[^.\\n]{0,40}\\b(arrested|in custody|accident|hospital|kidnapped|caught|detained)\\b"
+   ]
+  },
+  {
+   "id": "money_mule",
+   "title": "Offers money to use your bank account or SIM",
+   "weight": 40,
+   "detail": "This is money-mule recruitment. Letting others use your bank account, UPI or SIM for \"commission\" makes you part of the crime; police freeze such accounts and can arrest the owner.",
+   "patterns": [
+    "\\b(rent|lend|sell|give|share)\\b[^.\\n]{0,20}\\b(your )?(bank account|account|savings account|current account|sim card|sim|upi id)\\b[^.\\n]{0,60}\\b(commission|per (month|transaction)|earn|₹|rs\\.?)",
+    "\\b(commission|earn)\\b[^.\\n]{0,40}\\b(per transaction|for (receiving|transferring))\\b"
+   ]
+  },
+  {
+   "id": "account_takeover_code",
+   "title": "Asks for a chat or social-media login code",
+   "weight": 40,
+   "detail": "Sharing this code lets them take over your account and message your contacts asking for money.",
+   "advice": "If you shared it, open that app, log in again with your number, and turn on two-step verification.",
+   "patterns": [
+    "\\b(whatsapp|telegram|instagram|facebook)\\b[^.\\n]{0,40}\\b(6|six)[- ]?digit (code|otp)\\b",
+    "\\b(verification|login|registration) code\\b[^.\\n]{0,40}\\b(whatsapp|telegram|instagram)\\b",
+    "\\b(6|six)[- ]?digit (code|otp)\\b[^.\\n]{0,40}\\b(whatsapp|telegram|instagram|facebook)\\b"
+   ]
+  },
+  {
+   "id": "foreign_gift",
+   "title": "Gift or parcel \"stuck at customs\" that needs a fee",
+   "weight": 30,
+   "detail": "Online friends who send gifts \"stuck at customs\" are a romance scam. Real customs duty is paid at the official counter, never into someone's personal account.",
+   "patterns": [
+    "\\b(gift|parcel|package)\\b[^.\\n]{0,60}\\b(from (uk|usa|london|abroad|canada|dubai|america)|foreign)\\b",
+    "\\b(customs|airport)\\b[^.\\n]{0,40}\\b(clearance|duty|charges?|fee)\\b[^.\\n]{0,40}\\b(pay|send|transfer)"
+   ]
+  },
+  {
+   "id": "free_offer",
+   "title": "\"Free\" laptop, recharge or scheme with a link",
+   "weight": 25,
+   "detail": "Government schemes and companies don't hand out free items through forwarded links. Check on the official .gov.in website or app.",
+   "patterns": [
+    "\\bfree\\b[^\\n]{0,10}\\b(laptop|recharge|data|mobile|smartphone|scooty|ration|gas cylinder|tablet)\\b[^\\n]{0,80}\\b(click|link|register|apply|form|fill)"
+   ]
+  },
+  {
+   "id": "insurance_bonus",
+   "title": "Insurance bonus or maturity that needs a fee",
+   "weight": 25,
+   "detail": "Insurers never ask you to pay a fee or tax to release a bonus, maturity or claim amount.",
+   "patterns": [
+    "\\b(policy|insurance|lic)\\b[^.\\n]{0,60}\\b(bonus|maturity|lapsed|claim|refund)\\b[^\\n]{0,60}\\b(pay|charge|fee|gst|deposit|tax)\\b"
+   ]
+  }
+ ],
+ "callFlags": [
+  {
+   "id": "asked_otp",
+   "label": "Asked for an OTP, PIN, CVV or password",
+   "weight": 45,
+   "detail": "No genuine caller ever needs your OTP, PIN, CVV or password."
+  },
+  {
+   "id": "asked_app",
+   "label": "Asked me to install an app or share my screen",
+   "weight": 45,
+   "detail": "Remote-access apps give the caller control of your phone, including your OTPs."
+  },
+  {
+   "id": "threat_arrest",
+   "label": "Threatened arrest, a police case or legal action",
+   "weight": 40,
+   "detail": "Police don't arrest or settle cases over the phone. \"Digital arrest\" is a scam."
+  },
+  {
+   "id": "safe_account",
+   "label": "Asked me to transfer money to a \"safe\" account",
+   "weight": 45,
+   "detail": "No bank or agency ever asks you to move money to protect it."
+  },
+  {
+   "id": "claimed_authority",
+   "label": "Said they were from police, CBI, customs, TRAI or a court",
+   "weight": 25,
+   "detail": "Agencies don't cold-call people to investigate them."
+  },
+  {
+   "id": "video_uniform",
+   "label": "Video call with someone in uniform or a fake office",
+   "weight": 35,
+   "detail": "Uniforms, logos and a \"police station\" background are props used in digital-arrest scams."
+  },
+  {
+   "id": "stay_on_call",
+   "label": "Told me to stay on the call or not tell anyone",
+   "weight": 25,
+   "detail": "Isolating you from family and your bank is a pressure tactic."
+  },
+  {
+   "id": "account_block",
+   "label": "Said my account, card or SIM will be blocked",
+   "weight": 25,
+   "detail": "A threat to block your account is used to make you panic and comply."
+  },
+  {
+   "id": "prize_fee",
+   "label": "Offered a prize, refund, loan or job but wanted a fee first",
+   "weight": 30,
+   "detail": "Real prizes and refunds never require a payment to release them."
+  },
+  {
+   "id": "qr_collect",
+   "label": "Asked me to scan a QR code or approve a UPI request",
+   "weight": 40,
+   "detail": "Scanning a QR or approving a UPI request sends money; it never receives it."
+  },
+  {
+   "id": "urgency",
+   "label": "Pressured me to act right now",
+   "weight": 15,
+   "detail": "Urgency is designed to stop you from checking."
+  },
+  {
+   "id": "knew_details",
+   "label": "Knew some of my personal details to sound genuine",
+   "weight": 10,
+   "detail": "Leaked data (name, last digits of a card) is often used to build false trust."
+  },
+  {
+   "id": "asked_personal",
+   "label": "Asked for card, Aadhaar, PAN or bank details",
+   "weight": 30,
+   "detail": "Those details let criminals open accounts or take loans in your name."
+  },
+  {
+   "id": "family_emergency",
+   "label": "Claimed a family member is in trouble and needs money",
+   "weight": 30,
+   "detail": "Hang up and call the family member directly on their known number."
+  },
+  {
+   "id": "investment_pitch",
+   "label": "Pitched an investment, trading or crypto scheme",
+   "weight": 25,
+   "detail": "Unsolicited investment calls promising high returns are almost always fraud."
+  }
+ ],
+ "claimedOrgs": [
+  {
+   "id": "none",
+   "label": "Didn't say / a person"
+  },
+  {
+   "id": "bank",
+   "label": "Bank or card company"
+  },
+  {
+   "id": "police",
+   "label": "Police, CBI, customs or court"
+  },
+  {
+   "id": "telecom",
+   "label": "TRAI or mobile company"
+  },
+  {
+   "id": "govt",
+   "label": "Tax, Aadhaar or other government office"
+  },
+  {
+   "id": "courier",
+   "label": "Courier or delivery company"
+  },
+  {
+   "id": "utility",
+   "label": "Electricity or gas company"
+  },
+  {
+   "id": "company",
+   "label": "Amazon, Flipkart, tech support or another company"
+  },
+  {
+   "id": "employer",
+   "label": "Recruiter or employer"
+  },
+  {
+   "id": "family",
+   "label": "Friend or family member"
+  }
+ ],
+ "thresholds": {
+  "danger": 50,
+  "warning": 20
+ },
+ "criticalIds": [
+  "otp_request",
+  "upi_receive_trick",
+  "remote_access",
+  "safe_account",
+  "sextortion",
+  "apk_install",
+  "brand_impersonation",
+  "lookalike",
+  "at_sign",
+  "dangerous_file",
+  "script_scheme",
+  "asked_otp",
+  "asked_app",
+  "qr_collect",
+  "punycode",
+  "intl_number",
+  "community_scam_many",
+  "mobile_sender_official",
+  "call_forwarding",
+  "risky_permission",
+  "account_takeover_code",
+  "money_mule",
+  "upi_receive_note",
+  "pay_prank_app"
+ ],
+ "criticalFloor": 60,
+ "extraPatternBonus": 10,
+ "extraPatternMax": 20,
+ "reportTypes": [
+  {
+   "id": "fake_bank",
+   "label": "Fake bank, KYC or UPI call",
+   "kind": "scam"
+  },
+  {
+   "id": "fake_police",
+   "label": "Fake police, CBI or digital arrest",
+   "kind": "scam"
+  },
+  {
+   "id": "job_invest",
+   "label": "Job, task or investment scam",
+   "kind": "scam"
+  },
+  {
+   "id": "courier",
+   "label": "Fake courier, customs or bill",
+   "kind": "scam"
+  },
+  {
+   "id": "family",
+   "label": "Pretending to be family or a friend",
+   "kind": "scam"
+  },
+  {
+   "id": "sextortion",
+   "label": "Blackmail or sextortion",
+   "kind": "scam"
+  },
+  {
+   "id": "scam",
+   "label": "Other scam or fraud",
+   "kind": "scam"
+  },
+  {
+   "id": "spam",
+   "label": "Spam, sales or robocall",
+   "kind": "spam"
+  },
+  {
+   "id": "safe",
+   "label": "Genuine / safe caller",
+   "kind": "safe"
+  }
+ ],
+ "senderRules": {
+  "headerPattern": "^[A-Z]{2}-[A-Z0-9]{3,9}(?:-([PSTG]))?$",
+  "suffixes": {
+   "P": "Promotional",
+   "S": "Service",
+   "T": "Transactional",
+   "G": "Government"
+  },
+  "bankClaims": {
+   "sbi": [
+    "sbi"
+   ],
+   "hdfc": [
+    "hdfc"
+   ],
+   "icici": [
+    "icici"
+   ],
+   "axis": [
+    "axis"
+   ],
+   "kotak": [
+    "kotak"
+   ],
+   "paytm": [
+    "paytm"
+   ],
+   "phonepe": [
+    "phonpe",
+    "phonepe"
+   ],
+   "airtel": [
+    "airtel",
+    "airtl"
+   ],
+   "irctc": [
+    "irctc"
+   ],
+   "epfo": [
+    "epfo"
+   ],
+   "uidai": [
+    "uidai",
+    "aadhar",
+    "aadhaar"
+   ]
+  },
+  "officialClaim": "\\b(bank|a/c|account|kyc|otp|upi|credit card|debit card|net ?banking|income tax|epfo|aadhaar|uidai|electricity|police|customs|courier|refund)\\b",
+  "otpClaim": "\\b(otp|one[- ]time password|verification code|debited|credited|transaction)\\b"
+ },
+ "upi": {
+  "handles": {
+   "ybl": "PhonePe",
+   "ibl": "PhonePe",
+   "axl": "PhonePe",
+   "okaxis": "Google Pay",
+   "okhdfcbank": "Google Pay",
+   "okicici": "Google Pay",
+   "oksbi": "Google Pay",
+   "paytm": "Paytm",
+   "ptyes": "Paytm",
+   "ptaxis": "Paytm",
+   "pthdfc": "Paytm",
+   "ptsbi": "Paytm",
+   "apl": "Amazon Pay",
+   "yapl": "Amazon Pay",
+   "rapl": "Amazon Pay",
+   "upi": "BHIM",
+   "ikwik": "MobiKwik",
+   "freecharge": "Freecharge",
+   "axisbank": "Axis Bank",
+   "hdfcbank": "HDFC Bank",
+   "icici": "ICICI Bank",
+   "sbi": "State Bank of India",
+   "kotak": "Kotak Mahindra Bank",
+   "fbl": "Federal Bank",
+   "pnb": "Punjab National Bank",
+   "barodampay": "Bank of Baroda",
+   "cnrb": "Canara Bank",
+   "waicici": "WhatsApp Pay",
+   "wahdfcbank": "WhatsApp Pay",
+   "waaxis": "WhatsApp Pay",
+   "wasbi": "WhatsApp Pay",
+   "axisb": "CRED"
+  },
+  "baitWords": [
+   "kyc",
+   "refund",
+   "reward",
+   "rewards",
+   "cashback",
+   "prize",
+   "lottery",
+   "winner",
+   "helpdesk",
+   "helpline",
+   "customercare",
+   "care",
+   "support",
+   "service",
+   "claim",
+   "bonus",
+   "gift",
+   "free",
+   "verify",
+   "verification",
+   "fastag",
+   "challan",
+   "electricity",
+   "bill",
+   "income",
+   "tax"
+  ],
+  "officialWords": [
+   "gov",
+   "govt",
+   "government",
+   "police",
+   "cbi",
+   "rbi",
+   "npci",
+   "trai",
+   "court",
+   "customs",
+   "sbi",
+   "hdfc",
+   "icici",
+   "axis",
+   "kotak",
+   "paytm",
+   "phonepe",
+   "gpay",
+   "amazon",
+   "flipkart",
+   "bank",
+   "official",
+   "uidai",
+   "aadhaar",
+   "epfo",
+   "incometax"
+  ],
+  "receiveWords": [
+   "receive",
+   "refund",
+   "cashback",
+   "prize",
+   "reward",
+   "claim",
+   "return",
+   "won",
+   "lottery",
+   "kyc",
+   "verify",
+   "verification",
+   "unlock",
+   "release"
+  ]
+ },
+ "payment": {
+  "apps": {
+   "google pay": "Google Pay",
+   "gpay": "Google Pay",
+   "phonepe": "PhonePe",
+   "paytm": "Paytm",
+   "bhim": "BHIM",
+   "amazon pay": "Amazon Pay",
+   "cred": "CRED",
+   "mobikwik": "MobiKwik",
+   "whatsapp": "WhatsApp Pay",
+   "navi": "Navi",
+   "super.money": "super.money"
+  },
+  "prankWords": "\\b(prank|fake payment|spoof(ed)?|for entertainment|not a real (payment|transaction)|demo (payment|receipt)|sample receipt)\\b",
+  "pendingWords": "\\b(pending|processing|in progress|on hold|awaiting|under process|will be credited|not yet credited)\\b",
+  "failedWords": "\\b(failed|declined|unsuccessful|reversed|cancelled|canceled|rejected)\\b",
+  "successWords": "\\b(successful|success|completed|paid|sent|done|received|credited)\\b",
+  "editorApps": [
+   "photoshop",
+   "picsart",
+   "snapseed",
+   "canva",
+   "gimp",
+   "lightroom",
+   "photodirector",
+   "pixlr",
+   "fotor",
+   "inshot",
+   "polish",
+   "photoroom",
+   "meitu",
+   "remini",
+   "phonto",
+   "picsay",
+   "ibis paint",
+   "adobe"
+  ]
+ }
+}

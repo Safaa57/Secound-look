@@ -1,0 +1,2089 @@
+[
+ {
+  "kind": "link",
+  "input": "http://sbi-kyc-update.xyz/login",
+  "score": 100,
+  "level": "danger",
+  "ids": [
+   "brand_impersonation",
+   "hyphens",
+   "keywords",
+   "no_https",
+   "risky_tld"
+  ]
+ },
+ {
+  "kind": "link",
+  "input": "https://www.amaz0n-offers.in/gift",
+  "score": 60,
+  "level": "danger",
+  "ids": [
+   "keywords",
+   "lookalike"
+  ]
+ },
+ {
+  "kind": "link",
+  "input": "https://paypa1.com/signin",
+  "score": 60,
+  "level": "danger",
+  "ids": [
+   "keywords",
+   "lookalike"
+  ]
+ },
+ {
+  "kind": "link",
+  "input": "https://bit.ly/3xYz12",
+  "score": 20,
+  "level": "warning",
+  "ids": [
+   "shortener"
+  ]
+ },
+ {
+  "kind": "link",
+  "input": "http://192.168.4.20/hdfc/netbanking",
+  "score": 81,
+  "level": "danger",
+  "ids": [
+   "brand_in_path",
+   "ip_host",
+   "keywords",
+   "no_https"
+  ]
+ },
+ {
+  "kind": "link",
+  "input": "https://xn--pple-43d.com",
+  "score": 100,
+  "level": "danger",
+  "ids": [
+   "hyphens",
+   "lookalike",
+   "punycode"
+  ]
+ },
+ {
+  "kind": "link",
+  "input": "https://mparivahan-echallan.web.app/pay",
+  "score": 72,
+  "level": "danger",
+  "ids": [
+   "brand_impersonation",
+   "free_host",
+   "keywords"
+  ]
+ },
+ {
+  "kind": "link",
+  "input": "https://drive-files.top/RTO_Challan.apk",
+  "score": 72,
+  "level": "danger",
+  "ids": [
+   "dangerous_file",
+   "keywords",
+   "risky_tld"
+  ]
+ },
+ {
+  "kind": "link",
+  "input": "https://incometax-refund.gov-in.online/claim",
+  "score": 100,
+  "level": "danger",
+  "ids": [
+   "brand_impersonation",
+   "fake_gov",
+   "keywords",
+   "risky_tld"
+  ]
+ },
+ {
+  "kind": "link",
+  "input": "https://www.google.com/search?q=weather",
+  "score": 0,
+  "level": "safe",
+  "ids": [
+   "official"
+  ]
+ },
+ {
+  "kind": "link",
+  "input": "https://www.amazon.in/gp/your-account/order-history",
+  "score": 0,
+  "level": "safe",
+  "ids": [
+   "keywords",
+   "official"
+  ]
+ },
+ {
+  "kind": "link",
+  "input": "https://onlinesbi.sbi/",
+  "score": 0,
+  "level": "safe",
+  "ids": [
+   "official"
+  ]
+ },
+ {
+  "kind": "link",
+  "input": "https://en.wikipedia.org/wiki/Phishing",
+  "score": 0,
+  "level": "safe",
+  "ids": []
+ },
+ {
+  "kind": "link",
+  "input": "https://github.com/anthropics",
+  "score": 0,
+  "level": "safe",
+  "ids": []
+ },
+ {
+  "kind": "link",
+  "input": "https://www.hdfcbank.com@evil-site.ru/login",
+  "score": 60,
+  "level": "danger",
+  "ids": [
+   "at_sign",
+   "keywords"
+  ]
+ },
+ {
+  "kind": "message",
+  "input": "Dear Customer, your SBI YONO account will be blocked today. Update your PAN card immediately: http://sbi-yono-kyc.top/update",
+  "score": 100,
+  "level": "danger",
+  "ids": [
+   "bad_link",
+   "kyc_block",
+   "urgency"
+  ]
+ },
+ {
+  "kind": "message",
+  "input": "Dear customer your electricity power will be disconnected tonight at 9.30pm because your previous month bill was not updated. Please immediately contact our electricity officer 9876543210",
+  "score": 70,
+  "level": "danger",
+  "ids": [
+   "bill_disconnect",
+   "call_back_number",
+   "urgency"
+  ]
+ },
+ {
+  "kind": "message",
+  "input": "Hello! We are hiring for part time job. Earn Rs 3000 daily by liking YouTube videos. No experience needed. Contact HR on Telegram @hr_priya",
+  "score": 50,
+  "level": "danger",
+  "ids": [
+   "job_task"
+  ]
+ },
+ {
+  "kind": "message",
+  "input": "Congratulations! You have won Rs 25,00,000 in KBC lucky draw. Pay processing fee of Rs 12,500 to receive your prize money.",
+  "score": 100,
+  "level": "danger",
+  "ids": [
+   "advance_fee",
+   "prize_lottery"
+  ]
+ },
+ {
+  "kind": "message",
+  "input": "Hi Mum, this is my new number, I lost my phone. Can you send me 15000 urgently? Don't tell dad.",
+  "score": 60,
+  "level": "danger",
+  "ids": [
+   "impersonation_family",
+   "urgency"
+  ]
+ },
+ {
+  "kind": "message",
+  "input": "This is Mumbai Cyber Crime Branch. A parcel in your name with illegal drugs was seized by customs. Your case is registered. Stay on the video call, do not disconnect, you are under digital arrest.",
+  "score": 100,
+  "level": "danger",
+  "ids": [
+   "authority_mention",
+   "authority_threat",
+   "parcel",
+   "secrecy"
+  ]
+ },
+ {
+  "kind": "message",
+  "input": "To receive your refund of Rs 4,999 please scan the QR code and enter your UPI PIN.",
+  "score": 80,
+  "level": "danger",
+  "ids": [
+   "refund_tax",
+   "upi_receive_trick"
+  ]
+ },
+ {
+  "kind": "message",
+  "input": "USPS: Your package is on hold due to an incomplete address. Update here: https://usps-redelivery.click/track",
+  "score": 83,
+  "level": "danger",
+  "ids": [
+   "bad_link",
+   "parcel"
+  ]
+ },
+ {
+  "kind": "message",
+  "input": "Join our VIP stock tips group for guaranteed returns of 300% in a month. Limited seats!",
+  "score": 70,
+  "level": "danger",
+  "ids": [
+   "investment",
+   "urgency"
+  ]
+ },
+ {
+  "kind": "message",
+  "input": "Bank executive here. Please install AnyDesk so I can help you fix the KYC issue.",
+  "score": 60,
+  "level": "danger",
+  "ids": [
+   "remote_access"
+  ]
+ },
+ {
+  "kind": "message",
+  "input": "Your OTP for login is 482913. Do not share it with anyone. -HDFC Bank",
+  "score": 0,
+  "level": "safe",
+  "ids": []
+ },
+ {
+  "kind": "message",
+  "input": "Hey, are we still meeting for lunch tomorrow at 1? I booked a table at the cafe near the office.",
+  "score": 0,
+  "level": "safe",
+  "ids": []
+ },
+ {
+  "kind": "message",
+  "input": "Your Amazon order #402-1234 has shipped and will arrive Thursday. Track it in the Amazon app.",
+  "score": 0,
+  "level": "safe",
+  "ids": []
+ },
+ {
+  "kind": "message",
+  "input": "Rs.2,500 debited from A/c XX1234 on 10-Oct to UPI/merchant. Not you? Call 18001234 (toll free).",
+  "score": 0,
+  "level": "safe",
+  "ids": []
+ },
+ {
+  "kind": "sms",
+  "sender": "VM-SBIINB-T",
+  "input": "Rs.2,500 debited from A/c XX1234 on 10-Oct to UPI/merchant. Not you? Call 1800 1234 (toll free). -SBI",
+  "score": 0,
+  "level": "safe",
+  "ids": [],
+  "senderKind": "business"
+ },
+ {
+  "kind": "sms",
+  "sender": "AD-HDFCBK-T",
+  "input": "Your OTP for login is 482913. Do not share it with anyone. -HDFC Bank",
+  "score": 0,
+  "level": "safe",
+  "ids": [],
+  "senderKind": "business"
+ },
+ {
+  "kind": "sms",
+  "sender": "+919812345678",
+  "input": "Dear customer your SBI account will be blocked today. Update KYC: http://sbi-kyc.top",
+  "score": 100,
+  "level": "danger",
+  "ids": [
+   "bad_link",
+   "kyc_block",
+   "mobile_sender_official"
+  ],
+  "senderKind": "person"
+ },
+ {
+  "kind": "sms",
+  "sender": "9876543210",
+  "input": "Your HDFC bank KYC is pending, call our officer",
+  "score": 75,
+  "level": "danger",
+  "ids": [
+   "kyc_block",
+   "mobile_sender_official"
+  ],
+  "senderKind": "person"
+ },
+ {
+  "kind": "sms",
+  "sender": "JD-OFFERZ-P",
+  "input": "Your SBI account OTP is 482913 to verify the transaction",
+  "score": 35,
+  "level": "warning",
+  "ids": [
+   "header_mismatch",
+   "promo_claims_txn"
+  ],
+  "senderKind": "business"
+ },
+ {
+  "kind": "sms",
+  "sender": "CP-CBSSBI-T",
+  "input": "Your SBI a/c XX12 credited Rs 500",
+  "score": 0,
+  "level": "safe",
+  "ids": [],
+  "senderKind": "business"
+ },
+ {
+  "kind": "sms",
+  "sender": "VK-EPFOHO-G",
+  "input": "Your EPF contribution for Sept has been credited.",
+  "score": 0,
+  "level": "safe",
+  "ids": [
+   "gov_header"
+  ],
+  "senderKind": "business"
+ },
+ {
+  "kind": "sms",
+  "sender": "+92 300 1234567",
+  "input": "Hi, are you there?",
+  "score": 20,
+  "level": "warning",
+  "ids": [
+   "sender_intl_unknown"
+  ],
+  "senderKind": "person"
+ },
+ {
+  "kind": "sms",
+  "sender": "scam@mail.com",
+  "input": "Income tax refund approved, click link to claim",
+  "score": 70,
+  "level": "danger",
+  "ids": [
+   "email_sender_official",
+   "refund_tax"
+  ],
+  "senderKind": "email"
+ },
+ {
+  "kind": "sms",
+  "sender": "+919876543210",
+  "input": "Hey, reached home. Call you later.",
+  "score": 0,
+  "level": "safe",
+  "ids": [],
+  "senderKind": "person"
+ },
+ {
+  "kind": "number",
+  "input": "9845012345",
+  "score": 0,
+  "level": "safe",
+  "ids": [],
+  "caller": "person"
+ },
+ {
+  "kind": "number",
+  "input": "+92 300 1234567",
+  "score": 20,
+  "level": "warning",
+  "ids": [
+   "intl_unknown"
+  ],
+  "caller": "foreign"
+ },
+ {
+  "kind": "number",
+  "input": "1600123456",
+  "score": 0,
+  "level": "safe",
+  "ids": [
+   "series_1600"
+  ],
+  "caller": "business"
+ },
+ {
+  "kind": "number",
+  "input": "1401234567",
+  "score": 0,
+  "level": "safe",
+  "ids": [
+   "series_140"
+  ],
+  "caller": "telemarketer"
+ },
+ {
+  "kind": "number",
+  "input": "+44 7700 900123",
+  "score": 40,
+  "level": "warning",
+  "ids": [
+   "intl_unknown",
+   "invalid"
+  ],
+  "caller": "spoofed"
+ },
+ {
+  "kind": "number",
+  "input": "011 2345 6789",
+  "score": 0,
+  "level": "safe",
+  "ids": [],
+  "caller": "business"
+ },
+ {
+  "kind": "auto",
+  "input": "https://xn--pple-43d.com",
+  "score": 100,
+  "level": "danger",
+  "ids": [
+   "hyphens",
+   "lookalike",
+   "punycode"
+  ]
+ },
+ {
+  "kind": "auto",
+  "input": "http://192.168.4.20/hdfc/netbanking",
+  "score": 81,
+  "level": "danger",
+  "ids": [
+   "brand_in_path",
+   "ip_host",
+   "keywords",
+   "no_https"
+  ]
+ },
+ {
+  "kind": "auto",
+  "input": "https://bit.ly/3xYz12",
+  "score": 20,
+  "level": "warning",
+  "ids": [
+   "shortener"
+  ]
+ },
+ {
+  "kind": "auto",
+  "input": "https://www.hdfcbank.com@evil-site.ru/login",
+  "score": 60,
+  "level": "danger",
+  "ids": [
+   "at_sign",
+   "keywords"
+  ]
+ },
+ {
+  "kind": "auto",
+  "input": "https://a.b.c.d.example.com/x",
+  "score": 10,
+  "level": "safe",
+  "ids": [
+   "deep_subdomains"
+  ]
+ },
+ {
+  "kind": "message",
+  "input": "To activate 5G dial *401*9876543210 now",
+  "score": 65,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "call_back_number",
+   "call_forwarding"
+  ],
+  "advice": [
+   "Don't reply, click links or call numbers in the message.",
+   "If you already dialled it, dial ##002# right away to cancel all call forwarding, then check with your operator.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "call_forwarding",
+    "Asks you to dial a call-forwarding code",
+    "Codes like *401*, **21* or *21* forward all your calls to another number. The scammer then receives your bank's OTP calls and chat-app verification calls. Never dial a code someone sends you.",
+    55
+   ],
+   [
+    "call_back_number",
+    "Pushes you to call or message an unknown number",
+    "Scammers move you to a phone call or chat app where they can pressure you. Look up the official number yourself instead.",
+    10
+   ]
+  ]
+ },
+ {
+  "kind": "message",
+  "input": "Sir I sent 5000 by mistake to your number, please return the amount",
+  "score": 45,
+  "level": "warning",
+  "label": "Suspicious",
+  "ids": [
+   "wrong_transfer"
+  ],
+  "advice": [
+   "Don't reply, click links or call numbers in the message.",
+   "Check your balance in your own bank or UPI app, not the SMS or screenshot. If money really came by mistake, ask them to raise it with their bank; banks reverse wrong transfers.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "wrong_transfer",
+    "Says money was sent to you \"by mistake\" and asks for it back",
+    "A common trick: they send a fake \"credited\" SMS or screenshot (or a small real amount) and then ask you to \"return\" a bigger amount.",
+    45
+   ]
+  ]
+ },
+ {
+  "kind": "message",
+  "input": "Payment done, check the screenshot. It will reflect in 24 hours, please send the item",
+  "score": 45,
+  "level": "warning",
+  "label": "Suspicious",
+  "ids": [
+   "fake_payment_proof"
+  ],
+  "advice": [
+   "Don't reply, click links or call numbers in the message.",
+   "Hand over goods or send anything back only after the money shows in your own bank or UPI app.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "fake_payment_proof",
+    "Pushes a screenshot or \"pending\" message as proof of payment",
+    "A screenshot or SMS isn't proof of payment. UPI payments arrive within seconds, not \"in 24 hours\".",
+    45
+   ]
+  ]
+ },
+ {
+  "kind": "message",
+  "input": "Install the reward app and enable accessibility to get your points",
+  "score": 60,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "risky_permission"
+  ],
+  "advice": [
+   "Don't reply, click links or call numbers in the message.",
+   "If you already allowed it, uninstall that app, turn the permission off in Settings, and change your banking passwords from another device.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "risky_permission",
+    "Asks you to switch on a powerful phone permission",
+    "Accessibility, \"install unknown apps\", SMS or notification access lets an app read your screen and OTPs and tap buttons for you. Scam apps ask for exactly these.",
+    40
+   ]
+  ]
+ },
+ {
+  "kind": "message",
+  "input": "Wedding invitation apk, please install and see",
+  "score": 60,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "apk_install"
+  ],
+  "advice": [
+   "Don't reply, click links or call numbers in the message.",
+   "If you installed an app they asked for, turn on flight mode, uninstall it and change your banking passwords from another device.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "apk_install",
+    "Asks you to download an app file (APK) or app from a link",
+    "Fake bank, RTO challan, wedding invite and delivery apps sent as .apk files steal your SMS and OTPs. Install apps only from your phone's official app store.",
+    40
+   ]
+  ]
+ },
+ {
+  "kind": "message",
+  "input": "Your invoice is attached: Invoice_2026.exe",
+  "score": 40,
+  "level": "warning",
+  "label": "Suspicious",
+  "ids": [
+   "program_file"
+  ],
+  "advice": [
+   "Don't reply, click links or call numbers in the message.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "program_file",
+    "Mentions a program file (.exe, .bat, .jar…)",
+    "Files like these run programs that can take over a computer. Real invoices, bills and photos are never sent as programs.",
+    40
+   ]
+  ]
+ },
+ {
+  "kind": "message",
+  "input": "This is TRAI. Your number will be disconnected in 2 hours. Press 9 to talk to officer",
+  "score": 100,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "authority_mention",
+   "authority_threat",
+   "press_key",
+   "telecom_disconnect"
+  ],
+  "advice": [
+   "Don't reply, click links or call numbers in the message.",
+   "There is no such thing as a \"digital arrest\". Disconnect and tell a family member.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "authority_threat",
+    "Threatens police, CBI, customs, court or \"digital arrest\"",
+    "Police and investigating agencies never arrest anyone over a phone or video call and never ask for money to \"clear\" a case. \"Digital arrest\" is not a real legal process.",
+    40
+   ],
+   [
+    "telecom_disconnect",
+    "Claims TRAI or the telecom department will cut your number",
+    "TRAI and the telecom department never call or message to disconnect your number. This is often the first step of the \"digital arrest\" scam.",
+    40
+   ],
+   [
+    "press_key",
+    "Recorded message asking you to \"press 9\"",
+    "Automated calls that say \"press 9 to speak to an officer\" connect you to a scammer.",
+    20
+   ],
+   [
+    "authority_mention",
+    "Claims to be from police, CBI, customs or another agency",
+    "Scammers pose as officials to frighten you. Real agencies send written notices and never ask for money or OTPs over the phone or chat.",
+    15
+   ]
+  ]
+ },
+ {
+  "kind": "message",
+  "input": "Dear customer, to activate your eSIM reply with the code you received",
+  "score": 85,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "otp_request",
+   "sim_swap"
+  ],
+  "advice": [
+   "Don't reply, click links or call numbers in the message.",
+   "Never share OTPs, PINs, CVV or passwords. If you already did, call your bank now to block your card or account.",
+   "Never share OTPs, PINs, CVV or passwords. If you already did, call your bank now to block your card or account.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "otp_request",
+    "Asks for your OTP, PIN, CVV or password",
+    "No real bank, app or government office ever asks you to share an OTP, UPI PIN, CVV or password. Anyone asking for it is trying to take your money.",
+    40
+   ],
+   [
+    "sim_swap",
+    "SIM upgrade or eSIM request",
+    "Scammers move your number to their phone (SIM swap or eSIM) and then receive all your bank OTPs. Your operator never asks you to reply or share a code for an upgrade.",
+    35
+   ]
+  ]
+ },
+ {
+  "kind": "message",
+  "input": "Your e-challan of Rs 500 is pending. Pay now: echallan-pay.xyz",
+  "score": 93,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "bad_link",
+   "challan_fastag"
+  ],
+  "advice": [
+   "Don't reply, click links or call numbers in the message.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "bad_link",
+    "Contains a risky link: echallan-pay.xyz",
+    "Uses the name \"e-Challan (Parivahan)\" but isn't their real website · Uses a web ending often linked to scams (.xyz) · Contains bait words: pay, echallan",
+    58
+   ],
+   [
+    "challan_fastag",
+    "Traffic challan or FASTag message with a link",
+    "Check challans only on echallan.parivahan.gov.in or the mParivahan app, and FASTag only in your bank's or NHAI's official app. Links in SMS or chat messages often lead to fake payment pages or APKs.",
+    25
+   ]
+  ]
+ },
+ {
+  "kind": "message",
+  "input": "Your son has been arrested by police, send 50000 urgently to release him",
+  "score": 50,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "family_emergency",
+   "urgency"
+  ],
+  "advice": [
+   "Don't reply, click links or call numbers in the message.",
+   "Hang up and call your relative, or another family member, on the number you already have.",
+   "Call your relative on the number you already have for them before sending anything.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "family_emergency",
+    "Says a relative is arrested, hurt or in trouble",
+    "Scammers can now copy a relative's voice with AI. The panic is the trick.",
+    35
+   ],
+   [
+    "urgency",
+    "Creates panic or a tight deadline",
+    "Scammers rush you so you act before you think. Real organisations give you time and a way to check.",
+    15
+   ]
+  ]
+ },
+ {
+  "kind": "message",
+  "input": "Rent your bank account to us and earn Rs 20000 commission per month",
+  "score": 60,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "money_mule"
+  ],
+  "advice": [
+   "Don't reply, click links or call numbers in the message.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "money_mule",
+    "Offers money to use your bank account or SIM",
+    "This is money-mule recruitment. Letting others use your bank account, UPI or SIM for \"commission\" makes you part of the crime; police freeze such accounts and can arrest the owner.",
+    40
+   ]
+  ]
+ },
+ {
+  "kind": "message",
+  "input": "I sent you a 6 digit code by mistake for my WhatsApp, please share",
+  "score": 90,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "account_takeover_code",
+   "otp_request"
+  ],
+  "advice": [
+   "Don't reply, click links or call numbers in the message.",
+   "Never share OTPs, PINs, CVV or passwords. If you already did, call your bank now to block your card or account.",
+   "If you shared it, open that app, log in again with your number, and turn on two-step verification.",
+   "Never share OTPs, PINs, CVV or passwords. If you already did, call your bank now to block your card or account.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "otp_request",
+    "Asks for your OTP, PIN, CVV or password",
+    "No real bank, app or government office ever asks you to share an OTP, UPI PIN, CVV or password. Anyone asking for it is trying to take your money.",
+    40
+   ],
+   [
+    "account_takeover_code",
+    "Asks for a chat or social-media login code",
+    "Sharing this code lets them take over your account and message your contacts asking for money.",
+    40
+   ]
+  ]
+ },
+ {
+  "kind": "message",
+  "input": "Your gift from London is at the airport. Pay customs clearance fee of Rs 35000",
+  "score": 70,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "advance_fee",
+   "foreign_gift"
+  ],
+  "advice": [
+   "Don't reply, click links or call numbers in the message.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "advance_fee",
+    "Asks you to pay a fee before you get something",
+    "Registration, processing, \"GST\" or release fees to receive a job, loan, prize or parcel are the classic advance-fee scam.",
+    30
+   ],
+   [
+    "foreign_gift",
+    "Gift or parcel \"stuck at customs\" that needs a fee",
+    "Online friends who send gifts \"stuck at customs\" are a romance scam. Real customs duty is paid at the official counter, never into someone's personal account.",
+    30
+   ]
+  ]
+ },
+ {
+  "kind": "message",
+  "input": "Free laptop for students under PM scheme. Click link to register: free-laptop-yojana.site",
+  "score": 60,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "bad_link",
+   "free_offer"
+  ],
+  "advice": [
+   "Don't reply, click links or call numbers in the message.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "free_offer",
+    "\"Free\" laptop, recharge or scheme with a link",
+    "Government schemes and companies don't hand out free items through forwarded links. Check on the official .gov.in website or app.",
+    25
+   ],
+   [
+    "bad_link",
+    "Contains a risky link: free-laptop-yojana.site",
+    "Uses a web ending often linked to scams (.site) · Website name stuffed with hyphens · Contains bait words: free",
+    25
+   ]
+  ]
+ },
+ {
+  "kind": "message",
+  "input": "Your LIC policy bonus of Rs 2,50,000 is ready. Pay GST of Rs 4,500 to release",
+  "score": 65,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "advance_fee",
+   "insurance_bonus"
+  ],
+  "advice": [
+   "Don't reply, click links or call numbers in the message.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "advance_fee",
+    "Asks you to pay a fee before you get something",
+    "Registration, processing, \"GST\" or release fees to receive a job, loan, prize or parcel are the classic advance-fee scam.",
+    30
+   ],
+   [
+    "insurance_bonus",
+    "Insurance bonus or maturity that needs a fee",
+    "Insurers never ask you to pay a fee or tax to release a bonus, maturity or claim amount.",
+    25
+   ]
+  ]
+ },
+ {
+  "kind": "message",
+  "input": "Refund ready, pay Rs 10 to sbi.refund.helpdesk@ybl to verify",
+  "score": 91,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "bad_link",
+   "bad_upi"
+  ],
+  "advice": [
+   "Don't reply, click links or call numbers in the message.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "bad_link",
+    "Contains a risky link: sbi.refund.help",
+    "Uses the name \"State Bank of India\" but isn't their real website · Uses a web ending often linked to scams (.help) · Contains bait words: refund",
+    53
+   ],
+   [
+    "bad_upi",
+    "Contains a risky UPI ID: sbi.refund.helpdesk@ybl",
+    "UPI ID pretends to be official (\"sbi\")",
+    28
+   ]
+  ]
+ },
+ {
+  "kind": "message",
+  "input": "123456 is your OTP for login. Do not share it with anyone. -SBI",
+  "score": 0,
+  "level": "safe",
+  "label": "No strong warning signs",
+  "ids": [],
+  "advice": [
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message."
+  ],
+  "reasons": []
+ },
+ {
+  "kind": "message",
+  "input": "Rs 500.00 credited to a/c XX1234 on 13-10-26 by UPI ref 628612345678. -HDFC Bank",
+  "score": 0,
+  "level": "safe",
+  "label": "No strong warning signs",
+  "ids": [],
+  "advice": [
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message."
+  ],
+  "reasons": []
+ },
+ {
+  "kind": "message",
+  "input": "Hey, dinner at 8? I will pay you back the 300 tomorrow",
+  "score": 0,
+  "level": "safe",
+  "label": "No strong warning signs",
+  "ids": [],
+  "advice": [
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message."
+  ],
+  "reasons": []
+ },
+ {
+  "kind": "message",
+  "input": "Please return the book to the library by Friday",
+  "score": 0,
+  "level": "safe",
+  "label": "No strong warning signs",
+  "ids": [],
+  "advice": [
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message."
+  ],
+  "reasons": []
+ },
+ {
+  "kind": "message",
+  "input": "Send it to priya.sharma@okhdfcbank, thanks",
+  "score": 0,
+  "level": "safe",
+  "label": "No strong warning signs",
+  "ids": [],
+  "advice": [
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message."
+  ],
+  "reasons": []
+ },
+ {
+  "kind": "message",
+  "input": "Mail me at priya@gmail.com",
+  "score": 0,
+  "level": "safe",
+  "label": "No strong warning signs",
+  "ids": [],
+  "advice": [
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message."
+  ],
+  "reasons": []
+ },
+ {
+  "kind": "auto",
+  "input": "sbi.kyc.update@ybl",
+  "score": 35,
+  "level": "warning",
+  "label": "Suspicious",
+  "ids": [
+   "upi_check_name",
+   "upi_fake_official"
+  ],
+  "advice": [
+   "Don't pay or approve this request. If someone said you'd receive money this way, it's a scam.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "upi_fake_official",
+    "UPI ID pretends to be official (\"sbi\")",
+    "Banks, police and government offices don't collect money through UPI IDs like this. Anyone can create a UPI ID with any name in it.",
+    35
+   ],
+   [
+    "upi_check_name",
+    "Check the name before you pay",
+    "Your UPI app shows the registered name of the person or shop after you enter the ID or scan the code. If it isn't who you expected, stop.",
+    0
+   ]
+  ]
+ },
+ {
+  "kind": "auto",
+  "input": "9876543210@ybl",
+  "score": 0,
+  "level": "safe",
+  "label": "No strong warning signs",
+  "ids": [
+   "upi_check_name"
+  ],
+  "advice": [
+   "Before paying, check the name your UPI app shows for this ID. Remember: you never pay or enter a PIN to receive money.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message."
+  ],
+  "reasons": [
+   [
+    "upi_check_name",
+    "Check the name before you pay",
+    "Your UPI app shows the registered name of the person or shop after you enter the ID or scan the code. If it isn't who you expected, stop.",
+    0
+   ]
+  ]
+ },
+ {
+  "kind": "auto",
+  "input": "upi://pay?pa=shop.ramesh@okaxis&pn=Ramesh%20Stores&am=250",
+  "score": 0,
+  "level": "safe",
+  "label": "No strong warning signs",
+  "ids": [
+   "upi_check_name"
+  ],
+  "advice": [
+   "Before paying, check the name your UPI app shows for this ID. Remember: you never pay or enter a PIN to receive money.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message."
+  ],
+  "reasons": [
+   [
+    "upi_check_name",
+    "Check the name before you pay",
+    "Your UPI app shows the registered name of the person or shop after you enter the ID or scan the code. If it isn't who you expected, stop.",
+    0
+   ]
+  ]
+ },
+ {
+  "kind": "auto",
+  "input": "upi://pay?pa=9876543210@ybl&pn=SBI%20Customer%20Care&am=4999&tn=receive%20refund",
+  "score": 85,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "upi_check_name",
+   "upi_payee_claims_official",
+   "upi_receive_note"
+  ],
+  "advice": [
+   "Don't pay or approve this request. If someone said you'd receive money this way, it's a scam.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "upi_receive_note",
+    "Payment note says \"receive refund\"",
+    "Paying or scanning this sends money FROM your account. You never pay, scan a QR code or enter a PIN to receive money, a refund or a prize.",
+    45
+   ],
+   [
+    "upi_payee_claims_official",
+    "Payee name claims to be official (\"SBI Customer Care\")",
+    "The name in a payment link is typed by whoever made it. It proves nothing.",
+    30
+   ],
+   [
+    "upi_check_name",
+    "Check the name before you pay",
+    "Your UPI app shows the registered name of the person or shop after you enter the ID or scan the code. If it isn't who you expected, stop.",
+    0
+   ]
+  ]
+ },
+ {
+  "kind": "payment",
+  "input": {
+   "text": "Payment Successful\n₹5,000\nPaid to Ramesh Stores\nramesh@okaxis\n13 Oct 2026, 10:32 am\nUPI transaction ID: 628612345678\nGoogle Pay",
+   "now": 1791892800000,
+   "myUpi": "ramesh@okaxis",
+   "expectedAmount": "5000"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No red flags found. Confirm in your bank app",
+  "ids": [
+   "pay_screenshot_not_proof"
+  ],
+  "advice": [
+   "Open your own bank or UPI app and look for this payment before you hand anything over. A screenshot or SMS isn't enough.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message."
+  ],
+  "reasons": [
+   [
+    "pay_screenshot_not_proof",
+    "A screenshot is never proof of payment",
+    "Anyone can edit a screenshot or use a fake payment app. The only proof is the money in your own bank or UPI app: check the balance or find this reference number in your transaction history.",
+    0
+   ]
+  ]
+ },
+ {
+  "kind": "payment",
+  "input": {
+   "text": "Payment Pending ₹5,000 UPI Ref No 628612345678 13 Oct 2026",
+   "now": 1791892800000
+  },
+  "score": 35,
+  "level": "warning",
+  "label": "Suspicious",
+  "ids": [
+   "pay_not_complete",
+   "pay_screenshot_not_proof"
+  ],
+  "advice": [
+   "Don't hand over goods, services or any \"refund\" until the money shows in your own bank or UPI app.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "pay_not_complete",
+    "The screenshot itself says the payment isn't complete (pending)",
+    "Only a completed payment moves money. A pending or failed screen shared as \"proof\" is a common trick.",
+    35
+   ],
+   [
+    "pay_screenshot_not_proof",
+    "A screenshot is never proof of payment",
+    "Anyone can edit a screenshot or use a fake payment app. The only proof is the money in your own bank or UPI app: check the balance or find this reference number in your transaction history.",
+    0
+   ]
+  ]
+ },
+ {
+  "kind": "payment",
+  "input": {
+   "text": "Payment Successful ₹5,000 31 Feb 2026 UPI Ref No: 605912345678",
+   "now": 1791892800000
+  },
+  "score": 45,
+  "level": "warning",
+  "label": "Suspicious",
+  "ids": [
+   "pay_bad_date",
+   "pay_screenshot_not_proof"
+  ],
+  "advice": [
+   "Don't hand over goods, services or any \"refund\" until the money shows in your own bank or UPI app.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "pay_bad_date",
+    "The date on the screenshot doesn't exist",
+    "31/2/2026 isn't a real calendar date, so the screenshot was edited.",
+    45
+   ],
+   [
+    "pay_screenshot_not_proof",
+    "A screenshot is never proof of payment",
+    "Anyone can edit a screenshot or use a fake payment app. The only proof is the money in your own bank or UPI app: check the balance or find this reference number in your transaction history.",
+    0
+   ]
+  ]
+ },
+ {
+  "kind": "payment",
+  "input": {
+   "text": "Payment Successful ₹5,000 20 Dec 2026 UPI Ref No: 635412345678",
+   "now": 1791892800000
+  },
+  "score": 45,
+  "level": "warning",
+  "label": "Suspicious",
+  "ids": [
+   "pay_future_date",
+   "pay_screenshot_not_proof"
+  ],
+  "advice": [
+   "Don't hand over goods, services or any \"refund\" until the money shows in your own bank or UPI app.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "pay_future_date",
+    "The payment date is in the future (2026-12-20)",
+    "A real payment can't be dated in the future. The screenshot was edited.",
+    45
+   ],
+   [
+    "pay_screenshot_not_proof",
+    "A screenshot is never proof of payment",
+    "Anyone can edit a screenshot or use a fake payment app. The only proof is the money in your own bank or UPI app: check the balance or find this reference number in your transaction history.",
+    0
+   ]
+  ]
+ },
+ {
+  "kind": "payment",
+  "input": {
+   "text": "Payment Successful\n₹5,000\nPaid to Ramesh Stores\nramesh@okaxis\n13 Oct 2026, 10:32 am\nUPI transaction ID: 628612345678\nGoogle Pay",
+   "now": 1791892800000,
+   "myUpi": "me@oksbi",
+   "expectedAmount": "50000"
+  },
+  "score": 75,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "pay_amount_mismatch",
+   "pay_screenshot_not_proof",
+   "pay_wrong_payee"
+  ],
+  "advice": [
+   "Don't hand over goods, services or any \"refund\" until the money shows in your own bank or UPI app.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "pay_wrong_payee",
+    "Your UPI ID isn't on the screenshot",
+    "It shows ramesh@okaxis, not your UPI ID me@oksbi. The money may have gone to someone else, or the screenshot is from another payment.",
+    35
+   ],
+   [
+    "pay_amount_mismatch",
+    "Amount is ₹5,000, not the ₹50,000 you expected",
+    "Check the exact amount in your own bank app.",
+    30
+   ],
+   [
+    "pay_screenshot_not_proof",
+    "A screenshot is never proof of payment",
+    "Anyone can edit a screenshot or use a fake payment app. The only proof is the money in your own bank or UPI app: check the balance or find this reference number in your transaction history.",
+    0
+   ]
+  ]
+ },
+ {
+  "kind": "payment",
+  "input": {
+   "text": "Payment Successful\n₹5,000\nPaid to Ramesh Stores\nramesh@okaxis\n13 Oct 2026, 10:32 am\nUPI transaction ID: 628612345678\nGoogle Pay\nFake payment prank app",
+   "now": 1791892800000
+  },
+  "score": 60,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "pay_prank_app",
+   "pay_screenshot_not_proof"
+  ],
+  "advice": [
+   "Don't hand over goods, services or any \"refund\" until the money shows in your own bank or UPI app.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "pay_prank_app",
+    "Made with a fake \"prank\" payment app",
+    "The screenshot contains words used by apps that create fake payment receipts. No money was sent.",
+    60
+   ],
+   [
+    "pay_screenshot_not_proof",
+    "A screenshot is never proof of payment",
+    "Anyone can edit a screenshot or use a fake payment app. The only proof is the money in your own bank or UPI app: check the balance or find this reference number in your transaction history.",
+    0
+   ]
+  ]
+ },
+ {
+  "kind": "payment",
+  "input": {
+   "text": "Payment Successful\n₹5,000\nPaid to Ramesh Stores\nramesh@okaxis\n13 Oct 2026, 10:32 am\nUPI transaction ID: 628612345678\nGoogle Pay",
+   "now": 1791892800000,
+   "imageEditor": "PicsArt"
+  },
+  "score": 35,
+  "level": "warning",
+  "label": "Suspicious",
+  "ids": [
+   "pay_edited_image",
+   "pay_screenshot_not_proof"
+  ],
+  "advice": [
+   "Don't hand over goods, services or any \"refund\" until the money shows in your own bank or UPI app.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "pay_edited_image",
+    "The image file shows it was saved by a photo-editing app",
+    "Genuine payment screenshots come straight from the phone. This one passed through a photo editor.",
+    35
+   ],
+   [
+    "pay_screenshot_not_proof",
+    "A screenshot is never proof of payment",
+    "Anyone can edit a screenshot or use a fake payment app. The only proof is the money in your own bank or UPI app: check the balance or find this reference number in your transaction history.",
+    0
+   ]
+  ]
+ },
+ {
+  "kind": "payment",
+  "input": {
+   "text": "PhonePe Transaction Successful ₹ 2,000 13 Oct 2026 UTR: 62861234567",
+   "now": 1791892800000
+  },
+  "score": 30,
+  "level": "warning",
+  "label": "Suspicious",
+  "ids": [
+   "pay_bad_ref",
+   "pay_screenshot_not_proof"
+  ],
+  "advice": [
+   "Don't hand over goods, services or any \"refund\" until the money shows in your own bank or UPI app.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "pay_bad_ref",
+    "UPI reference has 11 digits instead of 12",
+    "Real UPI reference numbers are exactly 12 digits. A wrong length usually means the screenshot was edited.",
+    30
+   ],
+   [
+    "pay_screenshot_not_proof",
+    "A screenshot is never proof of payment",
+    "Anyone can edit a screenshot or use a fake payment app. The only proof is the money in your own bank or UPI app: check the balance or find this reference number in your transaction history.",
+    0
+   ]
+  ]
+ },
+ {
+  "kind": "payment",
+  "input": {
+   "text": "Paid ₹ 900 on 2 Sep 2026 UPI transaction ID 624512345678",
+   "now": 1791892800000
+  },
+  "score": 20,
+  "level": "warning",
+  "label": "Suspicious",
+  "ids": [
+   "pay_old_date",
+   "pay_screenshot_not_proof"
+  ],
+  "advice": [
+   "Don't hand over goods, services or any \"refund\" until the money shows in your own bank or UPI app.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "pay_old_date",
+    "This payment is from 2026-09-02, not today",
+    "Scammers reuse old screenshots of someone else's payment.",
+    20
+   ],
+   [
+    "pay_screenshot_not_proof",
+    "A screenshot is never proof of payment",
+    "Anyone can edit a screenshot or use a fake payment app. The only proof is the money in your own bank or UPI app: check the balance or find this reference number in your transaction history.",
+    0
+   ]
+  ]
+ },
+ {
+  "kind": "payment",
+  "input": {
+   "text": "Payment Successful Rs 50,00 13 Oct 2026 UPI Ref No 628612345678",
+   "now": 1791892800000
+  },
+  "score": 20,
+  "level": "warning",
+  "label": "Suspicious",
+  "ids": [
+   "pay_amount_format",
+   "pay_screenshot_not_proof"
+  ],
+  "advice": [
+   "Don't hand over goods, services or any \"refund\" until the money shows in your own bank or UPI app.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "pay_amount_format",
+    "Amount is written oddly (50,00)",
+    "Commas or decimals in the wrong place are a sign the amount was typed over.",
+    20
+   ],
+   [
+    "pay_screenshot_not_proof",
+    "A screenshot is never proof of payment",
+    "Anyone can edit a screenshot or use a fake payment app. The only proof is the money in your own bank or UPI app: check the balance or find this reference number in your transaction history.",
+    0
+   ]
+  ]
+ },
+ {
+  "kind": "auto",
+  "input": "upi://pay?pa=abc.refund%40ybl&pn=Help%20Desk&tn=claim%20cashback&am=1234567.5",
+  "score": 85,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "upi_bait_name",
+   "upi_check_name",
+   "upi_receive_note"
+  ],
+  "advice": [
+   "Don't pay or approve this request. If someone said you'd receive money this way, it's a scam.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "upi_receive_note",
+    "Payment note says \"claim cashback\"",
+    "Paying or scanning this sends money FROM your account. You never pay, scan a QR code or enter a PIN to receive money, a refund or a prize.",
+    45
+   ],
+   [
+    "upi_bait_name",
+    "UPI ID uses bait words (\"refund\")",
+    "Words like refund, reward, KYC or helpdesk in a UPI ID are typical of scam collection accounts.",
+    30
+   ],
+   [
+    "upi_check_name",
+    "Check the name before you pay",
+    "Your UPI app shows the registered name of the person or shop after you enter the ID or scan the code. If it isn't who you expected, stop.",
+    0
+   ]
+  ]
+ },
+ {
+  "kind": "auto",
+  "input": "upi://pay?pa=x.prize@ybl&tn=%E0%A4&am=250%0A",
+  "score": 30,
+  "level": "warning",
+  "label": "Suspicious",
+  "ids": [
+   "upi_bait_name",
+   "upi_check_name"
+  ],
+  "advice": [
+   "Don't pay or approve this request. If someone said you'd receive money this way, it's a scam.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "upi_bait_name",
+    "UPI ID uses bait words (\"prize\")",
+    "Words like refund, reward, KYC or helpdesk in a UPI ID are typical of scam collection accounts.",
+    30
+   ],
+   [
+    "upi_check_name",
+    "Check the name before you pay",
+    "Your UPI app shows the registered name of the person or shop after you enter the ID or scan the code. If it isn't who you expected, stop.",
+    0
+   ]
+  ]
+ },
+ {
+  "kind": "auto",
+  "input": "UPI://PAY?PA=Gov.Fine@SBI&PN=Police%2BDept&am=99.99",
+  "score": 35,
+  "level": "warning",
+  "label": "Suspicious",
+  "ids": [
+   "upi_check_name",
+   "upi_fake_official"
+  ],
+  "advice": [
+   "Don't pay or approve this request. If someone said you'd receive money this way, it's a scam.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "upi_fake_official",
+    "UPI ID pretends to be official (\"gov\")",
+    "Banks, police and government offices don't collect money through UPI IDs like this. Anyone can create a UPI ID with any name in it.",
+    35
+   ],
+   [
+    "upi_check_name",
+    "Check the name before you pay",
+    "Your UPI app shows the registered name of the person or shop after you enter the ID or scan the code. If it isn't who you expected, stop.",
+    0
+   ]
+  ]
+ },
+ {
+  "kind": "auto",
+  "input": "upi:pay?pa=919876543210@paytm&pn=RBI%20Refund",
+  "score": 30,
+  "level": "warning",
+  "label": "Suspicious",
+  "ids": [
+   "upi_check_name",
+   "upi_payee_claims_official"
+  ],
+  "advice": [
+   "Don't pay or approve this request. If someone said you'd receive money this way, it's a scam.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "upi_payee_claims_official",
+    "Payee name claims to be official (\"RBI Refund\")",
+    "The name in a payment link is typed by whoever made it. It proves nothing.",
+    30
+   ],
+   [
+    "upi_check_name",
+    "Check the name before you pay",
+    "Your UPI app shows the registered name of the person or shop after you enter the ID or scan the code. If it isn't who you expected, stop.",
+    0
+   ]
+  ]
+ },
+ {
+  "kind": "auto",
+  "input": "someone@constructor",
+  "score": 5,
+  "level": "safe",
+  "label": "No strong warning signs",
+  "ids": [
+   "upi_check_name",
+   "upi_unknown_handle"
+  ],
+  "advice": [
+   "Before paying, check the name your UPI app shows for this ID. Remember: you never pay or enter a PIN to receive money.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message."
+  ],
+  "reasons": [
+   [
+    "upi_unknown_handle",
+    "Unfamiliar UPI app (@constructor)",
+    "We don't recognise the bank or app behind @constructor. It may still be genuine; check the name your UPI app shows before paying.",
+    5
+   ],
+   [
+    "upi_check_name",
+    "Check the name before you pay",
+    "Your UPI app shows the registered name of the person or shop after you enter the ID or scan the code. If it isn't who you expected, stop.",
+    0
+   ]
+  ]
+ },
+ {
+  "kind": "auto",
+  "input": "  09876543210@ybl ",
+  "score": 0,
+  "level": "safe",
+  "label": "No strong warning signs",
+  "ids": [
+   "upi_check_name"
+  ],
+  "advice": [
+   "Before paying, check the name your UPI app shows for this ID. Remember: you never pay or enter a PIN to receive money.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message."
+  ],
+  "reasons": [
+   [
+    "upi_check_name",
+    "Check the name before you pay",
+    "Your UPI app shows the registered name of the person or shop after you enter the ID or scan the code. If it isn't who you expected, stop.",
+    0
+   ]
+  ]
+ },
+ {
+  "kind": "auto",
+  "input": "upi://pay?pn=NoPayee",
+  "score": 0,
+  "level": "safe",
+  "label": "No strong warning signs",
+  "ids": [
+   "unparseable"
+  ],
+  "advice": [
+   "Before paying, check the name your UPI app shows for this ID. Remember: you never pay or enter a PIN to receive money.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message."
+  ],
+  "reasons": [
+   [
+    "unparseable",
+    "This doesn't look like a valid UPI ID",
+    "A UPI ID looks like name@bank, for example 9876543210@ybl.",
+    0
+   ]
+  ]
+ },
+ {
+  "kind": "message",
+  "input": "Pay Rs 500 processing fee to release your parcel, it is held at customs",
+  "score": 85,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "advance_fee",
+   "parcel"
+  ],
+  "advice": [
+   "Don't reply, click links or call numbers in the message.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "advance_fee",
+    "Asks you to pay a fee before you get something",
+    "Registration, processing, \"GST\" or release fees to receive a job, loan, prize or parcel are the classic advance-fee scam.",
+    50
+   ],
+   [
+    "parcel",
+    "Fake parcel, courier or customs message",
+    "Messages about a held parcel, failed delivery or customs duty with a link or a number to call are common phishing. Check tracking only on the courier's official site.",
+    25
+   ]
+  ]
+ },
+ {
+  "kind": "message",
+  "input": "Please send money to kyc.verify.help@paytm or upi://pay?pa=reward.claim@ibl&tn=receive%20prize now",
+  "score": 90,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "bad_link",
+   "bad_upi"
+  ],
+  "advice": [
+   "Don't reply, click links or call numbers in the message.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "bad_upi",
+    "Contains a risky UPI ID: reward.claim@ibl",
+    "Payment note says \"receive prize\" · UPI ID uses bait words (\"reward\")",
+    68
+   ],
+   [
+    "bad_link",
+    "Contains a risky link: kyc.verify.help",
+    "Uses a web ending often linked to scams (.help) · Contains bait words: verify, kyc",
+    22
+   ]
+  ]
+ },
+ {
+  "kind": "message",
+  "input": "आपका ₹५०० refund pending है, OTP बताओ",
+  "score": 25,
+  "level": "warning",
+  "label": "Suspicious",
+  "ids": [
+   "refund_tax"
+  ],
+  "advice": [
+   "Don't reply, click links or call numbers in the message.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "refund_tax",
+    "Unexpected refund, tax rebate or subsidy",
+    "Tax refunds are paid straight into your registered bank account. You never have to click a link or share card details to get them.",
+    25
+   ]
+  ]
+ },
+ {
+  "kind": "message",
+  "input": "My new number, transfer to papa.ji@okicici and also pay@sbi",
+  "score": 25,
+  "level": "warning",
+  "label": "Suspicious",
+  "ids": [
+   "impersonation_family"
+  ],
+  "advice": [
+   "Don't reply, click links or call numbers in the message.",
+   "Call your relative on the number you already have for them before sending anything.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "impersonation_family",
+    "Unknown number claims to be a friend or family member",
+    "\"Hi Mum, this is my new number\" or a relative \"in trouble\" asking for money is a known trick. Call the person on their old number before you pay.",
+    25
+   ]
+  ]
+ },
+ {
+  "kind": "payment",
+  "input": {
+   "text": "Payment Successful Rs 2,50,000 13 Oct 2026 UPI Ref No 612312345678 to shop@okaxis",
+   "now": 1791892800000,
+   "expectedAmount": 1234.5678,
+   "myUpi": "Shop@OKAXIS "
+  },
+  "score": 45,
+  "level": "warning",
+  "label": "Suspicious",
+  "ids": [
+   "pay_amount_mismatch",
+   "pay_ref_date_mismatch",
+   "pay_screenshot_not_proof"
+  ],
+  "advice": [
+   "Don't hand over goods, services or any \"refund\" until the money shows in your own bank or UPI app.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "pay_amount_mismatch",
+    "Amount is ₹2,50,000, not the ₹1,234.568 you expected",
+    "Check the exact amount in your own bank app.",
+    30
+   ],
+   [
+    "pay_ref_date_mismatch",
+    "Reference number doesn't match the date shown",
+    "UPI reference numbers usually begin with the last digit of the year and the day of the year (for 2026-10-13 that would be 6286…). This one doesn't, which often happens when a screenshot is edited. Some banks number differently, so confirm in your bank app.",
+    15
+   ],
+   [
+    "pay_screenshot_not_proof",
+    "A screenshot is never proof of payment",
+    "Anyone can edit a screenshot or use a fake payment app. The only proof is the money in your own bank or UPI app: check the balance or find this reference number in your transaction history.",
+    0
+   ]
+  ]
+ },
+ {
+  "kind": "payment",
+  "input": {
+   "text": "Paid ₹ 1,23,456.5 on 12/10/2026 UTR 628512345678 PhonePe",
+   "now": 1791892800000,
+   "expectedAmount": "0x10"
+  },
+  "score": 30,
+  "level": "warning",
+  "label": "Suspicious",
+  "ids": [
+   "pay_amount_mismatch",
+   "pay_screenshot_not_proof"
+  ],
+  "advice": [
+   "Don't hand over goods, services or any \"refund\" until the money shows in your own bank or UPI app.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "pay_amount_mismatch",
+    "Amount is ₹1,23,456.5, not the ₹16 you expected",
+    "Check the exact amount in your own bank app.",
+    30
+   ],
+   [
+    "pay_screenshot_not_proof",
+    "A screenshot is never proof of payment",
+    "Anyone can edit a screenshot or use a fake payment app. The only proof is the money in your own bank or UPI app: check the balance or find this reference number in your transaction history.",
+    0
+   ]
+  ]
+ },
+ {
+  "kind": "payment",
+  "input": {
+   "text": "Paid ₹ 999 on 2026-10-12 txn id ABCD12345678 upi transaction id 628512345678 Paytm",
+   "now": 1791892800000,
+   "expectedAmount": " "
+  },
+  "score": 30,
+  "level": "warning",
+  "label": "Suspicious",
+  "ids": [
+   "pay_amount_mismatch",
+   "pay_screenshot_not_proof"
+  ],
+  "advice": [
+   "Don't hand over goods, services or any \"refund\" until the money shows in your own bank or UPI app.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "pay_amount_mismatch",
+    "Amount is ₹999, not the ₹0 you expected",
+    "Check the exact amount in your own bank app.",
+    30
+   ],
+   [
+    "pay_screenshot_not_proof",
+    "A screenshot is never proof of payment",
+    "Anyone can edit a screenshot or use a fake payment app. The only proof is the money in your own bank or UPI app: check the balance or find this reference number in your transaction history.",
+    0
+   ]
+  ]
+ },
+ {
+  "kind": "payment",
+  "input": {
+   "text": "Transaction successful INR 15,00 at 10:32 PM, 12th October, 2026 reference number 1234 5678 9012",
+   "now": 1791892800000,
+   "expectedAmount": "-0.0004",
+   "imageEditor": "  Adobe Photoshop Express Editor App v2  "
+  },
+  "score": 100,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "pay_amount_format",
+   "pay_amount_mismatch",
+   "pay_edited_image",
+   "pay_ref_date_mismatch",
+   "pay_screenshot_not_proof"
+  ],
+  "advice": [
+   "Don't hand over goods, services or any \"refund\" until the money shows in your own bank or UPI app.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "pay_edited_image",
+    "The image file shows it was saved by a photo-editing app",
+    "Genuine payment screenshots come straight from the phone. This one passed through a photo editor.",
+    35
+   ],
+   [
+    "pay_amount_mismatch",
+    "Amount is ₹15,00, not the ₹-0 you expected",
+    "Check the exact amount in your own bank app.",
+    30
+   ],
+   [
+    "pay_amount_format",
+    "Amount is written oddly (15,00)",
+    "Commas or decimals in the wrong place are a sign the amount was typed over.",
+    20
+   ],
+   [
+    "pay_ref_date_mismatch",
+    "Reference number doesn't match the date shown",
+    "UPI reference numbers usually begin with the last digit of the year and the day of the year (for 2026-10-12 that would be 6285…). This one doesn't, which often happens when a screenshot is edited. Some banks number differently, so confirm in your bank app.",
+    15
+   ],
+   [
+    "pay_screenshot_not_proof",
+    "A screenshot is never proof of payment",
+    "Anyone can edit a screenshot or use a fake payment app. The only proof is the money in your own bank or UPI app: check the balance or find this reference number in your transaction history.",
+    0
+   ]
+  ]
+ },
+ {
+  "kind": "payment",
+  "input": {
+   "text": "Payment failed. Amount ₹500 will be credited back. Order ID: 9X8Y7Z6W5V Google Pay 31/04/2026",
+   "now": 1791892800000,
+   "expectedAmount": "abc",
+   "myUpi": "not-a-vpa"
+  },
+  "score": 100,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "pay_bad_date",
+   "pay_no_ref",
+   "pay_not_complete",
+   "pay_screenshot_not_proof"
+  ],
+  "advice": [
+   "Don't hand over goods, services or any \"refund\" until the money shows in your own bank or UPI app.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "pay_bad_date",
+    "The date on the screenshot doesn't exist",
+    "31/4/2026 isn't a real calendar date, so the screenshot was edited.",
+    45
+   ],
+   [
+    "pay_not_complete",
+    "The screenshot itself says the payment isn't complete (failed)",
+    "Only a completed payment moves money. A pending or failed screen shared as \"proof\" is a common trick.",
+    35
+   ],
+   [
+    "pay_no_ref",
+    "No UPI reference (UTR) number",
+    "Every real UPI payment has a 12-digit reference number. Without it, the payment can't be traced.",
+    20
+   ],
+   [
+    "pay_screenshot_not_proof",
+    "A screenshot is never proof of payment",
+    "Anyone can edit a screenshot or use a fake payment app. The only proof is the money in your own bank or UPI app: check the balance or find this reference number in your transaction history.",
+    0
+   ]
+  ]
+ },
+ {
+  "kind": "payment",
+  "input": {
+   "text": "Rs. 1,0,00 sent to friend@ybl. Sent by mistake please return the amount. Oct 12, 2026",
+   "now": 1791892800000,
+   "expectedAmount": "1e3"
+  },
+  "score": 75,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "pay_amount_format",
+   "pay_no_ref",
+   "pay_screenshot_not_proof",
+   "wrong_transfer"
+  ],
+  "advice": [
+   "Don't hand over goods, services or any \"refund\" until the money shows in your own bank or UPI app.",
+   "Check your balance in your own bank or UPI app, not the SMS or screenshot. If money really came by mistake, ask them to raise it with their bank; banks reverse wrong transfers.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "wrong_transfer",
+    "Says money was sent to you \"by mistake\" and asks for it back",
+    "A common trick: they send a fake \"credited\" SMS or screenshot (or a small real amount) and then ask you to \"return\" a bigger amount.",
+    35
+   ],
+   [
+    "pay_no_ref",
+    "No UPI reference (UTR) number",
+    "Every real UPI payment has a 12-digit reference number. Without it, the payment can't be traced.",
+    20
+   ],
+   [
+    "pay_amount_format",
+    "Amount is written oddly (1,0,00)",
+    "Commas or decimals in the wrong place are a sign the amount was typed over.",
+    20
+   ],
+   [
+    "pay_screenshot_not_proof",
+    "A screenshot is never proof of payment",
+    "Anyone can edit a screenshot or use a fake payment app. The only proof is the money in your own bank or UPI app: check the balance or find this reference number in your transaction history.",
+    0
+   ]
+  ]
+ },
+ {
+  "kind": "payment",
+  "input": {
+   "text": "",
+   "now": 1791892800000
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No red flags found. Confirm in your bank app",
+  "ids": [
+   "pay_screenshot_not_proof"
+  ],
+  "advice": [
+   "Open your own bank or UPI app and look for this payment before you hand anything over. A screenshot or SMS isn't enough.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message."
+  ],
+  "reasons": [
+   [
+    "pay_screenshot_not_proof",
+    "A screenshot is never proof of payment",
+    "Anyone can edit a screenshot or use a fake payment app. The only proof is the money in your own bank or UPI app: check the balance or find this reference number in your transaction history.",
+    0
+   ]
+  ]
+ }
+]
