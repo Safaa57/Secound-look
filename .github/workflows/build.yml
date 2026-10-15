@@ -55,14 +55,14 @@ jobs:
           name: SecondLook-TEST-APK
           path: app/build/app/outputs/flutter-apk/app-debug.apk
  
-  # Starts the test app on an Android emulator and records what happens, so start-up crashes can be read here.
+  # Starts the normal (release) app on an Android emulator and records what happens, so start-up crashes can be read here.
   android-test:
     needs: android
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: SecondLook-TEST-APK
+          name: SecondLook-APK
           path: apk
       - name: Enable hardware acceleration for the emulator
         run: |
@@ -77,7 +77,7 @@ jobs:
           target: google_apis
           disable-animations: true
           script: |
-            adb install -r apk/app-debug.apk
+            adb install -r apk/app-release.apk
             adb logcat -c
             adb shell monkey -p com.secondlook.second_look -c android.intent.category.LAUNCHER 1
             sleep 40
