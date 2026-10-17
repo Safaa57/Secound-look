@@ -4,12 +4,13 @@ import java.nio.file.*;
 import java.util.*;
 
 public class EngineTest {
-    /** Compares score, level key and label, sorted reason ids, advice and every reason (id, title, detail, weight). */
+    /** Compares score, level key and label, sorted reason ids, advice and every reason (id, title, detail, weight); for documents also info and input. */
     @SuppressWarnings("unchecked")
     static String checkFull(Engine e, Map<String, Object> c) {
         String kind = (String) c.get("kind");
         Map<String, Object> r;
         if (kind.equals("payment")) r = e.analyzePayment(new LinkedHashMap<>(Json.obj(c.get("input"))));
+        else if (kind.equals("document")) r = e.analyzeDocument(new LinkedHashMap<>(Json.obj(c.get("input"))));
         else if (kind.equals("auto")) r = e.analyzeAuto((String) c.get("input"));
         else r = e.analyzeMessage((String) c.get("input"));
         Map<String, Object> lv = Json.obj(r.get("level"));
@@ -31,6 +32,13 @@ public class EngineTest {
         if (!ids.equals(Json.arr(c.get("ids")))) return "ids java " + ids + " js " + c.get("ids");
         if (!r.get("advice").equals(c.get("advice"))) return "advice java " + r.get("advice") + "\n  js " + c.get("advice");
         if (!reasons.equals(want)) return "reasons java " + reasons + "\n  js " + want;
+        if (kind.equals("document")) {  // info fields and the echoed input, compared as JSON text
+            Map<String, Object> info = Json.obj(r.get("info")), picked = new LinkedHashMap<>();
+            for (String k : new String[]{"docType", "ids", "statement", "file", "passport", "qr"}) if (info.containsKey(k)) picked.put(k, info.get(k));
+            String got = Json.stringify(picked), exp = Json.stringify(c.get("info"));
+            if (!got.equals(exp)) return "info java " + got + "\n  js " + exp;
+            if (!Json.stringify(r.get("input")).equals(Json.stringify(c.get("echo")))) return "input java " + Json.stringify(r.get("input")) + "\n  js " + Json.stringify(c.get("echo"));
+        }
         return null;
     }
 
@@ -55,6 +63,13 @@ public class EngineTest {
         for (Object o : Json.arr(Json.parse(Files.readString(Path.of("test/expected.json"))))) {
             Map<String, Object> c = Json.obj(o);
             String kind = (String) c.get("kind");
+            if (kind.equals("helper")) {  // verhoeffOk / gstinOk
+                n++;
+                String arg = (String) c.get("input");
+                boolean got = c.get("method").equals("verhoeffOk") ? Engine.verhoeffOk(arg) : Engine.gstinOk(arg);
+                if (got != (Boolean) c.get("result")) { fail++; System.out.println("FAIL " + c.get("method") + " " + Json.stringify(arg) + " java " + got); }
+                continue;
+            }
             if (c.containsKey("advice")) {  // UPI / payment / rules-1.1 cases: full comparison
                 n++;
                 String why = checkFull(e, c);
@@ -82,6 +97,10 @@ public class EngineTest {
         // payment defaults: no "now" means the current time
         Map<String, Object> pr = e.analyzePayment(Json.map("text", "Payment Successful Rs 500 UPI Ref No 628612345678"));
         if (!"payment".equals(pr.get("kind"))) { fail++; System.out.println("FAIL analyzePayment without now"); }
+        // documents: no "now", null and nested values
+        Map<String, Object> dr = e.analyzeDocument(Json.map("text", "Opening balance 1.00", "docType", null, "file", null, "aadhaarQr", null));
+        if (!"document".equals(dr.get("kind")) || !"statement".equals(Json.obj(dr.get("info")).get("docType"))) { fail++; System.out.println("FAIL analyzeDocument defaults"); }
+        Json.parse(Json.stringify(e.analyzeDocument(null)));
         // round-trip JSON
         String js = Json.stringify(e.analyzeSms("+919812345678", "Your SBI account will be blocked. Update KYC: http://sbi-kyc.top"));
         Json.parse(js);

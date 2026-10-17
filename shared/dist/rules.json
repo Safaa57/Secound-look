@@ -1,5 +1,5 @@
 {
- "version": "1.1.0",
+ "version": "1.2.0",
  "brands": {
   "sbi": {
    "name": "State Bank of India",
@@ -1213,6 +1213,52 @@
    "patterns": [
     "\\b(policy|insurance|lic)\\b[^.\\n]{0,60}\\b(bonus|maturity|lapsed|claim|refund)\\b[^\\n]{0,60}\\b(pay|charge|fee|gst|deposit|tax)\\b"
    ]
+  },
+  {
+   "id": "doc_official_free_email",
+   "title": "Official-looking letter that uses a free e-mail address",
+   "weight": 40,
+   "detail": "Government offices, courts, police and regulators use official addresses (usually ending in .gov.in or .nic.in), never free e-mail services.",
+   "patterns": [
+    "\\b(rbi|reserve bank|cbi|enforcement directorate|income tax|supreme court|high court|police|customs|trai|ministry|government of india|uidai|sebi|npci|cyber cell|narcotics)\\b[\\s\\S]{0,400}\\b[a-z0-9._+-]+@(gmail|yahoo|outlook|hotmail|rediffmail|protonmail|proton)\\.(com|in|co\\.in|me)\\b",
+    "\\b[a-z0-9._+-]+@(gmail|yahoo|outlook|hotmail|rediffmail|protonmail|proton)\\.(com|in|co\\.in|me)\\b[\\s\\S]{0,400}\\b(rbi|reserve bank|cbi|enforcement directorate|income tax|supreme court|high court|police|customs|trai|ministry|government of india|uidai|sebi|npci|cyber cell|narcotics)\\b"
+   ]
+  },
+  {
+   "id": "doc_pay_to_close",
+   "title": "Demands payment to stop an arrest, case or investigation",
+   "weight": 45,
+   "detail": "Police, courts and agencies never ask you to pay money to close a case, stop a warrant or \"verify\" your account. This is the \"digital arrest\" scam.",
+   "patterns": [
+    "\\b(pay|deposit|transfer|remit)\\b[^.\\n]{0,60}\\b(to (avoid|stop|cancel|close|settle|quash)|for (clearance|settlement|closure|verification))\\b[^.\\n]{0,40}\\b(arrest|case|warrant|fir|investigation|account|proceedings|charges)"
+   ]
+  },
+  {
+   "id": "doc_rbi_fee",
+   "title": "Letter in the name of RBI asking for a fee or deposit",
+   "weight": 40,
+   "detail": "The Reserve Bank of India doesn't deal with individuals' loans, prizes, refunds or accounts, and never asks anyone to pay fees.",
+   "patterns": [
+    "\\b(rbi|reserve bank of india)\\b[\\s\\S]{0,300}\\b(fee|charges?|deposit|gst|tax)\\b[\\s\\S]{0,120}\\b(pay|deposit|transfer|remit)"
+   ]
+  },
+  {
+   "id": "doc_job_fee",
+   "title": "Job offer that asks you to pay a deposit or fee",
+   "weight": 40,
+   "detail": "Real employers don't charge for joining, training, laptops or \"refundable\" security deposits. Fake offer letters always end with a payment request.",
+   "patterns": [
+    "\\b(offer letter|appointment letter|you have been selected|joining)\\b[\\s\\S]{0,300}\\b(security deposit|refundable (deposit|fee|amount)|training fee|registration fee|joining fee|laptop (charges|deposit)|kit charges|uniform charges)\\b"
+   ]
+  },
+  {
+   "id": "doc_loan_fee",
+   "title": "Loan approval that needs a fee paid first",
+   "weight": 35,
+   "detail": "Genuine lenders deduct charges from the loan amount. Asking for processing, insurance, stamp duty or GST money before the loan is paid out is a classic fake loan letter.",
+   "patterns": [
+    "\\bloan\\b[^\\n]{0,80}\\b(approved|sanctioned|disbursal|disbursement)\\b[\\s\\S]{0,300}\\b(processing|insurance|stamp duty|gst|file|noc|tds)\\s*(fee|charges?|amount)\\b"
+   ]
   }
  ],
  "callFlags": [
@@ -1377,7 +1423,10 @@
   "account_takeover_code",
   "money_mule",
   "upi_receive_note",
-  "pay_prank_app"
+  "pay_prank_app",
+  "doc_qr_mismatch",
+  "doc_qr_bad_signature",
+  "doc_pay_to_close"
  ],
  "criticalFloor": 60,
  "extraPatternBonus": 10,
@@ -1625,5 +1674,57 @@
    "ibis paint",
    "adobe"
   ]
+ },
+ "documents": {
+  "pdfEditors": [
+   "ilovepdf",
+   "smallpdf",
+   "sejda",
+   "pdfescape",
+   "pdf-xchange",
+   "foxit",
+   "nitro",
+   "pdfelement",
+   "wondershare",
+   "dochub",
+   "pdffiller",
+   "soda pdf",
+   "xodo",
+   "apowersoft",
+   "pdf24",
+   "pdfcandy",
+   "pdf2go",
+   "acrobat",
+   "pdf editor",
+   "pdfedit",
+   "hipdf",
+   "lightpdf",
+   "cleverpdf",
+   "pdfsam",
+   "master pdf",
+   "pdf studio",
+   "pdfgear",
+   "updf"
+  ],
+  "officeApps": [
+   "microsoft word",
+   "microsoft® word",
+   "microsoft excel",
+   "microsoft® excel",
+   "libreoffice",
+   "openoffice",
+   "wps ",
+   "google docs",
+   "canva",
+   "photoshop",
+   "illustrator",
+   "coreldraw",
+   "inkscape",
+   "gimp",
+   "pages",
+   "keynote",
+   "paint.net"
+  ],
+  "panEntity": "ABCEFGHJLPT"
  }
 }

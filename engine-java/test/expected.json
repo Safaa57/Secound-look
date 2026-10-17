@@ -2085,5 +2085,2784 @@
     0
    ]
   ]
+ },
+ {
+  "kind": "helper",
+  "method": "verhoeffOk",
+  "input": "2363",
+  "result": true
+ },
+ {
+  "kind": "helper",
+  "method": "verhoeffOk",
+  "input": "2364",
+  "result": false
+ },
+ {
+  "kind": "helper",
+  "method": "verhoeffOk",
+  "input": "499118665246",
+  "result": true
+ },
+ {
+  "kind": "helper",
+  "method": "gstinOk",
+  "input": "27AAPFU0939F1ZV",
+  "result": true
+ },
+ {
+  "kind": "helper",
+  "method": "gstinOk",
+  "input": "27AAPFU0939F1ZW",
+  "result": false
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "PASSPORT\nL898902C3\nP<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\nL898902C36UTO7408122F1204159ZE184226B<<<<<10"
+  },
+  "score": 15,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_expired",
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Passport: ask to see the original passport and compare the photo page and code lines carefully."
+  ],
+  "reasons": [
+   [
+    "doc_expired",
+    "This passport has expired (2012-04-15)",
+    "An expired passport can't be used as valid ID.",
+    15
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "passport",
+   "ids": [
+    {
+     "type": "passport",
+     "value": "L898902C3",
+     "valid": true
+    }
+   ],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   },
+   "passport": {
+    "number": "L898902C3",
+    "country": "UTO",
+    "dob": "1974-08-12",
+    "expiry": "2012-04-15",
+    "mrzValid": true
+   }
+  },
+  "echo": {
+   "docType": "passport",
+   "text": "PASSPORT\nL898902C3\nP<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\nL898902C36UTO7408122F1204159ZE184226B<<<<<10"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\nL898902C36UTO7508122F1204159ZE184226B<<<<<10"
+  },
+  "score": 55,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "doc_expired",
+   "doc_mrz_bad",
+   "doc_not_proof"
+  ],
+  "advice": [
+   "Don't act on this document, pay anything or share it further until the issuer confirms it.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.",
+   "Passport: ask to see the original passport and compare the photo page and code lines carefully."
+  ],
+  "reasons": [
+   [
+    "doc_mrz_bad",
+    "Passport code lines don't add up (date of birth, overall check)",
+    "The two lines of code at the bottom of a passport contain check digits. These don't match, which happens when a passport is edited. Blurry photos can also cause misreads, so compare the code with the printed details.",
+    40
+   ],
+   [
+    "doc_expired",
+    "This passport has expired (2012-04-15)",
+    "An expired passport can't be used as valid ID.",
+    15
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "passport",
+   "ids": [
+    {
+     "type": "passport",
+     "value": "L898902C3",
+     "valid": false
+    }
+   ],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   },
+   "passport": {
+    "number": "L898902C3",
+    "country": "UTO",
+    "dob": "1975-08-12",
+    "expiry": "2012-04-15",
+    "mrzValid": false
+   }
+  },
+  "echo": {
+   "docType": "passport",
+   "text": "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\nL898902C36UTO7508122F1204159ZE184226B<<<<<10"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Passport No. K1234567\nP<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\nL898902C36UTO7408122F1204159ZE184226B<<<<<10"
+  },
+  "score": 55,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "doc_expired",
+   "doc_mrz_mismatch",
+   "doc_not_proof"
+  ],
+  "advice": [
+   "Don't act on this document, pay anything or share it further until the issuer confirms it.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.",
+   "Passport: ask to see the original passport and compare the photo page and code lines carefully."
+  ],
+  "reasons": [
+   [
+    "doc_mrz_mismatch",
+    "Printed passport number doesn't match the code lines",
+    "The number printed on the page is different from the number in the code at the bottom.",
+    40
+   ],
+   [
+    "doc_expired",
+    "This passport has expired (2012-04-15)",
+    "An expired passport can't be used as valid ID.",
+    15
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "passport",
+   "ids": [
+    {
+     "type": "passport",
+     "value": "L898902C3",
+     "valid": true
+    }
+   ],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   },
+   "passport": {
+    "number": "L898902C3",
+    "country": "UTO",
+    "dob": "1974-08-12",
+    "expiry": "2012-04-15",
+    "mrzValid": true
+   }
+  },
+  "echo": {
+   "docType": "passport",
+   "text": "Passport No. K1234567\nP<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\nL898902C36UTO7408122F1204159ZE184226B<<<<<10"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Government of India\nRahul Sharma\nDOB: 12/05/1990\n4991 1866 5246"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "id",
+   "ids": [
+    {
+     "type": "aadhaar",
+     "value": "XXXX XXXX 5246",
+     "valid": true
+    }
+   ],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "id",
+   "text": "Government of India\nRahul Sharma\nDOB: 12/05/1990\n4991 1866 5246"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Government of India\nRahul Sharma\n4991 1866 5245"
+  },
+  "score": 35,
+  "level": "warning",
+  "label": "Suspicious",
+  "ids": [
+   "doc_aadhaar_bad",
+   "doc_not_proof"
+  ],
+  "advice": [
+   "Don't act on this document, pay anything or share it further until the issuer confirms it.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.",
+   "Aadhaar: scan the QR code with UIDAI's official QR scanner app, or check the number at myaadhaar.uidai.gov.in (Verify Aadhaar)."
+  ],
+  "reasons": [
+   [
+    "doc_aadhaar_bad",
+    "Aadhaar number XXXX XXXX 5245 fails its built-in check",
+    "Every real Aadhaar number ends with a check digit calculated from the others. This one doesn't match: the number was changed, or a photo misread a digit. Compare it carefully with the card.",
+    35
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "id",
+   "ids": [
+    {
+     "type": "aadhaar",
+     "value": "XXXX XXXX 5245",
+     "valid": false
+    }
+   ],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "id",
+   "text": "Government of India\nRahul Sharma\n4991 1866 5245"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Government of India\nRahul Sharma\nDOB: 12/05/1990\n4991 1866 5246",
+   "aadhaarQr": {
+    "decoded": true,
+    "signatureChecked": true,
+    "signatureValid": true,
+    "name": "Rahul Sharma",
+    "dob": "12-05-1990",
+    "last4": "5246"
+   }
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof",
+   "doc_qr_verified"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Aadhaar: scan the QR code with UIDAI's official QR scanner app, or check the number at myaadhaar.uidai.gov.in (Verify Aadhaar)."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ],
+   [
+    "doc_qr_verified",
+    "Aadhaar QR is digitally signed by UIDAI",
+    "The QR code's signature is genuine, so the details inside the QR are real. Make sure the printed details and photo match the QR.",
+    -30
+   ]
+  ],
+  "info": {
+   "docType": "id",
+   "ids": [
+    {
+     "type": "aadhaar",
+     "value": "XXXX XXXX 5246",
+     "valid": true
+    }
+   ],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   },
+   "qr": {
+    "name": "Rahul Sharma",
+    "dob": "12-05-1990",
+    "gender": null,
+    "last4": "5246",
+    "oldXml": false,
+    "signatureChecked": true,
+    "signatureValid": true
+   }
+  },
+  "echo": {
+   "docType": "id",
+   "text": "Government of India\nRahul Sharma\nDOB: 12/05/1990\n4991 1866 5246"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Government of India\nPriya Verma\nDOB: 12/05/1990\n4991 1866 5246",
+   "aadhaarQr": {
+    "decoded": true,
+    "signatureChecked": true,
+    "signatureValid": true,
+    "name": "Rahul Sharma",
+    "dob": "12-05-1990",
+    "last4": "5246"
+   }
+  },
+  "score": 60,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "doc_not_proof",
+   "doc_qr_mismatch",
+   "doc_qr_verified"
+  ],
+  "advice": [
+   "Don't act on this document, pay anything or share it further until the issuer confirms it.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.",
+   "Aadhaar: scan the QR code with UIDAI's official QR scanner app, or check the number at myaadhaar.uidai.gov.in (Verify Aadhaar)."
+  ],
+  "reasons": [
+   [
+    "doc_qr_mismatch",
+    "Printed details don't match the QR (name)",
+    "The QR code holds the real details. When the printed card shows something different, the card was edited or someone else's QR was pasted on.",
+    50
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ],
+   [
+    "doc_qr_verified",
+    "Aadhaar QR is digitally signed by UIDAI",
+    "The QR code's signature is genuine, so the details inside the QR are real. Make sure the printed details and photo match the QR.",
+    -30
+   ]
+  ],
+  "info": {
+   "docType": "id",
+   "ids": [
+    {
+     "type": "aadhaar",
+     "value": "XXXX XXXX 5246",
+     "valid": true
+    }
+   ],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   },
+   "qr": {
+    "name": "Rahul Sharma",
+    "dob": "12-05-1990",
+    "gender": null,
+    "last4": "5246",
+    "oldXml": false,
+    "signatureChecked": true,
+    "signatureValid": true
+   }
+  },
+  "echo": {
+   "docType": "id",
+   "text": "Government of India\nPriya Verma\nDOB: 12/05/1990\n4991 1866 5246"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Aadhaar",
+   "aadhaarQr": {
+    "decoded": true,
+    "signatureChecked": true,
+    "signatureValid": false
+   }
+  },
+  "score": 60,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "doc_not_proof",
+   "doc_qr_bad_signature"
+  ],
+  "advice": [
+   "Don't act on this document, pay anything or share it further until the issuer confirms it.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.",
+   "Aadhaar: scan the QR code with UIDAI's official QR scanner app, or check the number at myaadhaar.uidai.gov.in (Verify Aadhaar)."
+  ],
+  "reasons": [
+   [
+    "doc_qr_bad_signature",
+    "Aadhaar QR signature is not valid",
+    "The secure QR on a real Aadhaar is signed by UIDAI. This signature doesn't check out, so the QR was made or changed by someone else.",
+    60
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "letter",
+   "ids": [],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   },
+   "qr": {
+    "name": null,
+    "dob": null,
+    "gender": null,
+    "last4": null,
+    "oldXml": false,
+    "signatureChecked": true,
+    "signatureValid": false
+   }
+  },
+  "echo": {
+   "docType": "letter",
+   "text": "Aadhaar"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Aadhaar",
+   "aadhaarQr": {
+    "decoded": true,
+    "oldXml": true
+   }
+  },
+  "score": 10,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof",
+   "doc_qr_old"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Aadhaar: scan the QR code with UIDAI's official QR scanner app, or check the number at myaadhaar.uidai.gov.in (Verify Aadhaar)."
+  ],
+  "reasons": [
+   [
+    "doc_qr_old",
+    "Old-style Aadhaar QR without a digital signature",
+    "Older Aadhaar QR codes aren't signed, so they're easy to fake. Ask for an e-Aadhaar or a recent print with the secure QR.",
+    10
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "letter",
+   "ids": [],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   },
+   "qr": {
+    "name": null,
+    "dob": null,
+    "gender": null,
+    "last4": null,
+    "oldXml": true,
+    "signatureChecked": false,
+    "signatureValid": false
+   }
+  },
+  "echo": {
+   "docType": "letter",
+   "text": "Aadhaar"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "INCOME TAX DEPARTMENT\nPermanent Account Number\nABCPE1234F"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "id",
+   "ids": [
+    {
+     "type": "pan",
+     "value": "ABCPE1234F",
+     "valid": true
+    }
+   ],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "id",
+   "text": "INCOME TAX DEPARTMENT\nPermanent Account Number\nABCPE1234F"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "INCOME TAX DEPARTMENT\nPermanent Account Number\nABCDE1234F"
+  },
+  "score": 30,
+  "level": "warning",
+  "label": "Suspicious",
+  "ids": [
+   "doc_not_proof",
+   "doc_pan_bad"
+  ],
+  "advice": [
+   "Don't act on this document, pay anything or share it further until the issuer confirms it.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.",
+   "PAN: use \"Verify Your PAN\" on the Income Tax e-filing website (incometax.gov.in)."
+  ],
+  "reasons": [
+   [
+    "doc_pan_bad",
+    "PAN ABCDE1234F has an impossible format",
+    "The 4th letter of a PAN shows the holder type (P for a person, C for a company, and so on). \"D\" isn't used, so this PAN can't exist.",
+    30
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "id",
+   "ids": [
+    {
+     "type": "pan",
+     "value": "ABCDE1234F",
+     "valid": false
+    }
+   ],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "id",
+   "text": "INCOME TAX DEPARTMENT\nPermanent Account Number\nABCDE1234F"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Invoice GSTIN: 27AAPFU0939F1ZW"
+  },
+  "score": 30,
+  "level": "warning",
+  "label": "Suspicious",
+  "ids": [
+   "doc_gstin_bad",
+   "doc_not_proof"
+  ],
+  "advice": [
+   "Don't act on this document, pay anything or share it further until the issuer confirms it.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "doc_gstin_bad",
+    "GST number 27AAPFU0939F1ZW fails its check",
+    "GST numbers end with a check character calculated from the rest. This one doesn't match, so the number was changed or mistyped.",
+    30
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "letter",
+   "ids": [
+    {
+     "type": "gstin",
+     "value": "27AAPFU0939F1ZW",
+     "valid": false
+    }
+   ],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "letter",
+   "text": "Invoice GSTIN: 27AAPFU0939F1ZW"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Bank details IFSC: SBIN1234567"
+  },
+  "score": 20,
+  "level": "warning",
+  "label": "Suspicious",
+  "ids": [
+   "doc_ifsc_bad",
+   "doc_not_proof"
+  ],
+  "advice": [
+   "Don't act on this document, pay anything or share it further until the issuer confirms it.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "doc_ifsc_bad",
+    "IFSC SBIN1234567 has the wrong format",
+    "Every IFSC has 4 letters, then a zero, then 6 letters or digits.",
+    20
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "letter",
+   "ids": [
+    {
+     "type": "ifsc",
+     "value": "SBIN1234567",
+     "valid": false
+    }
+   ],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "letter",
+   "text": "Bank details IFSC: SBIN1234567"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "STATEMENT OF ACCOUNT\nOpening Balance 10,000.00\n01/10/2026 UPI/ramesh/grocery 500.00 9,500.00\n02/10/2026 SALARY CREDIT 25,000.00 34,500.00\n05/10/2026 ATM WDL 2,000.00 32,500.00\n08/10/2026 NEFT rent 12,000.00 20,500.00\nTotal Credits 25,000.00\nTotal Debits 14,500.00\nClosing Balance 20,500.00"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "statement",
+   "ids": [],
+   "statement": {
+    "rows": 4,
+    "checked": 3,
+    "mismatched": 0,
+    "outOfOrder": 0,
+    "summaryOk": true
+   },
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "statement",
+   "text": "STATEMENT OF ACCOUNT\nOpening Balance 10,000.00\n01/10/2026 UPI/ramesh/grocery 500.00 9,500.00\n02/10/2026 SALARY CREDIT 25,000.00 34,500.00\n05/10/2026 ATM WDL 2,000.00 32,500.00\n08/10/2026 NEFT rent 12,000.00 20,500.00\nTotal Credits 25,000.00\nTotal Debits 14,500.00\nClosing Balance 20,500.00"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "STATEMENT OF ACCOUNT\nOpening Balance 10,000.00\n01/10/2026 UPI/ramesh/grocery 500.00 9,500.00\n02/10/2026 SALARY CREDIT 85,000.00 34,500.00\n05/10/2026 ATM WDL 2,000.00 92,500.00\n08/10/2026 NEFT rent 12,000.00 20,500.00\nTotal Credits 25,000.00\nTotal Debits 14,500.00\nClosing Balance 20,500.00"
+  },
+  "score": 45,
+  "level": "warning",
+  "label": "Suspicious",
+  "ids": [
+   "doc_balance_mismatch",
+   "doc_not_proof"
+  ],
+  "advice": [
+   "Don't act on this document, pay anything or share it further until the issuer confirms it.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.",
+   "Bank statement: ask for it to be downloaded from net banking in front of you, shared through the RBI Account Aggregator system, or confirmed by the bank."
+  ],
+  "reasons": [
+   [
+    "doc_balance_mismatch",
+    "Balances don't add up in 3 of 3 rows",
+    "In a real statement every balance equals the previous balance plus credits minus debits. Several rows break this, which is a strong sign the amounts were edited.\"02/10/2026 SALARY CREDIT 85,000.00 34,500.00\"",
+    45
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "statement",
+   "ids": [],
+   "statement": {
+    "rows": 4,
+    "checked": 3,
+    "mismatched": 3,
+    "outOfOrder": 0,
+    "summaryOk": true
+   },
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "statement",
+   "text": "STATEMENT OF ACCOUNT\nOpening Balance 10,000.00\n01/10/2026 UPI/ramesh/grocery 500.00 9,500.00\n02/10/2026 SALARY CREDIT 85,000.00 34,500.00\n05/10/2026 ATM WDL 2,000.00 92,500.00\n08/10/2026 NEFT rent 12,000.00 20,500.00\nTotal Credits 25,000.00\nTotal Debits 14,500.00\nClosing Balance 20,500.00"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "STATEMENT OF ACCOUNT\nOpening Balance 10,000.00\n01/10/2026 UPI/ramesh/grocery 500.00 9,500.00\n02/10/2026 SALARY CREDIT 25,000.00 34,500.00\n05/10/2026 ATM WDL 2,000.00 32,500.00\n08/10/2026 NEFT rent 12,000.00 20,500.00\nTotal Credits 25,000.00\nTotal Debits 14,500.00\nClosing Balance 80,500.00"
+  },
+  "score": 45,
+  "level": "warning",
+  "label": "Suspicious",
+  "ids": [
+   "doc_not_proof",
+   "doc_summary_mismatch"
+  ],
+  "advice": [
+   "Don't act on this document, pay anything or share it further until the issuer confirms it.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.",
+   "Bank statement: ask for it to be downloaded from net banking in front of you, shared through the RBI Account Aggregator system, or confirmed by the bank."
+  ],
+  "reasons": [
+   [
+    "doc_summary_mismatch",
+    "Statement totals don't add up",
+    "Opening balance + total credits − total debits should equal the closing balance. Here it doesn't.",
+    45
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "statement",
+   "ids": [],
+   "statement": {
+    "rows": 4,
+    "checked": 3,
+    "mismatched": 0,
+    "outOfOrder": 0,
+    "summaryOk": false
+   },
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "statement",
+   "text": "STATEMENT OF ACCOUNT\nOpening Balance 10,000.00\n01/10/2026 UPI/ramesh/grocery 500.00 9,500.00\n02/10/2026 SALARY CREDIT 25,000.00 34,500.00\n05/10/2026 ATM WDL 2,000.00 32,500.00\n08/10/2026 NEFT rent 12,000.00 20,500.00\nTotal Credits 25,000.00\nTotal Debits 14,500.00\nClosing Balance 80,500.00"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "STATEMENT OF ACCOUNT\nOpening Balance 10,000.00\n01/10/2026 UPI/ramesh/grocery 500.00 9,500.00\n02/10/2026 SALARY CREDIT 25,000.00 34,500.00\n05/10/2026 ATM WDL 2,000.00 32,500.00\n08/10/2026 NEFT rent 12,000.00 20,500.00\nTotal Credits 25,000.00\nTotal Debits 14,500.00\nClosing Balance 20,500.00",
+   "file": {
+    "kind": "pdf",
+    "creator": "Microsoft® Word for Microsoft 365",
+    "producer": "Microsoft® Word for Microsoft 365"
+   }
+  },
+  "score": 35,
+  "level": "warning",
+  "label": "Suspicious",
+  "ids": [
+   "doc_not_proof",
+   "doc_office_app"
+  ],
+  "advice": [
+   "Don't act on this document, pay anything or share it further until the issuer confirms it.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "doc_office_app",
+    "Statement made with a word processor or design app",
+    "Banks generate statements from their own systems, not from word-processing or design apps. This is a common sign of a fake statement.",
+    35
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "statement",
+   "ids": [],
+   "statement": {
+    "rows": 4,
+    "checked": 3,
+    "mismatched": 0,
+    "outOfOrder": 0,
+    "summaryOk": true
+   },
+   "file": {
+    "kind": "pdf",
+    "program": "Microsoft® Word for Microsoft 365",
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "statement",
+   "text": "STATEMENT OF ACCOUNT\nOpening Balance 10,000.00\n01/10/2026 UPI/ramesh/grocery 500.00 9,500.00\n02/10/2026 SALARY CREDIT 25,000.00 34,500.00\n05/10/2026 ATM WDL 2,000.00 32,500.00\n08/10/2026 NEFT rent 12,000.00 20,500.00\nTotal Credits 25,000.00\nTotal Debits 14,500.00\nClosing Balance 20,500.00"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "STATEMENT OF ACCOUNT\nOpening Balance 10,000.00\n01/10/2026 UPI/ramesh/grocery 500.00 9,500.00\n02/10/2026 SALARY CREDIT 25,000.00 34,500.00\n05/10/2026 ATM WDL 2,000.00 32,500.00\n08/10/2026 NEFT rent 12,000.00 20,500.00\nTotal Credits 25,000.00\nTotal Debits 14,500.00\nClosing Balance 20,500.00",
+   "file": {
+    "kind": "pdf",
+    "producer": "iLovePDF",
+    "created": "2026-09-01T10:00:00Z",
+    "modified": "2026-10-12T10:00:00Z",
+    "revisions": 3
+   }
+  },
+  "score": 100,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "doc_created_before_content",
+   "doc_modified",
+   "doc_not_proof",
+   "doc_pdf_editor"
+  ],
+  "advice": [
+   "Don't act on this document, pay anything or share it further until the issuer confirms it.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.",
+   "Bank statement: ask for it to be downloaded from net banking in front of you, shared through the RBI Account Aggregator system, or confirmed by the bank."
+  ],
+  "reasons": [
+   [
+    "doc_created_before_content",
+    "File was created before the dates printed in it",
+    "The file says it was made on 2026-09-01, but it lists transactions after that. That can't happen in a statement downloaded from a bank.",
+    40
+   ],
+   [
+    "doc_pdf_editor",
+    "Made or re-saved with a PDF editing app",
+    "Documents issued by banks and government offices come straight from their systems. A file that passed through an editing app may have been changed.",
+    30
+   ],
+   [
+    "doc_modified",
+    "Changed after it was first saved (2 edits recorded)",
+    "The file keeps a record of later changes. Genuine downloads from a bank or government site are normally saved once.",
+    25
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "statement",
+   "ids": [],
+   "statement": {
+    "rows": 4,
+    "checked": 3,
+    "mismatched": 0,
+    "outOfOrder": 0,
+    "summaryOk": true
+   },
+   "file": {
+    "kind": "pdf",
+    "program": "/ iLovePDF",
+    "created": "2026-09-01T10:00:00Z",
+    "modified": "2026-10-12T10:00:00Z",
+    "revisions": 3
+   }
+  },
+  "echo": {
+   "docType": "statement",
+   "text": "STATEMENT OF ACCOUNT\nOpening Balance 10,000.00\n01/10/2026 UPI/ramesh/grocery 500.00 9,500.00\n02/10/2026 SALARY CREDIT 25,000.00 34,500.00\n05/10/2026 ATM WDL 2,000.00 32,500.00\n08/10/2026 NEFT rent 12,000.00 20,500.00\nTotal Credits 25,000.00\nTotal Debits 14,500.00\nClosing Balance 20,500.00"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "STATEMENT OF ACCOUNT\nOpening Balance 10,000.00\n01/10/2026 UPI/ramesh/grocery 500.00 9,500.00\n02/10/2026 SALARY CREDIT 25,000.00 34,500.00\n05/10/2026 ATM WDL 2,000.00 32,500.00\n08/10/2026 NEFT rent 12,000.00 20,500.00\nTotal Credits 25,000.00\nTotal Debits 14,500.00\nClosing Balance 20,500.00",
+   "file": {
+    "kind": "pdf",
+    "producer": "iText 5.5.13",
+    "created": "2026-10-12T10:00:00Z",
+    "modified": "2026-10-12T10:00:00Z",
+    "revisions": 1
+   }
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "statement",
+   "ids": [],
+   "statement": {
+    "rows": 4,
+    "checked": 3,
+    "mismatched": 0,
+    "outOfOrder": 0,
+    "summaryOk": true
+   },
+   "file": {
+    "kind": "pdf",
+    "program": "/ iText 5.5.13",
+    "created": "2026-10-12T10:00:00Z",
+    "modified": "2026-10-12T10:00:00Z",
+    "revisions": 1
+   }
+  },
+  "echo": {
+   "docType": "statement",
+   "text": "STATEMENT OF ACCOUNT\nOpening Balance 10,000.00\n01/10/2026 UPI/ramesh/grocery 500.00 9,500.00\n02/10/2026 SALARY CREDIT 25,000.00 34,500.00\n05/10/2026 ATM WDL 2,000.00 32,500.00\n08/10/2026 NEFT rent 12,000.00 20,500.00\nTotal Credits 25,000.00\nTotal Debits 14,500.00\nClosing Balance 20,500.00"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "CENTRAL BUREAU OF INVESTIGATION\nArrest Warrant\nYour Aadhaar is linked to money laundering. Pay Rs 2,00,000 to avoid arrest. Contact cbi.officer.delhi@gmail.com"
+  },
+  "score": 100,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "doc_not_proof",
+   "doc_official_free_email",
+   "doc_pay_to_close",
+   "link_with_bait"
+  ],
+  "advice": [
+   "Don't act on this document, pay anything or share it further until the issuer confirms it.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.",
+   "Government or police notice: look up the office's number on its official .gov.in website and call them. Agencies never ask for money to close cases."
+  ],
+  "reasons": [
+   [
+    "doc_pay_to_close",
+    "Demands payment to stop an arrest, case or investigation",
+    "Police, courts and agencies never ask you to pay money to close a case, stop a warrant or \"verify\" your account. This is the \"digital arrest\" scam.",
+    45
+   ],
+   [
+    "doc_official_free_email",
+    "Official-looking letter that uses a free e-mail address",
+    "Government offices, courts, police and regulators use official addresses (usually ending in .gov.in or .nic.in), never free e-mail services.",
+    40
+   ],
+   [
+    "link_with_bait",
+    "Pairs a pressure message with a link",
+    "Even if the link looks normal, don't log in or pay through a link sent like this. Open the official app or type the address yourself.",
+    10
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "letter",
+   "ids": [],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "letter",
+   "text": "CENTRAL BUREAU OF INVESTIGATION\nArrest Warrant\nYour Aadhaar is linked to money laundering. Pay Rs 2,00,000 to avoid arrest. Contact cbi.officer.delhi@gmail.com"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "RESERVE BANK OF INDIA\nYour prize amount of Rs 25,00,000 is approved. A clearance fee of Rs 15,000 must be paid. Transfer to account 1234567890."
+  },
+  "score": 100,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "advance_fee",
+   "doc_not_proof",
+   "doc_rbi_fee",
+   "prize_lottery"
+  ],
+  "advice": [
+   "Don't act on this document, pay anything or share it further until the issuer confirms it.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.",
+   "Government or police notice: look up the office's number on its official .gov.in website and call them. Agencies never ask for money to close cases."
+  ],
+  "reasons": [
+   [
+    "doc_rbi_fee",
+    "Letter in the name of RBI asking for a fee or deposit",
+    "The Reserve Bank of India doesn't deal with individuals' loans, prizes, refunds or accounts, and never asks anyone to pay fees.",
+    40
+   ],
+   [
+    "prize_lottery",
+    "Promises a prize, lottery, lucky draw or big cashback",
+    "You can't win a contest you never entered. Prize messages are bait to collect a \"fee\" or your bank details.",
+    30
+   ],
+   [
+    "advance_fee",
+    "Asks you to pay a fee before you get something",
+    "Registration, processing, \"GST\" or release fees to receive a job, loan, prize or parcel are the classic advance-fee scam.",
+    30
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "letter",
+   "ids": [],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "letter",
+   "text": "RESERVE BANK OF INDIA\nYour prize amount of Rs 25,00,000 is approved. A clearance fee of Rs 15,000 must be paid. Transfer to account 1234567890."
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Offer Letter\nYou have been selected for the post of Data Entry Operator. Please pay a refundable security deposit of Rs 4,999 for your laptop."
+  },
+  "score": 100,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "advance_fee",
+   "doc_job_fee",
+   "doc_not_proof",
+   "prize_lottery"
+  ],
+  "advice": [
+   "Don't act on this document, pay anything or share it further until the issuer confirms it.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "doc_job_fee",
+    "Job offer that asks you to pay a deposit or fee",
+    "Real employers don't charge for joining, training, laptops or \"refundable\" security deposits. Fake offer letters always end with a payment request.",
+    40
+   ],
+   [
+    "prize_lottery",
+    "Promises a prize, lottery, lucky draw or big cashback",
+    "You can't win a contest you never entered. Prize messages are bait to collect a \"fee\" or your bank details.",
+    30
+   ],
+   [
+    "advance_fee",
+    "Asks you to pay a fee before you get something",
+    "Registration, processing, \"GST\" or release fees to receive a job, loan, prize or parcel are the classic advance-fee scam.",
+    30
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "letter",
+   "ids": [],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "letter",
+   "text": "Offer Letter\nYou have been selected for the post of Data Entry Operator. Please pay a refundable security deposit of Rs 4,999 for your laptop."
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Loan Approval Letter\nYour personal loan of Rs 5,00,000 is approved. Pay processing fee of Rs 3,500 and GST charges before disbursal."
+  },
+  "score": 75,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "advance_fee",
+   "doc_loan_fee",
+   "doc_not_proof"
+  ],
+  "advice": [
+   "Don't act on this document, pay anything or share it further until the issuer confirms it.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "doc_loan_fee",
+    "Loan approval that needs a fee paid first",
+    "Genuine lenders deduct charges from the loan amount. Asking for processing, insurance, stamp duty or GST money before the loan is paid out is a classic fake loan letter.",
+    35
+   ],
+   [
+    "advance_fee",
+    "Asks you to pay a fee before you get something",
+    "Registration, processing, \"GST\" or release fees to receive a job, loan, prize or parcel are the classic advance-fee scam.",
+    30
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "letter",
+   "ids": [],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "letter",
+   "text": "Loan Approval Letter\nYour personal loan of Rs 5,00,000 is approved. Pay processing fee of Rs 3,500 and GST charges before disbursal."
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Dear Sir, Thank you for attending the meeting on 12 October 2026. Please find the minutes attached. Regards, Anil"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "letter",
+   "ids": [],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "letter",
+   "text": "Dear Sir, Thank you for attending the meeting on 12 October 2026. Please find the minutes attached. Regards, Anil"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Government of India\n4991 1866 5246",
+   "file": {
+    "kind": "image",
+    "imageEditor": "PicsArt"
+   }
+  },
+  "score": 35,
+  "level": "warning",
+  "label": "Suspicious",
+  "ids": [
+   "doc_image_edited",
+   "doc_not_proof"
+  ],
+  "advice": [
+   "Don't act on this document, pay anything or share it further until the issuer confirms it.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "doc_image_edited",
+    "The image was saved by a photo-editing app",
+    "Photos of real documents come straight from a camera or scanner. This one passed through an editor.",
+    35
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "id",
+   "ids": [
+    {
+     "type": "aadhaar",
+     "value": "XXXX XXXX 5246",
+     "valid": true
+    }
+   ],
+   "file": {
+    "kind": "image",
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "id",
+   "text": "Government of India\n4991 1866 5246"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "REPUBLIC OF INDIA\nPassport No. Z1234567\np<ind sharm a‹<ra hul<k umar< ‹<‹<< ‹<‹<< ‹<‹<< ‹<‹<\nZ1234 567〈1 IND99 01018 M3101 012AB 12345 C‹<‹< ‹<28«\t"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "passport",
+   "ids": [
+    {
+     "type": "passport",
+     "value": "Z1234567",
+     "valid": true
+    }
+   ],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   },
+   "passport": {
+    "number": "Z1234567",
+    "country": "IND",
+    "dob": "1999-01-01",
+    "expiry": "2031-01-01",
+    "mrzValid": true
+   }
+  },
+  "echo": {
+   "docType": "passport",
+   "text": "REPUBLIC OF INDIA\nPassport No. Z1234567\np<ind sharm a‹<ra hul<k umar< ‹<‹<< ‹<‹<< ‹<‹<< ‹<‹<\nZ1234 567〈1 IND99 01018 M3101 012AB 12345 C‹<‹< ‹<28«\t"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Passport\nP<INDSHARMA<<RAHUL<KUMAR<<<<<<<<<<<<<<<<<<<<\r\nK7654321<4IND<<<<<<0F2501017<<<<<<<<<<<<<<<0\r\n"
+  },
+  "score": 15,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_expired",
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Passport: ask to see the original passport and compare the photo page and code lines carefully."
+  ],
+  "reasons": [
+   [
+    "doc_expired",
+    "This passport has expired (2025-01-01)",
+    "An expired passport can't be used as valid ID.",
+    15
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "passport",
+   "ids": [
+    {
+     "type": "passport",
+     "value": "K7654321",
+     "valid": true
+    }
+   ],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   },
+   "passport": {
+    "number": "K7654321",
+    "country": "IND",
+    "dob": null,
+    "expiry": "2025-01-01",
+    "mrzValid": true
+   }
+  },
+  "echo": {
+   "docType": "passport",
+   "text": "Passport\nP<INDSHARMA<<RAHUL<KUMAR<<<<<<<<<<<<<<<<<<<<\r\nK7654321<4IND<<<<<<0F2501017<<<<<<<<<<<<<<<0\r\n"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "P<INDSHARMA<<RAHUL<KUMAR<<<<<<<<<<<<<<<<<<<<\nZ1234567<1IND9901018M3101012AB12345C<<<<<<29"
+  },
+  "score": 40,
+  "level": "warning",
+  "label": "Suspicious",
+  "ids": [
+   "doc_mrz_bad",
+   "doc_not_proof"
+  ],
+  "advice": [
+   "Don't act on this document, pay anything or share it further until the issuer confirms it.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.",
+   "Passport: ask to see the original passport and compare the photo page and code lines carefully."
+  ],
+  "reasons": [
+   [
+    "doc_mrz_bad",
+    "Passport code lines don't add up (overall check)",
+    "The two lines of code at the bottom of a passport contain check digits. These don't match, which happens when a passport is edited. Blurry photos can also cause misreads, so compare the code with the printed details.",
+    40
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "passport",
+   "ids": [
+    {
+     "type": "passport",
+     "value": "Z1234567",
+     "valid": false
+    }
+   ],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   },
+   "passport": {
+    "number": "Z1234567",
+    "country": "IND",
+    "dob": "1999-01-01",
+    "expiry": "2031-01-01",
+    "mrzValid": false
+   }
+  },
+  "echo": {
+   "docType": "passport",
+   "text": "P<INDSHARMA<<RAHUL<KUMAR<<<<<<<<<<<<<<<<<<<<\nZ1234567<1IND9901018M3101012AB12345C<<<<<<29"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Passport\nP«INDSHARMA<<RAHUL<KUMAR<<<<<<<<<<<<<<<<<<<<\nZ1234567<1IND9901018M3101012AB12345C<<<<<<28",
+   "docType": "letter"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "letter",
+   "ids": [],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "letter",
+   "text": "Passport\nP«INDSHARMA<<RAHUL<KUMAR<<<<<<<<<<<<<<<<<<<<\nZ1234567<1IND9901018M3101012AB12345C<<<<<<28"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "ACCOUNT STATEMENT\n01-10-2026 Opening 10,000.00 Cr\n02-10-2026 UPI/shop 500.00 Dr 9,500.00 Cr\n03-10-2026 NEFT salary 25,000.00 Cr 34,500.00 Cr\n04-10-2026 ATM 2,000.00 Dr 32,500.00 Cr\n05-10-2026 Interest 0.00 32,500.00 Cr\n06-10-2026 Charges 1,000.00\n07-10-2026 IMPS 1,500.00 Dr 31,000.00 Cr"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "statement",
+   "ids": [],
+   "statement": {
+    "rows": 5,
+    "checked": 3,
+    "mismatched": 0,
+    "outOfOrder": 0,
+    "summaryOk": null
+   },
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "statement",
+   "text": "ACCOUNT STATEMENT\n01-10-2026 Opening 10,000.00 Cr\n02-10-2026 UPI/shop 500.00 Dr 9,500.00 Cr\n03-10-2026 NEFT salary 25,000.00 Cr 34,500.00 Cr\n04-10-2026 ATM 2,000.00 Dr 32,500.00 Cr\n05-10-2026 Interest 0.00 32,500.00 Cr\n06-10-2026 Charges 1,000.00\n07-10-2026 IMPS 1,500.00 Dr 31,000.00 Cr"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Bank Statement\r\n05 Oct 2026 POS 100.00 900.00\r\n01 Oct 2026 POS 100.00 700.00\r\n20 Sep 2026 POS 100.00 650.00\r\n21 Sep 2026 POS 50.00 600.00\r\nOpening balance: Rs. 1,000.00\r\nTotal debits 400.00\r\nTotal credits 0.00\r\nClosing balance 600.00",
+   "file": {
+    "kind": "pdf",
+    "producer": "Microsoft Word - iLovePDF",
+    "creator": "Microsoft Word",
+    "created": "2026-10-01",
+    "modified": "2026-10-01T00:11:00+00:00",
+    "revisions": "2"
+   }
+  },
+  "score": 100,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "doc_balance_mismatch",
+   "doc_created_before_content",
+   "doc_dates_order",
+   "doc_modified",
+   "doc_not_proof",
+   "doc_pdf_editor"
+  ],
+  "advice": [
+   "Don't act on this document, pay anything or share it further until the issuer confirms it.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.",
+   "Bank statement: ask for it to be downloaded from net banking in front of you, shared through the RBI Account Aggregator system, or confirmed by the bank."
+  ],
+  "reasons": [
+   [
+    "doc_balance_mismatch",
+    "Balances don't add up in 2 of 3 rows",
+    "In a real statement every balance equals the previous balance plus credits minus debits. Several rows break this, which is a strong sign the amounts were edited.\"01 Oct 2026 POS 100.00 700.00\"",
+    45
+   ],
+   [
+    "doc_created_before_content",
+    "File was created before the dates printed in it",
+    "The file says it was made on 2026-10-01, but it lists transactions after that. That can't happen in a statement downloaded from a bank.",
+    40
+   ],
+   [
+    "doc_pdf_editor",
+    "Made or re-saved with a PDF editing app",
+    "Documents issued by banks and government offices come straight from their systems. A file that passed through an editing app may have been changed.",
+    30
+   ],
+   [
+    "doc_modified",
+    "Changed after it was first saved (1 edit recorded)",
+    "The file keeps a record of later changes. Genuine downloads from a bank or government site are normally saved once.",
+    25
+   ],
+   [
+    "doc_dates_order",
+    "Transaction dates are out of order",
+    "Bank statements list transactions in date order. Rows appear to have been moved or added.",
+    15
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "statement",
+   "ids": [],
+   "statement": {
+    "rows": 4,
+    "checked": 3,
+    "mismatched": 2,
+    "outOfOrder": 2,
+    "summaryOk": true
+   },
+   "file": {
+    "kind": "pdf",
+    "program": "Microsoft Word / Microsoft Word - iLovePDF",
+    "created": "2026-10-01",
+    "modified": "2026-10-01T00:11:00+00:00",
+    "revisions": "2"
+   }
+  },
+  "echo": {
+   "docType": "statement",
+   "text": "Bank Statement\r\n05 Oct 2026 POS 100.00 900.00\r\n01 Oct 2026 POS 100.00 700.00\r\n20 Sep 2026 POS 100.00 650.00\r\n21 Sep 2026 POS 50.00 600.00\r\nOpening balance: Rs. 1,000.00\r\nTotal debits 400.00\r\nTotal credits 0.00\r\nClosing balance 600.00"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Statement of Account\n1/10/26😀 grocery 500.00 9,500.00\n2/10/26😀 salary 1,000.00 10,500.00\n3/10/26 rent 4,000.00 6,500.00",
+   "file": {
+    "kind": "pdf",
+    "producer": "iText",
+    "creator": "iText",
+    "created": "2026-02-31T00:00:00Z",
+    "modified": "D:20261012",
+    "revisions": 2.5
+   }
+  },
+  "score": 75,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "doc_created_before_content",
+   "doc_modified",
+   "doc_not_proof"
+  ],
+  "advice": [
+   "Don't act on this document, pay anything or share it further until the issuer confirms it.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.",
+   "Bank statement: ask for it to be downloaded from net banking in front of you, shared through the RBI Account Aggregator system, or confirmed by the bank."
+  ],
+  "reasons": [
+   [
+    "doc_created_before_content",
+    "File was created before the dates printed in it",
+    "The file says it was made on 2026-02-31, but it lists transactions after that. That can't happen in a statement downloaded from a bank.",
+    40
+   ],
+   [
+    "doc_modified",
+    "Changed after it was first saved (1.5 edits recorded)",
+    "The file keeps a record of later changes. Genuine downloads from a bank or government site are normally saved once.",
+    25
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "statement",
+   "ids": [],
+   "statement": {
+    "rows": 3,
+    "checked": 2,
+    "mismatched": 0,
+    "outOfOrder": 0,
+    "summaryOk": null
+   },
+   "file": {
+    "kind": "pdf",
+    "program": "iText",
+    "created": "2026-02-31T00:00:00Z",
+    "modified": "D:20261012",
+    "revisions": 2.5
+   }
+  },
+  "echo": {
+   "docType": "statement",
+   "text": "Statement of Account\n1/10/26😀 grocery 500.00 9,500.00\n2/10/26😀 salary 1,000.00 10,500.00\n3/10/26 rent 4,000.00 6,500.00"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Opening Balance 100.00\n12/10/2026 x 50.00 150.00",
+   "docType": "statement",
+   "file": {
+    "created": "2026-09-01 10:00:00Z",
+    "modified": "2026-09-01T10:05:00Z",
+    "imageEditor": " "
+   }
+  },
+  "score": 85,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "doc_created_before_content",
+   "doc_image_edited",
+   "doc_not_proof",
+   "doc_statement_unread"
+  ],
+  "advice": [
+   "Don't act on this document, pay anything or share it further until the issuer confirms it.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.",
+   "Bank statement: ask for it to be downloaded from net banking in front of you, shared through the RBI Account Aggregator system, or confirmed by the bank."
+  ],
+  "reasons": [
+   [
+    "doc_created_before_content",
+    "File was created before the dates printed in it",
+    "The file says it was made on 2026-09-01, but it lists transactions after that. That can't happen in a statement downloaded from a bank.",
+    40
+   ],
+   [
+    "doc_image_edited",
+    "The image was saved by a photo-editing app",
+    "Photos of real documents come straight from a camera or scanner. This one passed through an editor.",
+    35
+   ],
+   [
+    "doc_statement_unread",
+    "Couldn't read the transaction rows",
+    "Amount checks need the rows as text. Try a clearer photo or the original PDF.",
+    0
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "statement",
+   "ids": [],
+   "statement": {
+    "rows": 1,
+    "checked": 0,
+    "mismatched": 0,
+    "outOfOrder": 0,
+    "summaryOk": null
+   },
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": "2026-09-01 10:00:00Z",
+    "modified": "2026-09-01T10:05:00Z",
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "statement",
+   "text": "Opening Balance 100.00\n12/10/2026 x 50.00 150.00"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Remit to IFSC: sbin0001234 or ifs code hdfc1234567, IFSC-ICIC0ABCDEF"
+  },
+  "score": 20,
+  "level": "warning",
+  "label": "Suspicious",
+  "ids": [
+   "doc_ifsc_bad",
+   "doc_not_proof"
+  ],
+  "advice": [
+   "Don't act on this document, pay anything or share it further until the issuer confirms it.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "doc_ifsc_bad",
+    "IFSC HDFC1234567 has the wrong format",
+    "Every IFSC has 4 letters, then a zero, then 6 letters or digits.",
+    20
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "letter",
+   "ids": [
+    {
+     "type": "ifsc",
+     "value": "SBIN0001234",
+     "valid": true
+    },
+    {
+     "type": "ifsc",
+     "value": "HDFC1234567",
+     "valid": false
+    },
+    {
+     "type": "ifsc",
+     "value": "ICIC0ABCDEF",
+     "valid": true
+    }
+   ],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "letter",
+   "text": "Remit to IFSC: sbin0001234 or ifs code hdfc1234567, IFSC-ICIC0ABCDEF"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Tax Invoice\nGSTIN 27ABCDE1234F1Z5\nPAN ABCDE1234F, ABCPE1234F, abcpe1234f\nGSTIN: 99AAPFU0939F1ZV 40AAPFU0939F1ZV"
+  },
+  "score": 100,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "doc_gstin_bad",
+   "doc_gstin_bad",
+   "doc_gstin_bad",
+   "doc_not_proof",
+   "doc_pan_bad"
+  ],
+  "advice": [
+   "Don't act on this document, pay anything or share it further until the issuer confirms it.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.",
+   "PAN: use \"Verify Your PAN\" on the Income Tax e-filing website (incometax.gov.in)."
+  ],
+  "reasons": [
+   [
+    "doc_pan_bad",
+    "PAN ABCDE1234F has an impossible format",
+    "The 4th letter of a PAN shows the holder type (P for a person, C for a company, and so on). \"D\" isn't used, so this PAN can't exist.",
+    30
+   ],
+   [
+    "doc_gstin_bad",
+    "GST number 27ABCDE1234F1Z5 fails its check",
+    "GST numbers end with a check character calculated from the rest. This one doesn't match, so the number was changed or mistyped.",
+    30
+   ],
+   [
+    "doc_gstin_bad",
+    "GST number 99AAPFU0939F1ZV fails its check",
+    "GST numbers end with a check character calculated from the rest. This one doesn't match, so the number was changed or mistyped.",
+    30
+   ],
+   [
+    "doc_gstin_bad",
+    "GST number 40AAPFU0939F1ZV fails its check",
+    "GST numbers end with a check character calculated from the rest. This one doesn't match, so the number was changed or mistyped.",
+    30
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "letter",
+   "ids": [
+    {
+     "type": "pan",
+     "value": "ABCDE1234F",
+     "valid": false
+    },
+    {
+     "type": "pan",
+     "value": "ABCPE1234F",
+     "valid": true
+    },
+    {
+     "type": "gstin",
+     "value": "27ABCDE1234F1Z5",
+     "valid": false
+    },
+    {
+     "type": "gstin",
+     "value": "99AAPFU0939F1ZV",
+     "valid": false
+    },
+    {
+     "type": "gstin",
+     "value": "40AAPFU0939F1ZV",
+     "valid": false
+    }
+   ],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "letter",
+   "text": "Tax Invoice\nGSTIN 27ABCDE1234F1Z5\nPAN ABCDE1234F, ABCPE1234F, abcpe1234f\nGSTIN: 99AAPFU0939F1ZV 40AAPFU0939F1ZV"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "भारत सरकार\nआधार\nराहुल शर्मा\nजन्म तिथि: १२/०५/१९९०\n4991 1866 5245\n४९९१ १८६६ ५२४६"
+  },
+  "score": 35,
+  "level": "warning",
+  "label": "Suspicious",
+  "ids": [
+   "doc_aadhaar_bad",
+   "doc_not_proof"
+  ],
+  "advice": [
+   "Don't act on this document, pay anything or share it further until the issuer confirms it.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.",
+   "Aadhaar: scan the QR code with UIDAI's official QR scanner app, or check the number at myaadhaar.uidai.gov.in (Verify Aadhaar)."
+  ],
+  "reasons": [
+   [
+    "doc_aadhaar_bad",
+    "Aadhaar number XXXX XXXX 5245 fails its built-in check",
+    "Every real Aadhaar number ends with a check digit calculated from the others. This one doesn't match: the number was changed, or a photo misread a digit. Compare it carefully with the card.",
+    35
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "id",
+   "ids": [
+    {
+     "type": "aadhaar",
+     "value": "XXXX XXXX 5245",
+     "valid": false
+    }
+   ],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "id",
+   "text": "भारत सरकार\nआधार\nराहुल शर्मा\nजन्म तिथि: १२/०५/१९९०\n4991 1866 5245\n४९९१ १८६६ ५२४६"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "UIDAI 4991 1866 5246 4991-1866-5246 2345 6789 0123 3456 7890 1234 5678 9012 3456 6789 0123 4567",
+   "docType": "auto"
+  },
+  "score": 100,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "doc_aadhaar_bad",
+   "doc_aadhaar_bad",
+   "doc_aadhaar_bad",
+   "doc_not_proof"
+  ],
+  "advice": [
+   "Don't act on this document, pay anything or share it further until the issuer confirms it.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.",
+   "Aadhaar: scan the QR code with UIDAI's official QR scanner app, or check the number at myaadhaar.uidai.gov.in (Verify Aadhaar)."
+  ],
+  "reasons": [
+   [
+    "doc_aadhaar_bad",
+    "Aadhaar number XXXX XXXX 0123 fails its built-in check",
+    "Every real Aadhaar number ends with a check digit calculated from the others. This one doesn't match: the number was changed, or a photo misread a digit. Compare it carefully with the card.",
+    35
+   ],
+   [
+    "doc_aadhaar_bad",
+    "Aadhaar number XXXX XXXX 1234 fails its built-in check",
+    "Every real Aadhaar number ends with a check digit calculated from the others. This one doesn't match: the number was changed, or a photo misread a digit. Compare it carefully with the card.",
+    35
+   ],
+   [
+    "doc_aadhaar_bad",
+    "Aadhaar number XXXX XXXX 3456 fails its built-in check",
+    "Every real Aadhaar number ends with a check digit calculated from the others. This one doesn't match: the number was changed, or a photo misread a digit. Compare it carefully with the card.",
+    35
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "id",
+   "ids": [
+    {
+     "type": "aadhaar",
+     "value": "XXXX XXXX 5246",
+     "valid": true
+    },
+    {
+     "type": "aadhaar",
+     "value": "XXXX XXXX 0123",
+     "valid": false
+    },
+    {
+     "type": "aadhaar",
+     "value": "XXXX XXXX 1234",
+     "valid": false
+    },
+    {
+     "type": "aadhaar",
+     "value": "XXXX XXXX 3456",
+     "valid": false
+    }
+   ],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "id",
+   "text": "UIDAI 4991 1866 5246 4991-1866-5246 2345 6789 0123 3456 7890 1234 5678 9012 3456 6789 0123 4567"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Rahul Sharma\nDOB 12.05.1990\n4991 1866 5246\nAadhaar",
+   "aadhaarQr": {
+    "decoded": true,
+    "signatureChecked": false,
+    "name": "R.  Sharma",
+    "dob": "DOB 13-05-1990",
+    "gender": "M",
+    "last4": 5246
+   }
+  },
+  "score": 60,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "doc_not_proof",
+   "doc_qr_mismatch",
+   "doc_qr_unchecked"
+  ],
+  "advice": [
+   "Don't act on this document, pay anything or share it further until the issuer confirms it.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.",
+   "Aadhaar: scan the QR code with UIDAI's official QR scanner app, or check the number at myaadhaar.uidai.gov.in (Verify Aadhaar)."
+  ],
+  "reasons": [
+   [
+    "doc_qr_mismatch",
+    "Printed details don't match the QR (name, date of birth)",
+    "The QR code holds the real details. When the printed card shows something different, the card was edited or someone else's QR was pasted on.",
+    50
+   ],
+   [
+    "doc_qr_unchecked",
+    "Aadhaar QR read, but its signature wasn't checked",
+    "Confirm it with UIDAI's official QR scanner app.",
+    0
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "id",
+   "ids": [
+    {
+     "type": "aadhaar",
+     "value": "XXXX XXXX 5246",
+     "valid": true
+    }
+   ],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   },
+   "qr": {
+    "name": "R.  Sharma",
+    "dob": "DOB 13-05-1990",
+    "gender": "M",
+    "last4": 5246,
+    "oldXml": false,
+    "signatureChecked": false,
+    "signatureValid": false
+   }
+  },
+  "echo": {
+   "docType": "id",
+   "text": "Rahul Sharma\nDOB 12.05.1990\n4991 1866 5246\nAadhaar"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Government of India Priya Verma 4991 1866 5246",
+   "aadhaarQr": {
+    "decoded": true,
+    "signatureChecked": true,
+    "signatureValid": "yes",
+    "name": "Al",
+    "last4": "1234",
+    "dob": 12051990
+   }
+  },
+  "score": 60,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "doc_not_proof",
+   "doc_qr_mismatch",
+   "doc_qr_verified"
+  ],
+  "advice": [
+   "Don't act on this document, pay anything or share it further until the issuer confirms it.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.",
+   "Aadhaar: scan the QR code with UIDAI's official QR scanner app, or check the number at myaadhaar.uidai.gov.in (Verify Aadhaar)."
+  ],
+  "reasons": [
+   [
+    "doc_qr_mismatch",
+    "Printed details don't match the QR (Aadhaar number)",
+    "The QR code holds the real details. When the printed card shows something different, the card was edited or someone else's QR was pasted on.",
+    50
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ],
+   [
+    "doc_qr_verified",
+    "Aadhaar QR is digitally signed by UIDAI",
+    "The QR code's signature is genuine, so the details inside the QR are real. Make sure the printed details and photo match the QR.",
+    -30
+   ]
+  ],
+  "info": {
+   "docType": "id",
+   "ids": [
+    {
+     "type": "aadhaar",
+     "value": "XXXX XXXX 5246",
+     "valid": true
+    }
+   ],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   },
+   "qr": {
+    "name": "Al",
+    "dob": 12051990,
+    "gender": null,
+    "last4": "1234",
+    "oldXml": false,
+    "signatureChecked": true,
+    "signatureValid": false
+   }
+  },
+  "echo": {
+   "docType": "id",
+   "text": "Government of India Priya Verma 4991 1866 5246"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Aadhaar",
+   "aadhaarQr": {
+    "decoded": false,
+    "oldXml": true
+   }
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "letter",
+   "ids": [],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "letter",
+   "text": "Aadhaar"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Office of the Commissioner of Police\nNotice u/s 41A\n\nYou must deposit Rs 50,000 for verification of your account.\nReply to: complaint.cell.mumbai@gmail.com",
+   "file": {
+    "kind": "image",
+    "imageEditor": "Snapseed"
+   }
+  },
+  "score": 100,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "doc_image_edited",
+   "doc_not_proof",
+   "doc_official_free_email",
+   "doc_pay_to_close"
+  ],
+  "advice": [
+   "Don't act on this document, pay anything or share it further until the issuer confirms it.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.",
+   "Government or police notice: look up the office's number on its official .gov.in website and call them. Agencies never ask for money to close cases."
+  ],
+  "reasons": [
+   [
+    "doc_pay_to_close",
+    "Demands payment to stop an arrest, case or investigation",
+    "Police, courts and agencies never ask you to pay money to close a case, stop a warrant or \"verify\" your account. This is the \"digital arrest\" scam.",
+    45
+   ],
+   [
+    "doc_official_free_email",
+    "Official-looking letter that uses a free e-mail address",
+    "Government offices, courts, police and regulators use official addresses (usually ending in .gov.in or .nic.in), never free e-mail services.",
+    40
+   ],
+   [
+    "doc_image_edited",
+    "The image was saved by a photo-editing app",
+    "Photos of real documents come straight from a camera or scanner. This one passed through an editor.",
+    35
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "letter",
+   "ids": [],
+   "file": {
+    "kind": "image",
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "letter",
+   "text": "Office of the Commissioner of Police\nNotice u/s 41A\n\nYou must deposit Rs 50,000 for verification of your account.\nReply to: complaint.cell.mumbai@gmail.com"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "",
+   "docType": "id"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "id",
+   "ids": [],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "id",
+   "text": ""
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "letter",
+   "ids": [],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "letter",
+   "text": ""
+  }
+ },
+ {
+  "kind": "helper",
+  "method": "verhoeffOk",
+  "input": "",
+  "result": false
+ },
+ {
+  "kind": "helper",
+  "method": "gstinOk",
+  "input": "",
+  "result": false
+ },
+ {
+  "kind": "helper",
+  "method": "verhoeffOk",
+  "input": "0",
+  "result": true
+ },
+ {
+  "kind": "helper",
+  "method": "gstinOk",
+  "input": "0",
+  "result": false
+ },
+ {
+  "kind": "helper",
+  "method": "verhoeffOk",
+  "input": "12a4",
+  "result": false
+ },
+ {
+  "kind": "helper",
+  "method": "gstinOk",
+  "input": "12a4",
+  "result": false
+ },
+ {
+  "kind": "helper",
+  "method": "verhoeffOk",
+  "input": "499118665246",
+  "result": true
+ },
+ {
+  "kind": "helper",
+  "method": "gstinOk",
+  "input": "499118665246",
+  "result": false
+ },
+ {
+  "kind": "helper",
+  "method": "verhoeffOk",
+  "input": "4991 1866 5246",
+  "result": false
+ },
+ {
+  "kind": "helper",
+  "method": "gstinOk",
+  "input": "4991 1866 5246",
+  "result": false
+ },
+ {
+  "kind": "helper",
+  "method": "verhoeffOk",
+  "input": "27aapfu0939f1zv",
+  "result": false
+ },
+ {
+  "kind": "helper",
+  "method": "gstinOk",
+  "input": "27aapfu0939f1zv",
+  "result": false
+ },
+ {
+  "kind": "helper",
+  "method": "verhoeffOk",
+  "input": "27AAPFU0939F1Z",
+  "result": false
+ },
+ {
+  "kind": "helper",
+  "method": "gstinOk",
+  "input": "27AAPFU0939F1Z",
+  "result": false
+ },
+ {
+  "kind": "helper",
+  "method": "verhoeffOk",
+  "input": "27AAPFU0939F1ZVX",
+  "result": false
+ },
+ {
+  "kind": "helper",
+  "method": "gstinOk",
+  "input": "27AAPFU0939F1ZVX",
+  "result": true
+ },
+ {
+  "kind": "helper",
+  "method": "verhoeffOk",
+  "input": "१२",
+  "result": false
+ },
+ {
+  "kind": "helper",
+  "method": "gstinOk",
+  "input": "१२",
+  "result": false
  }
 ]

@@ -45,6 +45,51 @@ jobs:
         with:
           name: SecondLook-APK
           path: app/build/app/outputs/flutter-apk/app-release.apk
+      # A test version that shows the exact error on screen if something goes wrong (bigger and slower; for testing only).
+      - name: Build the test APK
+        working-directory: app
+        run: flutter build apk --debug --dart-define-from-file=build_defines.json
+      - name: Save the test APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: SecondLook-TEST-APK
+          path: app/build/app/outputs/flutter-apk/app-debug.apk
+
+  # Starts the normal (release) app on an Android emulator and records what happens, so start-up crashes can be read here.
+  android-test:
+    needs: android
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: SecondLook-APK
+          path: apk
+      - name: Enable hardware acceleration for the emulator
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Open the app on an emulator and record the log
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          disable-animations: true
+          script: |
+            adb install -r apk/app-release.apk
+            adb logcat -c
+            adb shell monkey -p com.secondlook.second_look -c android.intent.category.LAUNCHER 1
+            sleep 40
+            adb logcat -d > logcat.txt
+            echo "===== CRASH DETAILS (send this part) =====" ; grep -n -A 45 -E "FATAL EXCEPTION|E/flutter|Unhandled Exception" logcat.txt | head -200 ; echo "===== END ====="
+            adb shell pidof com.secondlook.second_look && echo "APP IS RUNNING (no crash)" || echo "APP IS NOT RUNNING (it crashed or closed)"
+      - name: Save the log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: crash-log
+          path: logcat.txt
 
   web:
     runs-on: ubuntu-latest

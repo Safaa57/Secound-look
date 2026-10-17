@@ -56,6 +56,8 @@ public final class Engine {
     private final Map<String, Object> upiHandles, payApps;
     private final List<String> upiBait, upiOfficial, upiReceive;
     private final Pattern payPrank, payPending, payFailed, paySuccess;
+    private final Map<String, Object> docs;
+    private final List<String> pdfEditors, officeApps;
     private final int dangerT, warningT;
 
     public Engine(String rulesJson, PhoneLookup phone, String homeRegion) {
@@ -89,6 +91,9 @@ public final class Engine {
         payPending = reP(P.get("pendingWords"));
         payFailed = reP(P.get("failedWords"));
         paySuccess = reP(P.get("successWords"));
+        docs = R.get("documents") == null ? new HashMap<>() : Json.obj(R.get("documents"));
+        pdfEditors = strList(docs.get("pdfEditors"));
+        officeApps = strList(docs.get("officeApps"));
         Map<String, Object> t = Json.obj(R.get("thresholds"));
         dangerT = Json.num(t.get("danger"));
         warningT = Json.num(t.get("warning"));
@@ -805,6 +810,441 @@ public final class Engine {
         return res;
     }
 
+    // ------------------------------------------------------------------ documents (IDs, statements, letters)
+    private static final int[][] VH_D = {{0,1,2,3,4,5,6,7,8,9},{1,2,3,4,0,6,7,8,9,5},{2,3,4,0,1,7,8,9,5,6},{3,4,0,1,2,8,9,5,6,7},{4,0,1,2,3,9,5,6,7,8},{5,9,8,7,6,0,4,3,2,1},{6,5,9,8,7,1,0,4,3,2},{7,6,5,9,8,2,1,0,4,3},{8,7,6,5,9,3,2,1,0,4},{9,8,7,6,5,4,3,2,1,0}};
+    private static final int[][] VH_P = {{0,1,2,3,4,5,6,7,8,9},{1,5,7,6,2,8,3,0,9,4},{5,8,0,3,7,9,6,1,4,2},{8,9,1,6,0,4,3,5,2,7},{9,4,5,3,1,2,6,8,7,0},{4,2,8,6,5,7,3,9,0,1},{2,7,9,3,8,0,6,4,1,5},{7,0,4,6,9,1,3,2,5,8}};
+
+    /** Aadhaar numbers end with a Verhoeff check digit. False for anything that isn't all digits. */
+    public static boolean verhoeffOk(String num) {
+        if (num == null || !num.matches("[0-9]+")) return false;
+        int c = 0;
+        for (int i = 0; i < num.length(); i++) c = VH_D[c][VH_P[i % 8][num.charAt(num.length() - 1 - i) - '0']];
+        return c == 0;
+    }
+
+    /** GSTIN check character (15th) over the first 14 characters (upper-case only, like engine.js). */
+    public static boolean gstinOk(String g) {
+        if (g == null) return false;
+        String cs = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        int sum = 0;
+        for (int i = 0; i < 14; i++) {
+            if (i >= g.length()) return false;
+            int v = cs.indexOf(g.charAt(i));
+            if (v < 0) return false;
+            int prod = v * (i % 2 == 0 ? 1 : 2);
+            sum += prod / 36 + prod % 36;
+        }
+        return g.length() > 14 && cs.charAt((36 - sum % 36) % 36) == g.charAt(14);
+    }
+
+    private static int mrzValue(char ch) {
+        if (ch == '<') return 0;
+        if (ch >= '0' && ch <= '9') return ch - 48;
+        return ch - 55; // A=10
+    }
+
+    private static char mrzCheck(String s) {
+        int[] wt = {7, 3, 1};
+        int sum = 0;
+        for (int i = 0; i < s.length(); i++) sum += mrzValue(s.charAt(i)) * wt[i % 3];
+        return (char) ('0' + Math.floorMod(sum, 10));
+    }
+
+    private static final Pattern MRZ_JUNK = Pattern.compile(jsRe("[\\s\u00ab]"));
+    private static final Pattern MRZ_L1 = Pattern.compile("^P[A-Z<][A-Z<]{3}[A-Z<]{39}\\z");
+    private static final Pattern MRZ_L2 = Pattern.compile("^[A-Z0-9<]{9}[0-9<][A-Z<]{3}[0-9<]{6}[0-9<][MFX<][0-9<]{6}[0-9<][A-Z0-9<]{14}[0-9<][0-9<]\\z");
+
+    /** Passport machine-readable zone (ICAO 9303 TD3): two 44-character lines at the bottom of the photo page. */
+    private static String[] findMrz(String text) {
+        String[] raw = text.toUpperCase(Locale.ROOT).split("\n", -1);
+        String[] lines = new String[raw.length];
+        for (int i = 0; i < raw.length; i++) lines[i] = MRZ_JUNK.matcher(raw[i]).replaceAll("").replace('\u2039', '<').replace('\u3008', '<');
+        for (int i = 0; i < lines.length - 1; i++) {
+            String a = lines[i], b = lines[i + 1];
+            if (a.length() == 44 && b.length() == 44 && MRZ_L1.matcher(a).find() && MRZ_L2.matcher(b).find()) return new String[]{a, b};
+        }
+        return null;
+    }
+
+    /** UTC year of an epoch-ms time (like new Date(ms).getUTCFullYear()), or null for an invalid date. */
+    private static Integer utcYear(double ms) {
+        if (Double.isNaN(ms) || Double.isInfinite(ms) || Math.abs(ms) > 8.64e15) return null;
+        return LocalDate.ofEpochDay(Math.floorDiv((long) ms, 86400000L)).getYear();
+    }
+
+    private static String yymmdd(String s, boolean future, Integer nowY) {
+        if (!s.matches("[0-9]{6}")) return null;
+        int y = Integer.parseInt(s.substring(0, 2));
+        y += future ? 2000 : (nowY != null && y > nowY ? 1900 : 2000);
+        return y + "-" + s.substring(2, 4) + "-" + s.substring(4, 6);
+    }
+
+    private static final Pattern ISO_DATE = Pattern.compile("^([+-][0-9]{6}|[0-9]{4})(?:-([0-9]{2})(?:-([0-9]{2}))?)?(?:[Tt ]([0-9]{2}):([0-9]{2})(?::([0-9]{2})(?:\\.([0-9]+))?)?)?([Zz]|[+-][0-9]{2}:?[0-9]{2})?\\z");
+
+    /**
+     * Date.parse() for the ISO-8601 forms JS accepts (YYYY[-MM[-DD]][THH:mm[:ss[.sss]]][Z|±HH:mm]); NaN otherwise.
+     * Unlike JS, a date-time without a zone is read as UTC (JS uses the device's local time zone), and JS's
+     * engine-specific fallback formats ("Oct 12 2026", "2026/10/12") are not supported.
+     */
+    static double jsDateParse(String s) {
+        Matcher m = ISO_DATE.matcher(s == null ? "" : s);
+        if (!m.find() || "-000000".equals(m.group(1))) return Double.NaN;
+        long y = Long.parseLong(m.group(1));
+        int mo = m.group(2) == null ? 1 : Integer.parseInt(m.group(2)), d = m.group(3) == null ? 1 : Integer.parseInt(m.group(3));
+        int h = m.group(4) == null ? 0 : Integer.parseInt(m.group(4)), mi = m.group(5) == null ? 0 : Integer.parseInt(m.group(5));
+        int sec = m.group(6) == null ? 0 : Integer.parseInt(m.group(6)), ms = m.group(7) == null ? 0 : Integer.parseInt((m.group(7) + "00").substring(0, 3));
+        if (mo < 1 || mo > 12 || d < 1 || d > 31 || h > 24 || mi > 59 || sec > 59 || (h == 24 && (mi != 0 || sec != 0 || ms != 0))) return Double.NaN;
+        long off = 0;
+        String tz = m.group(8);
+        if (tz != null && !tz.equalsIgnoreCase("z")) {
+            String z = tz.replace(":", "");
+            int oh = Integer.parseInt(z.substring(1, 3)), om = Integer.parseInt(z.substring(3, 5));
+            if (oh > 23 || om > 59) return Double.NaN;
+            off = (tz.charAt(0) == '-' ? -1 : 1) * (oh * 60L + om);
+        }
+        if (Math.abs(y) > 300000) return Double.NaN;
+        long days = LocalDate.of((int) y, mo, 1).toEpochDay() + d - 1;
+        double t = days * 86400000.0 + h * 3600000.0 + mi * 60000.0 + sec * 1000.0 + ms - off * 60000.0;
+        return Math.abs(t) > 8.64e15 ? Double.NaN : t;
+    }
+
+    // JS value helpers for loosely typed document input (Maps from JSON or the app).
+    static boolean truthy(Object o) {
+        if (o == null) return false;
+        if (o instanceof Boolean) return (Boolean) o;
+        if (o instanceof Number) { double d = ((Number) o).doubleValue(); return d != 0 && !Double.isNaN(d); }
+        if (o instanceof String) return !((String) o).isEmpty();
+        return true;
+    }
+
+    /** Number -> String the way JS prints it (whole numbers without ".0"). */
+    static String numStr(double d) {
+        if (Double.isNaN(d)) return "NaN";
+        if (Double.isInfinite(d)) return d > 0 ? "Infinity" : "-Infinity";
+        if (d == Math.rint(d) && Math.abs(d) < 1e21) return Long.toString((long) d);
+        return Double.toString(d);
+    }
+
+    /** String(x). */
+    static String jsStr(Object o) {
+        if (o == null) return "null";
+        if (o instanceof Number) return numStr(((Number) o).doubleValue());
+        return String.valueOf(o);
+    }
+
+    /** Input values echoed into results: numbers normalised like JSON.stringify would print them. */
+    private static Object jsVal(Object o) { return o instanceof Number ? jsNum(((Number) o).doubleValue()) : o; }
+
+    private static Object orNull(Object o) { return truthy(o) ? jsVal(o) : null; }
+
+    /** Number(x) (NaN when JS would give NaN). */
+    static double jsToNumber(Object o) {
+        if (o == null) return 0;
+        if (o instanceof Boolean) return (Boolean) o ? 1 : 0;
+        if (o instanceof Number) return ((Number) o).doubleValue();
+        String s = jsTrim(String.valueOf(o));
+        if (s.isEmpty()) return 0;
+        if (s.matches("[+-]?Infinity")) return s.startsWith("-") ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY;
+        if (s.matches("[+-]?([0-9]+\\.?[0-9]*|\\.[0-9]+)([eE][+-]?[0-9]+)?")) return Double.parseDouble(s);
+        if (s.matches("0[xX][0-9a-fA-F]+")) return new BigInteger(s.substring(2), 16).doubleValue();
+        if (s.matches("0[oO][0-7]+")) return new BigInteger(s.substring(2), 8).doubleValue();
+        if (s.matches("0[bB][01]+")) return new BigInteger(s.substring(2), 2).doubleValue();
+        return Double.NaN;
+    }
+
+    private static boolean strictEq(Object a, Object b) {
+        if (a == null || b == null) return a == b;
+        if (a instanceof Number && b instanceof Number) return ((Number) a).doubleValue() == ((Number) b).doubleValue();
+        return a.getClass() == b.getClass() && a.equals(b);
+    }
+
+    private static final String AMT = "((?:\\d{1,3}(?:,\\d{2,3})+|\\d+)\\.\\d{2})";
+    private static final Pattern AMT_IN_LINE = Pattern.compile(jsRe("(^|[^\\d.,])" + AMT + "(?!\\d)"));
+    private static final Pattern LEAD_DATE = Pattern.compile(jsRe("^\\d{1,2}[\\s/.-]"));
+    private static final Pattern SUM_OPEN = Pattern.compile(jsRe("opening\\s+balance[^\\d\\n]{0,20}" + AMT), CI);
+    private static final Pattern SUM_CLOSE = Pattern.compile(jsRe("closing\\s+balance[^\\d\\n]{0,20}" + AMT), CI);
+    private static final Pattern SUM_CR = Pattern.compile(jsRe("total\\s+(?:credits?|deposits?)[^\\d\\n]{0,20}" + AMT), CI);
+    private static final Pattern SUM_DR = Pattern.compile(jsRe("total\\s+(?:debits?|withdrawals?)[^\\d\\n]{0,20}" + AMT), CI);
+
+    private static List<Double> lineAmounts(String line) {
+        List<Double> out = new ArrayList<>();
+        Matcher m = AMT_IN_LINE.matcher(line);
+        while (m.find()) out.add(Double.parseDouble(m.group(2).replace(",", "")));
+        return out;
+    }
+
+    private static int[] leadingDate(String line) {
+        String head = cap(jsTrim(line), 14);
+        if (!LEAD_DATE.matcher(head).find()) return null;
+        int[] d = findDate(head);
+        return d != null && d[3] == 0 ? d : null;
+    }
+
+    private static double utcDay(int[] d) { return LocalDate.of(d[0], d[1], d[2]).toEpochDay() * 86400000.0; }
+
+    private static Double grab(Pattern p, String text) {
+        Matcher m = p.matcher(text);
+        return m.find() ? Double.valueOf(Double.parseDouble(m.group(1).replace(",", ""))) : null;
+    }
+
+    /** Reads statement rows (date ... amount ... balance) and checks that every balance follows from the one before. */
+    private static Map<String, Object> statementMaths(String text) {
+        List<int[]> dates = new ArrayList<>();
+        List<List<Double>> amounts = new ArrayList<>();
+        List<String> lines = new ArrayList<>();
+        for (String line : text.split("\n", -1)) {
+            int[] d = leadingDate(line);
+            if (d == null) continue;
+            List<Double> amts = lineAmounts(line.length() > 8 ? line.substring(8) : "");
+            if (amts.size() < 2) continue;
+            dates.add(d);
+            amounts.add(amts);
+            lines.add(cap(jsTrim(line), 120));
+        }
+        int checked = 0, outOfOrder = 0;
+        List<String> mismatches = new ArrayList<>();
+        Double lastDate = null;
+        for (int i = 0; i < dates.size(); i++) {
+            double ts = utcDay(dates.get(i));
+            if (lastDate == null || ts > lastDate) lastDate = ts;
+            if (i == 0) continue;
+            double prevTs = utcDay(dates.get(i - 1));
+            if (ts < prevTs - 86400000.0 * 2) outOfOrder++;
+            List<Double> pa = amounts.get(i - 1), ra = amounts.get(i);
+            double prev = pa.get(pa.size() - 1), bal = ra.get(ra.size() - 1);
+            boolean any = false, ok = false;
+            for (int k = 0; k < ra.size() - 1; k++) {
+                double x = ra.get(k);
+                if (!(x > 0)) continue;
+                any = true;
+                if (Math.abs(prev + x - bal) < 0.011 || Math.abs(prev - x - bal) < 0.011) ok = true;
+            }
+            if (!any) continue;
+            checked++;
+            if (!ok) mismatches.add(lines.get(i));
+        }
+        Map<String, Object> res = Json.map("rows", dates.size(), "checked", checked, "mismatches", mismatches, "outOfOrder", outOfOrder, "lastDate", lastDate);
+        // Summary block: opening + credits - debits = closing
+        Double open = grab(SUM_OPEN, text), close = grab(SUM_CLOSE, text), cr = grab(SUM_CR, text), dr = grab(SUM_DR, text);
+        if (open != null && close != null && cr != null && dr != null) {
+            res.put("summary", Json.map("open", open, "credits", cr, "debits", dr, "close", close));
+            res.put("summaryOk", Math.abs(open + cr - dr - close) < 0.011);
+        }
+        return res;
+    }
+
+    private static final Pattern G_PASSPORT = Pattern.compile(jsRe("\\bpassport\\b|republic of india"));
+    private static final Pattern G_AADHAAR = Pattern.compile("aadhaar|\u0906\u0927\u093e\u0930|unique identification|uidai|government of india");
+    private static final Pattern G_AADHAAR_NUM = Pattern.compile(jsRe("\\b[2-9]\\d{3}[ -]\\d{4}[ -]\\d{4}\\b"));
+    private static final Pattern G_PAN_CARD = Pattern.compile("income tax department|permanent account number");
+    private static final Pattern G_STATEMENT = Pattern.compile("statement of account|account statement|bank statement|opening balance|closing balance");
+
+    private static String guessDocType(String t, boolean hasMrz) {
+        String low = t.toLowerCase(Locale.ROOT);
+        if (hasMrz || G_PASSPORT.matcher(low).find()) return "passport";
+        if (G_AADHAAR.matcher(low).find() && G_AADHAAR_NUM.matcher(t).find()) return "id";
+        if (G_PAN_CARD.matcher(low).find()) return "id";
+        if (G_STATEMENT.matcher(low).find()) return "statement";
+        return "letter";
+    }
+
+    private static String maskAadhaar(String n) { return "XXXX XXXX " + n.substring(Math.max(0, n.length() - 4)); }
+
+    private static String lettersOnly(String s) { return s.toLowerCase(Locale.ROOT).replaceAll("[^a-z]", ""); }
+
+    private static final Pattern PRINTED_PASSPORT = Pattern.compile(jsRe("\\b[A-Z][0-9]{7}\\b"));
+    private static final Pattern AADHAAR_MENTION = Pattern.compile("aadhaar|\u0906\u0927\u093e\u0930|uidai", CI);
+    private static final Pattern AADHAAR_RE = Pattern.compile(jsRe("(^|[^\\d])([2-9]\\d{3})[ -](\\d{4})[ -](\\d{4})(?![\\d])"));
+    private static final Pattern PAN_RE = Pattern.compile(jsRe("\\b[A-Z]{5}[0-9]{4}[A-Z]\\b"));
+    private static final Pattern GSTIN_RE = Pattern.compile(jsRe("\\b[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9A-Z]Z[0-9A-Z]\\b"));
+    private static final Pattern IFSC_RE = Pattern.compile(jsRe("\\bIFS(?:C)?(?:\\s*CODE)?[\\s:.-]*([A-Z0-9]{11})\\b"));
+    private static final Pattern QR_AADHAAR_PRINTED = Pattern.compile(jsRe("[2-9]\\d{3}[ -]\\d{4}[ -](\\d{4})"));
+    private static final Pattern QR_DOB = Pattern.compile(jsRe("\\d{2}[-/.]\\d{2}[-/.]\\d{4}"));
+    private static final Pattern PRINTED_DOB = Pattern.compile(jsRe("\\b\\d{2}[-/.]\\d{2}[-/.]\\d{4}\\b"));
+    private static final Pattern OPEN_CLOSE = Pattern.compile("opening balance|closing balance", CI);
+
+    private static List<String> uniqueMatches(Pattern p, String s, int max) {
+        LinkedHashSet<String> out = new LinkedHashSet<>();
+        Matcher m = p.matcher(s);
+        while (m.find()) out.add(m.group());
+        List<String> l = new ArrayList<>(out);
+        return l.subList(0, Math.min(max, l.size()));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Map<String, Object> mapOrEmpty(Object o) { return o instanceof Map ? (Map<String, Object>) o : new HashMap<>(); }
+
+    /**
+     * Checks a document for signs of forgery.
+     * input: text, docType (auto|id|passport|statement|letter), file (Map: kind, producer, creator, created, modified,
+     * revisions, imageEditor), aadhaarQr (Map: decoded, oldXml, signatureChecked, signatureValid, name, dob, gender, last4),
+     * now (epoch ms as a Number, optional; defaults to the current time). Values may be null.
+     */
+    public Map<String, Object> analyzeDocument(Map<String, Object> input) {
+        if (input == null) input = new HashMap<>();
+        Object textO = input.get("text");
+        String t = cap(truthy(textO) ? jsStr(textO) : "", MAX_TEXT * 5);
+        List<Map<String, Object>> reasons = new ArrayList<>();
+        String[] mrz = findMrz(t);
+        Object dt = input.get("docType");
+        Object docType = truthy(dt) && !"auto".equals(dt) ? dt : guessDocType(t, mrz != null);
+        List<Object> ids = new ArrayList<>();
+        Map<String, Object> info = Json.map("docType", docType, "ids", ids);
+        Map<String, Object> file = mapOrEmpty(input.get("file"));
+        Object qrO = input.get("aadhaarQr");
+        Map<String, Object> qr = qrO instanceof Map ? mapOrEmpty(qrO) : null;
+        Object nowO = input.get("now");
+        double now = nowO instanceof Number ? ((Number) nowO).doubleValue() : (double) System.currentTimeMillis();
+
+        // ---- passport MRZ
+        if (mrz != null) {
+            String b = mrz[1];
+            String num = b.substring(0, 9), dob = b.substring(13, 19), exp = b.substring(21, 27), opt = b.substring(28, 42);
+            List<String> fails = new ArrayList<>();
+            if (mrzCheck(num) != b.charAt(9)) fails.add("passport number");
+            if (mrzCheck(dob) != b.charAt(19)) fails.add("date of birth");
+            if (mrzCheck(exp) != b.charAt(27)) fails.add("expiry date");
+            if (b.charAt(42) != '<' && mrzCheck(opt) != b.charAt(42)) fails.add("personal number");
+            String composite = b.substring(0, 10) + b.substring(13, 20) + b.substring(21, 43);
+            if (mrzCheck(composite) != b.charAt(43)) fails.add("overall check");
+            String pnum = num.replace("<", "");
+            Integer nowY = utcYear(now);
+            if (nowY != null) nowY = nowY % 100;
+            String expiry = yymmdd(exp, true, nowY);
+            info.put("passport", Json.map("number", pnum, "country", b.substring(10, 13).replace("<", ""), "dob", yymmdd(dob, false, nowY), "expiry", expiry, "mrzValid", fails.isEmpty()));
+            ids.add(Json.map("type", "passport", "value", pnum, "valid", fails.isEmpty()));
+            if (!fails.isEmpty()) reasons.add(reason("doc_mrz_bad", "Passport code lines don't add up (" + String.join(", ", fails) + ")", "The two lines of code at the bottom of a passport contain check digits. These don't match, which happens when a passport is edited. Blurry photos can also cause misreads, so compare the code with the printed details.", 40));
+            // Printed passport number must match the MRZ.
+            List<String> restL = new ArrayList<>();
+            for (String l : t.toUpperCase(Locale.ROOT).split("\n", -1)) {
+                String c = MRZ_JUNK.matcher(l).replaceAll("");
+                if (!c.equals(mrz[0]) && !c.equals(mrz[1])) restL.add(l);
+            }
+            String rest = String.join("\n", restL);
+            if (!pnum.isEmpty() && PRINTED_PASSPORT.matcher(rest).find() && !rest.contains(pnum)) reasons.add(reason("doc_mrz_mismatch", "Printed passport number doesn't match the code lines", "The number printed on the page is different from the number in the code at the bottom.", 40));
+            if (expiry != null && jsDateParse(expiry + "T00:00:00Z") < now) reasons.add(reason("doc_expired", "This passport has expired (" + expiry + ")", "An expired passport can't be used as valid ID.", 15));
+        }
+
+        // ---- Aadhaar numbers (4-4-4 groups on an Aadhaar document)
+        if ("id".equals(docType) || AADHAAR_MENTION.matcher(t).find()) {
+            Matcher m = AADHAAR_RE.matcher(t);
+            Set<String> seen = new HashSet<>();
+            while (m.find() && seen.size() < 4) {
+                String n = m.group(2) + m.group(3) + m.group(4);
+                if (!seen.add(n)) continue;
+                boolean ok = verhoeffOk(n);
+                ids.add(Json.map("type", "aadhaar", "value", maskAadhaar(n), "valid", ok));
+                if (!ok) reasons.add(reason("doc_aadhaar_bad", "Aadhaar number " + maskAadhaar(n) + " fails its built-in check", "Every real Aadhaar number ends with a check digit calculated from the others. This one doesn't match: the number was changed, or a photo misread a digit. Compare it carefully with the card.", 35));
+            }
+        }
+
+        // ---- PAN, GSTIN, IFSC
+        String up = t.toUpperCase(Locale.ROOT);
+        String panEntity = docs.get("panEntity") == null ? "ABCEFGHJLPT" : String.valueOf(docs.get("panEntity"));
+        for (String p : uniqueMatches(PAN_RE, up, 4)) {
+            boolean ok = panEntity.indexOf(p.charAt(3)) >= 0;
+            ids.add(Json.map("type", "pan", "value", p, "valid", ok));
+            if (!ok) reasons.add(reason("doc_pan_bad", "PAN " + p + " has an impossible format", "The 4th letter of a PAN shows the holder type (P for a person, C for a company, and so on). \"" + p.charAt(3) + "\" isn't used, so this PAN can't exist.", 30));
+        }
+        for (String g : uniqueMatches(GSTIN_RE, up, 4)) {
+            int st = Integer.parseInt(g.substring(0, 2));
+            boolean ok = gstinOk(g) && ((st >= 1 && st <= 38) || st == 97 || st == 99);
+            ids.add(Json.map("type", "gstin", "value", g, "valid", ok));
+            if (!ok) reasons.add(reason("doc_gstin_bad", "GST number " + g + " fails its check", "GST numbers end with a check character calculated from the rest. This one doesn't match, so the number was changed or mistyped.", 30));
+        }
+        Matcher im = IFSC_RE.matcher(up);
+        while (im.find()) {
+            String c = im.group(1);
+            boolean ok = c.matches("[A-Z]{4}0[A-Z0-9]{6}");
+            ids.add(Json.map("type", "ifsc", "value", c, "valid", ok));
+            if (!ok) reasons.add(reason("doc_ifsc_bad", "IFSC " + c + " has the wrong format", "Every IFSC has 4 letters, then a zero, then 6 letters or digits.", 20));
+        }
+
+        // ---- Aadhaar QR
+        if (qr != null && truthy(qr.get("decoded"))) {
+            boolean oldXml = truthy(qr.get("oldXml")), sigChecked = truthy(qr.get("signatureChecked")), sigValid = truthy(qr.get("signatureValid"));
+            info.put("qr", Json.map("name", orNull(qr.get("name")), "dob", orNull(qr.get("dob")), "gender", orNull(qr.get("gender")), "last4", orNull(qr.get("last4")),
+                    "oldXml", oldXml, "signatureChecked", sigChecked, "signatureValid", Boolean.TRUE.equals(qr.get("signatureValid"))));
+            if (oldXml) reasons.add(reason("doc_qr_old", "Old-style Aadhaar QR without a digital signature", "Older Aadhaar QR codes aren't signed, so they're easy to fake. Ask for an e-Aadhaar or a recent print with the secure QR.", 10));
+            else if (sigChecked && sigValid) reasons.add(reason("doc_qr_verified", "Aadhaar QR is digitally signed by UIDAI", "The QR code's signature is genuine, so the details inside the QR are real. Make sure the printed details and photo match the QR.", -30));
+            else if (sigChecked) reasons.add(reason("doc_qr_bad_signature", "Aadhaar QR signature is not valid", "The secure QR on a real Aadhaar is signed by UIDAI. This signature doesn't check out, so the QR was made or changed by someone else.", 60));
+            else reasons.add(reason("doc_qr_unchecked", "Aadhaar QR read, but its signature wasn't checked", "Confirm it with UIDAI's official QR scanner app.", 0));
+            if (jsTrim(t).length() >= 30) {
+                List<String> mism = new ArrayList<>();
+                Object qn = qr.get("name");
+                if (truthy(qn) && lettersOnly(jsStr(qn)).length() >= 3 && !lettersOnly(t).contains(lettersOnly(jsStr(qn)))) mism.add("name");
+                Object l4 = qr.get("last4");
+                if (truthy(l4)) {
+                    List<String> printedA = new ArrayList<>();
+                    Matcher m = QR_AADHAAR_PRINTED.matcher(t);
+                    while (m.find()) printedA.add(m.group().substring(m.group().length() - 4));
+                    if (!printedA.isEmpty() && !printedA.contains(jsStr(l4))) mism.add("Aadhaar number");
+                }
+                Object qd = qr.get("dob");
+                if (truthy(qd) && QR_DOB.matcher(jsStr(qd)).find()) {
+                    String q = jsStr(qd).replaceAll("[-/.]", "");
+                    List<String> printedD = new ArrayList<>();
+                    Matcher m = PRINTED_DOB.matcher(t);
+                    while (m.find()) printedD.add(m.group().replaceAll("[-/.]", ""));
+                    if (!printedD.isEmpty() && !printedD.contains(q)) mism.add("date of birth");
+                }
+                if (!mism.isEmpty()) reasons.add(reason("doc_qr_mismatch", "Printed details don't match the QR (" + String.join(", ", mism) + ")", "The QR code holds the real details. When the printed card shows something different, the card was edited or someone else's QR was pasted on.", 50));
+            }
+        }
+
+        // ---- bank statement maths
+        if ("statement".equals(docType) || OPEN_CLOSE.matcher(t).find()) {
+            Map<String, Object> sm = statementMaths(t);
+            List<?> mismatches = (List<?>) sm.get("mismatches");
+            int rows = Json.num(sm.get("rows")), checked = Json.num(sm.get("checked")), outOfOrder = Json.num(sm.get("outOfOrder"));
+            Object summaryOk = sm.get("summaryOk");
+            info.put("statement", Json.map("rows", rows, "checked", checked, "mismatched", mismatches.size(), "outOfOrder", outOfOrder, "summaryOk", summaryOk));
+            if (checked >= 2 && !mismatches.isEmpty()) {
+                boolean many = mismatches.size() >= 2;
+                reasons.add(reason("doc_balance_mismatch", "Balances don't add up in " + mismatches.size() + " of " + checked + " rows", "In a real statement every balance equals the previous balance plus credits minus debits. " + (many ? "Several rows break this, which is a strong sign the amounts were edited." : "One row breaks this. It may be a misread, so look at that row: ") + "\"" + mismatches.get(0) + "\"", many ? 45 : 25));
+            }
+            if (Boolean.FALSE.equals(summaryOk)) reasons.add(reason("doc_summary_mismatch", "Statement totals don't add up", "Opening balance + total credits \u2212 total debits should equal the closing balance. Here it doesn't.", 45));
+            if (outOfOrder >= 2) reasons.add(reason("doc_dates_order", "Transaction dates are out of order", "Bank statements list transactions in date order. Rows appear to have been moved or added.", 15));
+            Double lastDate = (Double) sm.get("lastDate");
+            if (lastDate != null && lastDate != 0 && truthy(file.get("created"))) {
+                double c = jsDateParse(jsStr(file.get("created")));
+                if (!Double.isNaN(c) && c < lastDate - 86400000.0) reasons.add(reason("doc_created_before_content", "File was created before the dates printed in it", "The file says it was made on " + cap(jsStr(file.get("created")), 10) + ", but it lists transactions after that. That can't happen in a statement downloaded from a bank.", 40));
+            }
+            if ("statement".equals(docType) && rows < 3) reasons.add(reason("doc_statement_unread", "Couldn't read the transaction rows", "Amount checks need the rows as text. Try a clearer photo or the original PDF.", 0));
+        }
+
+        // ---- file signs (PDF metadata or image editor)
+        Object producer = file.get("producer"), creator = file.get("creator"), created = file.get("created"), modified = file.get("modified"), revO = file.get("revisions");
+        String prog = ((truthy(producer) ? jsStr(producer) : "") + " " + (truthy(creator) ? jsStr(creator) : "")).toLowerCase(Locale.ROOT);
+        String program = jsTrim((truthy(creator) ? jsStr(creator) : "") + (truthy(producer) && !strictEq(producer, creator) ? " / " + jsStr(producer) : ""));
+        info.put("file", Json.map("kind", orNull(file.get("kind")), "program", program.isEmpty() ? null : program, "created", orNull(created), "modified", orNull(modified), "revisions", truthy(revO) ? jsVal(revO) : 0));
+        String editor = null, office = null;
+        for (String e : pdfEditors) if (prog.contains(e)) { editor = e; break; }
+        if (editor == null) for (String e : officeApps) if (prog.contains(e)) { office = e; break; }
+        boolean isStatement = "statement".equals(docType);
+        if (editor != null) reasons.add(reason("doc_pdf_editor", "Made or re-saved with a PDF editing app", "Documents issued by banks and government offices come straight from their systems. A file that passed through an editing app may have been changed.", 30));
+        else if (office != null) reasons.add(reason("doc_office_app", isStatement ? "Statement made with a word processor or design app" : "Made with a word processor or design app", isStatement ? "Banks generate statements from their own systems, not from word-processing or design apps. This is a common sign of a fake statement." : "Official documents are usually generated by the issuer's system. A document typed in a general app could have been made by anyone.", isStatement ? 35 : 15));
+        if (truthy(file.get("imageEditor"))) reasons.add(reason("doc_image_edited", "The image was saved by a photo-editing app", "Photos of real documents come straight from a camera or scanner. This one passed through an editor.", 35));
+        double revs = jsToNumber(truthy(revO) ? revO : 0);
+        double cT = jsDateParse(truthy(created) ? jsStr(created) : ""), mT = jsDateParse(truthy(modified) ? jsStr(modified) : "");
+        if (revs > 1) reasons.add(reason("doc_modified", "Changed after it was first saved (" + numStr(revs - 1) + (revs - 1 == 1 ? " edit" : " edits") + " recorded)", "The file keeps a record of later changes. Genuine downloads from a bank or government site are normally saved once.", 25));
+        else if (!Double.isNaN(cT) && !Double.isNaN(mT) && mT - cT > 10 * 60000) reasons.add(reason("doc_modified", "Changed after it was first created", "The file was modified " + cap(jsStr(modified), 10) + ", after it was created " + cap(jsStr(created), 10) + ".", 20));
+
+        // ---- fake-letter tricks (same rules as messages)
+        Map<String, Object> msg = analyzeMessage(cap(t, MAX_TEXT));
+        Set<String> have = new HashSet<>();
+        for (Map<String, Object> r : reasons) have.add((String) r.get("id"));
+        for (Object o : Json.arr(msg.get("reasons"))) {
+            Map<String, Object> r = Json.obj(o);
+            if (!have.contains((String) r.get("id")) && !"shouting".equals(r.get("id"))) reasons.add(r);
+        }
+
+        reasons.add(reason("doc_not_proof", "A check like this can't prove a document is genuine", "Only the issuer can confirm it. Use the official verification steps below before you rely on it.", 0));
+        Map<String, Object> res = finish("document", Json.map("docType", docType, "text", cap(t, 2000)), reasons, info);
+        if ("safe".equals(Json.obj(res.get("level")).get("key"))) res.put("level", Json.map("key", "safe", "label", "No signs of forgery found. Confirm with the issuer"));
+        return res;
+    }
+
     // ------------------------------------------------------------------ SMS sender (Indian DLT headers)
     public Map<String, Object> analyzeSender(String senderIn, String body) {
         Map<String, Object> S = Json.obj(R.get("senderRules"));
@@ -978,6 +1418,7 @@ public final class Engine {
                 case "call": a.add("Hang up. Call the organisation back on the number printed on your card, bill or their official website."); break;
                 case "upi": a.add("Don't pay or approve this request. If someone said you'd receive money this way, it's a scam."); break;
                 case "payment": a.add("Don't hand over goods, services or any \"refund\" until the money shows in your own bank or UPI app."); break;
+                case "document": a.add("Don't act on this document, pay anything or share it further until the issuer confirms it."); break;
                 default: break;
             }
             for (Map<String, Object> r : reasons) {
@@ -995,9 +1436,20 @@ public final class Engine {
             a.add("Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.");
         } else {
             if ("payment".equals(kind)) a.add("Open your own bank or UPI app and look for this payment before you hand anything over. A screenshot or SMS isn't enough.");
+            else if ("document".equals(kind)) a.add("A clean result only means no signs of forgery were found. Confirm important documents with the issuer.");
             else if ("upi".equals(kind)) a.add("Before paying, check the name your UPI app shows for this ID. Remember: you never pay or enter a PIN to receive money.");
             a.add("No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.");
             a.add("When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.");
+        }
+        if ("document".equals(kind)) {
+            List<String> idList = new ArrayList<>();
+            for (Map<String, Object> r : reasons) idList.add((String) r.get("id"));
+            String all = String.join(" ", idList);
+            if (Pattern.compile("aadhaar|doc_qr").matcher(all).find() || ids.contains("doc_aadhaar_bad")) a.add("Aadhaar: scan the QR code with UIDAI's official QR scanner app, or check the number at myaadhaar.uidai.gov.in (Verify Aadhaar).");
+            if (ids.contains("doc_pan_bad")) a.add("PAN: use \"Verify Your PAN\" on the Income Tax e-filing website (incometax.gov.in).");
+            if (Pattern.compile("doc_mrz|doc_expired").matcher(all).find()) a.add("Passport: ask to see the original passport and compare the photo page and code lines carefully.");
+            if (Pattern.compile("doc_balance|doc_summary|doc_statement|doc_dates_order|doc_created_before").matcher(all).find()) a.add("Bank statement: ask for it to be downloaded from net banking in front of you, shared through the RBI Account Aggregator system, or confirmed by the bank.");
+            if (Pattern.compile("doc_official|doc_pay_to_close|doc_rbi|authority").matcher(all).find()) a.add("Government or police notice: look up the office's number on its official .gov.in website and call them. Agencies never ask for money to close cases.");
         }
         return a;
     }

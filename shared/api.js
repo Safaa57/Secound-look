@@ -36,6 +36,11 @@ var SL = (function () {
       try { o = JSON.parse(inputJson || "{}") || {}; } catch (e) { o = {}; }
       return JSON.stringify(eng.analyzePayment({ text: String(o.text || ""), expectedAmount: o.expectedAmount, myUpi: o.myUpi, imageEditor: o.imageEditor }));
     },
+    analyzeDocument: function (inputJson) {
+      var o = {};
+      try { o = JSON.parse(inputJson || "{}") || {}; } catch (e) { o = {}; }
+      return JSON.stringify(eng.analyzeDocument({ text: String(o.text || ""), docType: o.docType, file: o.file || {}, aadhaarQr: o.aadhaarQr || null }));
+    },
     lookupNumber: function (number) { return JSON.stringify(eng.lookupNumber(number)); },
     reportTypes: function () { return JSON.stringify(g.SECONDLOOK_RULES.reportTypes); },
   };

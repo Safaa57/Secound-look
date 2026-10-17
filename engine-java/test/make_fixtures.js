@@ -76,6 +76,71 @@ for (const c of calls) {
   newChecks.push(e);
 }
 fs.writeFileSync(path.join(root, "python/tests/new_checks_expected.json"), JSON.stringify(newChecks, null, 1));
+
+// Cases from tests/test_documents.js (rules 1.2: IDs, passports, statements, letters, file signs), collected the same way.
+const docCalls = [];
+{
+  const stub = { create: () => new Proxy({}, { get: (_, method) => (arg) => { docCalls.push({ method, arg }); return { score: 0, level: { key: "safe" }, reasons: [] }; } }) };
+  const src = fs.readFileSync(path.join(root, "tests/test_documents.js"), "utf8");
+  const req = (m) => (/engine\.js$/.test(m) ? stub : require(path.join(root, "tests", m)));
+  new Function("require", "console", "process", src)(req, { log() {} }, { exit() {} });
+}
+// Extra parity-only document edge cases.
+{
+  const DNOW = Date.UTC(2026, 9, 17, 12);
+  const mrzCheck = (s) => String([...s].reduce((a, ch, i) => a + (ch === "<" ? 0 : /\d/.test(ch) ? +ch : ch.charCodeAt(0) - 55) * [7, 3, 1][i % 3], 0) % 10);
+  const td3 = (num, nat, dob, sex, exp, opt) => {
+    const n = (num + "<<<<<<<<<").slice(0, 9), o = (opt + "<<<<<<<<<<<<<<").slice(0, 14);
+    const oc = /^<+$/.test(o) ? "<" : mrzCheck(o);
+    const b = n + mrzCheck(n) + nat + dob + mrzCheck(dob) + sex + exp + mrzCheck(exp) + o + oc;
+    return b + mrzCheck(b.slice(0, 10) + b.slice(13, 20) + b.slice(21, 43));
+  };
+  const L1 = "P<INDSHARMA<<RAHUL<KUMAR<<<<<<<<<<<<<<<<<<<<";
+  const spaced = (l) => l.replace(/(.{5})/g, "$1 ").replace(/<</g, "\u2039<");
+  const A = td3("Z1234567", "IND", "990101", "M", "310101", "AB12345C");
+  const B = td3("K7654321", "IND", "<<<<<<", "F", "250101", "");
+  const docs = [
+    { text: "REPUBLIC OF INDIA\nPassport No. Z1234567\n" + spaced(L1).toLowerCase() + "\n" + spaced(A).replace(/</, "\u3008") + "\u00ab\t" },
+    { text: "Passport\n" + L1 + "\r\n" + B + "\r\n" },
+    { text: L1 + "\n" + A.slice(0, 43) + "9" },
+    { text: "Passport\n" + L1.replace("P<", "P\u00ab") + "\n" + A, docType: "letter" },
+    { text: "ACCOUNT STATEMENT\n01-10-2026 Opening 10,000.00 Cr\n02-10-2026 UPI/shop 500.00 Dr 9,500.00 Cr\n03-10-2026 NEFT salary 25,000.00 Cr 34,500.00 Cr\n04-10-2026 ATM 2,000.00 Dr 32,500.00 Cr\n05-10-2026 Interest 0.00 32,500.00 Cr\n06-10-2026 Charges 1,000.00\n07-10-2026 IMPS 1,500.00 Dr 31,000.00 Cr" },
+    { text: "Bank Statement\r\n05 Oct 2026 POS 100.00 900.00\r\n01 Oct 2026 POS 100.00 700.00\r\n20 Sep 2026 POS 100.00 650.00\r\n21 Sep 2026 POS 50.00 600.00\r\nOpening balance: Rs. 1,000.00\r\nTotal debits 400.00\r\nTotal credits 0.00\r\nClosing balance 600.00", file: { kind: "pdf", producer: "Microsoft Word - iLovePDF", creator: "Microsoft Word", created: "2026-10-01", modified: "2026-10-01T00:11:00+00:00", revisions: "2" } },
+    { text: "Statement of Account\n1/10/26\ud83d\ude00 grocery 500.00 9,500.00\n2/10/26\ud83d\ude00 salary 1,000.00 10,500.00\n3/10/26 rent 4,000.00 6,500.00", file: { kind: "pdf", producer: "iText", creator: "iText", created: "2026-02-31T00:00:00Z", modified: "D:20261012", revisions: 2.5 } },
+    { text: "Opening Balance 100.00\n12/10/2026 x 50.00 150.00", docType: "statement", file: { created: "2026-09-01 10:00:00Z", modified: "2026-09-01T10:05:00Z", imageEditor: " " } },
+    { text: "Remit to IFSC: sbin0001234 or ifs code hdfc1234567, IFSC-ICIC0ABCDEF" },
+    { text: "Tax Invoice\nGSTIN 27ABCDE1234F1Z5\nPAN ABCDE1234F, ABCPE1234F, abcpe1234f\nGSTIN: 99AAPFU0939F1ZV 40AAPFU0939F1ZV" },
+    { text: "\u092d\u093e\u0930\u0924 \u0938\u0930\u0915\u093e\u0930\n\u0906\u0927\u093e\u0930\n\u0930\u093e\u0939\u0941\u0932 \u0936\u0930\u094d\u092e\u093e\n\u091c\u0928\u094d\u092e \u0924\u093f\u0925\u093f: \u0967\u0968/\u0966\u096b/\u0967\u096f\u096f\u0966\n4991 1866 5245\n\u096a\u096f\u096f\u0967 \u0967\u096e\u096c\u096c \u096b\u0968\u096a\u096c" },
+    { text: "UIDAI 4991 1866 5246 4991-1866-5246 2345 6789 0123 3456 7890 1234 5678 9012 3456 6789 0123 4567", docType: "auto" },
+    { text: "Rahul Sharma\nDOB 12.05.1990\n4991 1866 5246\nAadhaar", aadhaarQr: { decoded: true, signatureChecked: false, name: "R.  Sharma", dob: "DOB 13-05-1990", gender: "M", last4: 5246 } },
+    { text: "Government of India Priya Verma 4991 1866 5246", aadhaarQr: { decoded: true, signatureChecked: true, signatureValid: "yes", name: "Al", last4: "1234", dob: 12051990 } },
+    { text: "Aadhaar", aadhaarQr: { decoded: false, oldXml: true } },
+    { text: "Office of the Commissioner of Police\nNotice u/s 41A\n\nYou must deposit Rs 50,000 for verification of your account.\nReply to: complaint.cell.mumbai@gmail.com", file: { kind: "image", imageEditor: "Snapseed" } },
+    { text: "", docType: "id" },
+    {},
+  ];
+  for (const d of docs) docCalls.push({ method: "analyzeDocument", arg: Object.assign({ now: DNOW }, d) });
+  for (const a of ["", "0", "12a4", "499118665246", "4991 1866 5246", "27aapfu0939f1zv", "27AAPFU0939F1Z", "27AAPFU0939F1ZVX", "\u0967\u0968"]) {
+    docCalls.push({ method: "verhoeffOk", arg: a });
+    docCalls.push({ method: "gstinOk", arg: a });
+  }
+}
+const pick = (info) => { const o = {}; for (const k of ["docType", "ids", "statement", "file", "passport", "qr"]) if (k in info) o[k] = info[k]; return o; };
+const documents = [];
+for (const c of docCalls) {
+  let e;
+  if (c.method === "verhoeffOk" || c.method === "gstinOk") {
+    e = { kind: "helper", method: c.method, input: c.arg, result: sl[c.method](c.arg) };
+  } else {
+    const r = sl.analyzeDocument(c.arg), p = plain.analyzeDocument(c.arg);
+    if (JSON.stringify([p.score, p.advice, p.reasons.map((x) => x.id)]) !== JSON.stringify([r.score, r.advice, r.reasons.map((x) => x.id)])) throw new Error("phone layer changes result for " + JSON.stringify(c.arg));
+    e = { kind: "document", input: c.arg, score: r.score, level: r.level.key, label: r.level.label, ids: r.reasons.map((x) => x.id).sort(), advice: r.advice,
+      reasons: r.reasons.map((x) => [x.id, x.title, x.detail, x.weight]), info: pick(r.info), echo: r.input };
+  }
+  expected.push(e);
+  documents.push(e);
+}
+fs.writeFileSync(path.join(root, "python/tests/documents_expected.json"), JSON.stringify(documents, null, 1));
 fs.writeFileSync(path.join(__dirname, "phone_fixtures.json"), JSON.stringify(fixtures));
 fs.writeFileSync(path.join(__dirname, "expected.json"), JSON.stringify(expected, null, 1));
-console.log("fixtures:", Object.keys(fixtures.lookup).length, "lookups,", Object.keys(fixtures.extract).length, "extracts; expected:", expected.length, "(" + newChecks.length + " UPI/payment/new-rule cases, also in python/tests/new_checks_expected.json)");
+console.log("fixtures:", Object.keys(fixtures.lookup).length, "lookups,", Object.keys(fixtures.extract).length, "extracts; expected:", expected.length, "(" + newChecks.length + " UPI/payment/new-rule cases, also in python/tests/new_checks_expected.json; " + documents.length + " document cases, also in python/tests/documents_expected.json)");

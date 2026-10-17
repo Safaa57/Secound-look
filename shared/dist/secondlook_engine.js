@@ -157,7 +157,7 @@ var SECONDLOOK_PHONE_DATA = {"source":"Google libphonenumber via phonenumbers 9.
 
 ;
 var SECONDLOOK_RULES = {
- "version": "1.1.0",
+ "version": "1.2.0",
  "brands": {
   "sbi": {
    "name": "State Bank of India",
@@ -1371,6 +1371,52 @@ var SECONDLOOK_RULES = {
    "patterns": [
     "\\b(policy|insurance|lic)\\b[^.\\n]{0,60}\\b(bonus|maturity|lapsed|claim|refund)\\b[^\\n]{0,60}\\b(pay|charge|fee|gst|deposit|tax)\\b"
    ]
+  },
+  {
+   "id": "doc_official_free_email",
+   "title": "Official-looking letter that uses a free e-mail address",
+   "weight": 40,
+   "detail": "Government offices, courts, police and regulators use official addresses (usually ending in .gov.in or .nic.in), never free e-mail services.",
+   "patterns": [
+    "\\b(rbi|reserve bank|cbi|enforcement directorate|income tax|supreme court|high court|police|customs|trai|ministry|government of india|uidai|sebi|npci|cyber cell|narcotics)\\b[\\s\\S]{0,400}\\b[a-z0-9._+-]+@(gmail|yahoo|outlook|hotmail|rediffmail|protonmail|proton)\\.(com|in|co\\.in|me)\\b",
+    "\\b[a-z0-9._+-]+@(gmail|yahoo|outlook|hotmail|rediffmail|protonmail|proton)\\.(com|in|co\\.in|me)\\b[\\s\\S]{0,400}\\b(rbi|reserve bank|cbi|enforcement directorate|income tax|supreme court|high court|police|customs|trai|ministry|government of india|uidai|sebi|npci|cyber cell|narcotics)\\b"
+   ]
+  },
+  {
+   "id": "doc_pay_to_close",
+   "title": "Demands payment to stop an arrest, case or investigation",
+   "weight": 45,
+   "detail": "Police, courts and agencies never ask you to pay money to close a case, stop a warrant or \"verify\" your account. This is the \"digital arrest\" scam.",
+   "patterns": [
+    "\\b(pay|deposit|transfer|remit)\\b[^.\\n]{0,60}\\b(to (avoid|stop|cancel|close|settle|quash)|for (clearance|settlement|closure|verification))\\b[^.\\n]{0,40}\\b(arrest|case|warrant|fir|investigation|account|proceedings|charges)"
+   ]
+  },
+  {
+   "id": "doc_rbi_fee",
+   "title": "Letter in the name of RBI asking for a fee or deposit",
+   "weight": 40,
+   "detail": "The Reserve Bank of India doesn't deal with individuals' loans, prizes, refunds or accounts, and never asks anyone to pay fees.",
+   "patterns": [
+    "\\b(rbi|reserve bank of india)\\b[\\s\\S]{0,300}\\b(fee|charges?|deposit|gst|tax)\\b[\\s\\S]{0,120}\\b(pay|deposit|transfer|remit)"
+   ]
+  },
+  {
+   "id": "doc_job_fee",
+   "title": "Job offer that asks you to pay a deposit or fee",
+   "weight": 40,
+   "detail": "Real employers don't charge for joining, training, laptops or \"refundable\" security deposits. Fake offer letters always end with a payment request.",
+   "patterns": [
+    "\\b(offer letter|appointment letter|you have been selected|joining)\\b[\\s\\S]{0,300}\\b(security deposit|refundable (deposit|fee|amount)|training fee|registration fee|joining fee|laptop (charges|deposit)|kit charges|uniform charges)\\b"
+   ]
+  },
+  {
+   "id": "doc_loan_fee",
+   "title": "Loan approval that needs a fee paid first",
+   "weight": 35,
+   "detail": "Genuine lenders deduct charges from the loan amount. Asking for processing, insurance, stamp duty or GST money before the loan is paid out is a classic fake loan letter.",
+   "patterns": [
+    "\\bloan\\b[^\\n]{0,80}\\b(approved|sanctioned|disbursal|disbursement)\\b[\\s\\S]{0,300}\\b(processing|insurance|stamp duty|gst|file|noc|tds)\\s*(fee|charges?|amount)\\b"
+   ]
   }
  ],
  "callFlags": [
@@ -1535,7 +1581,10 @@ var SECONDLOOK_RULES = {
   "account_takeover_code",
   "money_mule",
   "upi_receive_note",
-  "pay_prank_app"
+  "pay_prank_app",
+  "doc_qr_mismatch",
+  "doc_qr_bad_signature",
+  "doc_pay_to_close"
  ],
  "criticalFloor": 60,
  "extraPatternBonus": 10,
@@ -1783,6 +1832,58 @@ var SECONDLOOK_RULES = {
    "ibis paint",
    "adobe"
   ]
+ },
+ "documents": {
+  "pdfEditors": [
+   "ilovepdf",
+   "smallpdf",
+   "sejda",
+   "pdfescape",
+   "pdf-xchange",
+   "foxit",
+   "nitro",
+   "pdfelement",
+   "wondershare",
+   "dochub",
+   "pdffiller",
+   "soda pdf",
+   "xodo",
+   "apowersoft",
+   "pdf24",
+   "pdfcandy",
+   "pdf2go",
+   "acrobat",
+   "pdf editor",
+   "pdfedit",
+   "hipdf",
+   "lightpdf",
+   "cleverpdf",
+   "pdfsam",
+   "master pdf",
+   "pdf studio",
+   "pdfgear",
+   "updf"
+  ],
+  "officeApps": [
+   "microsoft word",
+   "microsoft® word",
+   "microsoft excel",
+   "microsoft® excel",
+   "libreoffice",
+   "openoffice",
+   "wps ",
+   "google docs",
+   "canva",
+   "photoshop",
+   "illustrator",
+   "coreldraw",
+   "inkscape",
+   "gimp",
+   "pages",
+   "keynote",
+   "paint.net"
+  ],
+  "panEntity": "ABCEFGHJLPT"
  }
 };
 ;
@@ -2484,6 +2585,7 @@ var SECONDLOOK_RULES = {
         if (kind === "call") a.push("Hang up. Call the organisation back on the number printed on your card, bill or their official website.");
         if (kind === "upi") a.push("Don't pay or approve this request. If someone said you'd receive money this way, it's a scam.");
         if (kind === "payment") a.push("Don't hand over goods, services or any \"refund\" until the money shows in your own bank or UPI app.");
+        if (kind === "document") a.push("Don't act on this document, pay anything or share it further until the issuer confirms it.");
         for (const r of reasons) { const rule = ruleById[r.id]; if (rule && rule.advice && a.indexOf(rule.advice) < 0) a.push(rule.advice); }
         if (ids.has("otp_request") || ids.has("asked_otp") || ids.has("sensitive_data") || ids.has("asked_personal")) a.push("Never share OTPs, PINs, CVV or passwords. If you already did, call your bank now to block your card or account.");
         if (ids.has("remote_access") || ids.has("asked_app") || ids.has("dangerous_file") || ids.has("apk_install")) a.push("If you installed an app they asked for, turn on flight mode, uninstall it and change your banking passwords from another device.");
@@ -2495,9 +2597,19 @@ var SECONDLOOK_RULES = {
         a.push("Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.");
       } else {
         if (kind === "payment") a.push("Open your own bank or UPI app and look for this payment before you hand anything over. A screenshot or SMS isn't enough.");
+        else if (kind === "document") a.push("A clean result only means no signs of forgery were found. Confirm important documents with the issuer.");
         else if (kind === "upi") a.push("Before paying, check the name your UPI app shows for this ID. Remember: you never pay or enter a PIN to receive money.");
         a.push("No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.");
         a.push("When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.");
+      }
+      if (kind === "document") {
+        const ids = new Set(reasons.map((r) => r.id));
+        const all = reasons.map((r) => r.id).join(" ");
+        if (/aadhaar|doc_qr/.test(all) || ids.has("doc_aadhaar_bad")) a.push("Aadhaar: scan the QR code with UIDAI's official QR scanner app, or check the number at myaadhaar.uidai.gov.in (Verify Aadhaar).");
+        if (ids.has("doc_pan_bad")) a.push("PAN: use \"Verify Your PAN\" on the Income Tax e-filing website (incometax.gov.in).");
+        if (/doc_mrz|doc_expired/.test(all)) a.push("Passport: ask to see the original passport and compare the photo page and code lines carefully.");
+        if (/doc_balance|doc_summary|doc_statement|doc_dates_order|doc_created_before/.test(all)) a.push("Bank statement: ask for it to be downloaded from net banking in front of you, shared through the RBI Account Aggregator system, or confirmed by the bank.");
+        if (/doc_official|doc_pay_to_close|doc_rbi|authority/.test(all)) a.push("Government or police notice: look up the office's number on its official .gov.in website and call them. Agencies never ask for money to close cases.");
       }
       return a;
     }
@@ -2523,7 +2635,284 @@ var SECONDLOOK_RULES = {
       ].join("\n");
     }
 
-    return { analyzeUpi, analyzePayment, extractUpi, analyzeSms, analyzeSender, callerKind, communityReasons, rescore, analyzeNumber, lookupNumber: (n, o) => (phone ? phone.lookup(n, Object.assign({ home: homeRegion }, o || {})) : null), analyzeLink, analyzeMessage, analyzeCall, analyzeAuto, extractUrls, registrable, buildAiPrompt, rules: R, level };
+
+    // ---------------------------------------------------------------- documents (IDs, statements, letters)
+    const D = R.documents || { pdfEditors: [], officeApps: [], panEntity: "ABCEFGHJLPT" };
+    const VH_D = [[0,1,2,3,4,5,6,7,8,9],[1,2,3,4,0,6,7,8,9,5],[2,3,4,0,1,7,8,9,5,6],[3,4,0,1,2,8,9,5,6,7],[4,0,1,2,3,9,5,6,7,8],[5,9,8,7,6,0,4,3,2,1],[6,5,9,8,7,1,0,4,3,2],[7,6,5,9,8,2,1,0,4,3],[8,7,6,5,9,3,2,1,0,4],[9,8,7,6,5,4,3,2,1,0]];
+    const VH_P = [[0,1,2,3,4,5,6,7,8,9],[1,5,7,6,2,8,3,0,9,4],[5,8,0,3,7,9,6,1,4,2],[8,9,1,6,0,4,3,5,2,7],[9,4,5,3,1,2,6,8,7,0],[4,2,8,6,5,7,3,9,0,1],[2,7,9,3,8,0,6,4,1,5],[7,0,4,6,9,1,3,2,5,8]];
+
+    /** Aadhaar numbers end with a Verhoeff check digit. */
+    function verhoeffOk(num) {
+      const s = String(num == null ? "" : num);
+      if (!/^\d+$/.test(s)) return false; // non-digits used to throw (undefined table lookup)
+      let c = 0;
+      const d = s.split("").reverse();
+      for (let i = 0; i < d.length; i++) c = VH_D[c][VH_P[i % 8][Number(d[i])]];
+      return c === 0;
+    }
+
+    function gstinOk(g) {
+      const cs = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      let sum = 0;
+      for (let i = 0; i < 14; i++) {
+        const v = cs.indexOf(g[i]);
+        if (v < 0) return false;
+        const prod = v * (i % 2 === 0 ? 1 : 2);
+        sum += Math.floor(prod / 36) + (prod % 36);
+      }
+      return cs[(36 - (sum % 36)) % 36] === g[14];
+    }
+
+    function mrzValue(ch) {
+      if (ch === "<") return 0;
+      if (ch >= "0" && ch <= "9") return ch.charCodeAt(0) - 48;
+      return ch.charCodeAt(0) - 55; // A=10
+    }
+
+    function mrzCheck(str) {
+      const w = [7, 3, 1];
+      let s = 0;
+      for (let i = 0; i < str.length; i++) s += mrzValue(str[i]) * w[i % 3];
+      return String(s % 10);
+    }
+
+    /** Passport machine-readable zone (ICAO 9303 TD3): two 44-character lines at the bottom of the photo page. */
+    function findMrz(text) {
+      const lines = String(text).toUpperCase().split(/\n/).map((l) => l.replace(/[\s«]/g, "").replace(/[‹〈]/g, "<"));
+      for (let i = 0; i < lines.length - 1; i++) {
+        const a = lines[i], b = lines[i + 1];
+        if (a.length === 44 && b.length === 44 && /^P[A-Z<][A-Z<]{3}[A-Z<]{39}$/.test(a) && /^[A-Z0-9<]{9}[0-9<][A-Z<]{3}[0-9<]{6}[0-9<][MFX<][0-9<]{6}[0-9<][A-Z0-9<]{14}[0-9<][0-9<]$/.test(b)) {
+          return { line1: a, line2: b };
+        }
+      }
+      return null;
+    }
+
+    function yymmdd(s, future, now) {
+      if (!/^\d{6}$/.test(s)) return null;
+      let y = Number(s.slice(0, 2));
+      const nowY = new Date(now).getUTCFullYear() % 100; // century cut-off follows input.now, not the wall clock
+      y += future ? 2000 : (y > nowY ? 1900 : 2000);
+      return y + "-" + s.slice(2, 4) + "-" + s.slice(4, 6);
+    }
+
+    const AMT_IN_LINE = /(^|[^\d.,])((?:\d{1,3}(?:,\d{2,3})+|\d+)\.\d{2})(?!\d)/g;
+
+    function lineAmounts(line) {
+      const out = [];
+      let m;
+      AMT_IN_LINE.lastIndex = 0;
+      while ((m = AMT_IN_LINE.exec(line))) out.push(Number(m[2].replace(/,/g, "")));
+      return out;
+    }
+
+    function leadingDate(line) {
+      const head = line.trim().slice(0, 14);
+      if (!/^\d{1,2}[\s\/.-]/.test(head)) return null;
+      const d = findDate(head);
+      return d && !d.invalid ? d : null;
+    }
+
+    /** Reads statement rows (date ... amount ... balance) and checks that every balance follows from the one before. */
+    function statementMaths(text) {
+      const rows = [];
+      for (const line of String(text).split(/\n/)) {
+        const d = leadingDate(line);
+        if (!d) continue;
+        const amts = lineAmounts(line.slice(8));
+        if (amts.length < 2) continue;
+        rows.push({ date: d, amounts: amts, line: line.trim().slice(0, 120) });
+      }
+      const res = { rows: rows.length, checked: 0, mismatches: [], outOfOrder: 0, lastDate: null };
+      for (let i = 0; i < rows.length; i++) {
+        const r = rows[i];
+        const ts = Date.UTC(r.date.y, r.date.mo - 1, r.date.d);
+        if (res.lastDate == null || ts > res.lastDate) res.lastDate = ts;
+        if (i === 0) continue;
+        const prevTs = Date.UTC(rows[i - 1].date.y, rows[i - 1].date.mo - 1, rows[i - 1].date.d);
+        if (ts < prevTs - 86400000 * 2) res.outOfOrder++;
+        const prev = rows[i - 1].amounts[rows[i - 1].amounts.length - 1];
+        const bal = r.amounts[r.amounts.length - 1];
+        const moves = r.amounts.slice(0, -1).filter((x) => x > 0);
+        if (!moves.length) continue;
+        res.checked++;
+        const ok = moves.some((x) => Math.abs(prev + x - bal) < 0.011 || Math.abs(prev - x - bal) < 0.011);
+        if (!ok) res.mismatches.push(r.line);
+      }
+      // Summary block: opening + credits - debits = closing
+      const grab = (re) => { const m = String(text).match(re); return m ? Number(m[1].replace(/,/g, "")) : null; };
+      const amt = "((?:\\d{1,3}(?:,\\d{2,3})+|\\d+)\\.\\d{2})";
+      const open = grab(new RegExp("opening\\s+balance[^\\d\\n]{0,20}" + amt, "i"));
+      const close = grab(new RegExp("closing\\s+balance[^\\d\\n]{0,20}" + amt, "i"));
+      const cr = grab(new RegExp("total\\s+(?:credits?|deposits?)[^\\d\\n]{0,20}" + amt, "i"));
+      const dr = grab(new RegExp("total\\s+(?:debits?|withdrawals?)[^\\d\\n]{0,20}" + amt, "i"));
+      if (open != null && close != null && cr != null && dr != null) {
+        res.summary = { open, credits: cr, debits: dr, close };
+        res.summaryOk = Math.abs(open + cr - dr - close) < 0.011;
+      }
+      return res;
+    }
+
+    function guessDocType(t, hasMrz) {
+      const low = t.toLowerCase();
+      if (hasMrz || /\bpassport\b|republic of india/.test(low)) return "passport";
+      if (/aadhaar|आधार|unique identification|uidai|government of india/.test(low) && /\b[2-9]\d{3}[ -]\d{4}[ -]\d{4}\b/.test(t)) return "id";
+      if (/income tax department|permanent account number/.test(low)) return "id";
+      if (/statement of account|account statement|bank statement|opening balance|closing balance/.test(low)) return "statement";
+      return "letter";
+    }
+
+    function maskAadhaar(n) {
+      return "XXXX XXXX " + String(n).slice(-4);
+    }
+
+    function lettersOnly(s) {
+      return String(s || "").toLowerCase().replace(/[^a-z]/g, "");
+    }
+
+    /**
+     * Checks a document for signs of forgery.
+     * input: { text, docType: auto|id|passport|statement|letter, file: { kind, producer, creator, created, modified, revisions, imageEditor },
+     *          aadhaarQr: { decoded, oldXml, signatureChecked, signatureValid, name, dob, gender, last4 }, now }
+     */
+    function analyzeDocument(input) {
+      input = input || {};
+      const t = String(input.text || "").slice(0, MAX_TEXT * 5);
+      const reasons = [];
+      const add = (id, title, detail, weight) => reasons.push({ id, title, detail, weight });
+      const mrz = findMrz(t);
+      const docType = input.docType && input.docType !== "auto" ? input.docType : guessDocType(t, !!mrz);
+      const info = { docType, ids: [] };
+      const file = input.file || {};
+      const qr = input.aadhaarQr || null;
+      const now = typeof input.now === "number" ? input.now : Date.now();
+
+      // ---- passport MRZ
+      if (mrz) {
+        const b = mrz.line2;
+        const num = b.slice(0, 9), dob = b.slice(13, 19), exp = b.slice(21, 27), opt = b.slice(28, 42);
+        const fails = [];
+        if (mrzCheck(num) !== b[9]) fails.push("passport number");
+        if (mrzCheck(dob) !== b[19]) fails.push("date of birth");
+        if (mrzCheck(exp) !== b[27]) fails.push("expiry date");
+        if (b[42] !== "<" && mrzCheck(opt) !== b[42]) fails.push("personal number");
+        const composite = b.slice(0, 10) + b.slice(13, 20) + b.slice(21, 43);
+        if (mrzCheck(composite) !== b[43]) fails.push("overall check");
+        const pnum = num.replace(/</g, "");
+        info.passport = { number: pnum, country: b.slice(10, 13).replace(/</g, ""), dob: yymmdd(dob, false, now), expiry: yymmdd(exp, true, now), mrzValid: fails.length === 0 };
+        info.ids.push({ type: "passport", value: pnum, valid: fails.length === 0 });
+        if (fails.length) add("doc_mrz_bad", "Passport code lines don't add up (" + fails.join(", ") + ")", "The two lines of code at the bottom of a passport contain check digits. These don't match, which happens when a passport is edited. Blurry photos can also cause misreads, so compare the code with the printed details.", 40);
+        // Printed passport number must match the MRZ.
+        const rest = t.toUpperCase().split(/\n/).filter((l) => { const c = l.replace(/[\s«]/g, ""); return c !== mrz.line1 && c !== mrz.line2; }).join("\n");
+        const printed = rest.match(/\b[A-Z][0-9]{7}\b/g) || [];
+        if (pnum && printed.length && !rest.includes(pnum)) add("doc_mrz_mismatch", "Printed passport number doesn't match the code lines", "The number printed on the page is different from the number in the code at the bottom.", 40);
+        if (info.passport.expiry && Date.parse(info.passport.expiry + "T00:00:00Z") < now) add("doc_expired", "This passport has expired (" + info.passport.expiry + ")", "An expired passport can't be used as valid ID.", 15);
+      }
+
+      // ---- Aadhaar numbers (4-4-4 groups on an Aadhaar document)
+      if (docType === "id" || /aadhaar|आधार|uidai/i.test(t)) {
+        const re = /(^|[^\d])([2-9]\d{3})[ -](\d{4})[ -](\d{4})(?![\d])/g;
+        let m;
+        const seen = new Set();
+        while ((m = re.exec(t)) && seen.size < 4) {
+          const n = m[2] + m[3] + m[4];
+          if (seen.has(n)) continue;
+          seen.add(n);
+          const ok = verhoeffOk(n);
+          info.ids.push({ type: "aadhaar", value: maskAadhaar(n), valid: ok });
+          if (!ok) add("doc_aadhaar_bad", "Aadhaar number " + maskAadhaar(n) + " fails its built-in check", "Every real Aadhaar number ends with a check digit calculated from the others. This one doesn't match: the number was changed, or a photo misread a digit. Compare it carefully with the card.", 35);
+        }
+      }
+
+      // ---- PAN, GSTIN, IFSC
+      const up = t.toUpperCase();
+      const pans = Array.from(new Set(up.match(/\b[A-Z]{5}[0-9]{4}[A-Z]\b/g) || [])).slice(0, 4);
+      for (const p of pans) {
+        const ok = D.panEntity.indexOf(p[3]) >= 0;
+        info.ids.push({ type: "pan", value: p, valid: ok });
+        if (!ok) add("doc_pan_bad", "PAN " + p + " has an impossible format", "The 4th letter of a PAN shows the holder type (P for a person, C for a company, and so on). \"" + p[3] + "\" isn't used, so this PAN can't exist.", 30);
+      }
+      const gstins = Array.from(new Set(up.match(/\b[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9A-Z]Z[0-9A-Z]\b/g) || [])).slice(0, 4);
+      for (const g of gstins) {
+        const st = Number(g.slice(0, 2));
+        const ok = gstinOk(g) && ((st >= 1 && st <= 38) || st === 97 || st === 99);
+        info.ids.push({ type: "gstin", value: g, valid: ok });
+        if (!ok) add("doc_gstin_bad", "GST number " + g + " fails its check", "GST numbers end with a check character calculated from the rest. This one doesn't match, so the number was changed or mistyped.", 30);
+      }
+      const ifscRe = /\bIFS(?:C)?(?:\s*CODE)?[\s:.-]*([A-Z0-9]{11})\b/g;
+      let im;
+      while ((im = ifscRe.exec(up))) {
+        const c = im[1];
+        const ok = /^[A-Z]{4}0[A-Z0-9]{6}$/.test(c);
+        info.ids.push({ type: "ifsc", value: c, valid: ok });
+        if (!ok) add("doc_ifsc_bad", "IFSC " + c + " has the wrong format", "Every IFSC has 4 letters, then a zero, then 6 letters or digits.", 20);
+      }
+
+      // ---- Aadhaar QR
+      if (qr && qr.decoded) {
+        info.qr = { name: qr.name || null, dob: qr.dob || null, gender: qr.gender || null, last4: qr.last4 || null, oldXml: !!qr.oldXml, signatureChecked: !!qr.signatureChecked, signatureValid: qr.signatureValid === true };
+        if (qr.oldXml) add("doc_qr_old", "Old-style Aadhaar QR without a digital signature", "Older Aadhaar QR codes aren't signed, so they're easy to fake. Ask for an e-Aadhaar or a recent print with the secure QR.", 10);
+        else if (qr.signatureChecked && qr.signatureValid) add("doc_qr_verified", "Aadhaar QR is digitally signed by UIDAI", "The QR code's signature is genuine, so the details inside the QR are real. Make sure the printed details and photo match the QR.", -30);
+        else if (qr.signatureChecked && !qr.signatureValid) add("doc_qr_bad_signature", "Aadhaar QR signature is not valid", "The secure QR on a real Aadhaar is signed by UIDAI. This signature doesn't check out, so the QR was made or changed by someone else.", 60);
+        else add("doc_qr_unchecked", "Aadhaar QR read, but its signature wasn't checked", "Confirm it with UIDAI's official QR scanner app.", 0);
+        if (t.trim().length >= 30) {
+          const mism = [];
+          if (qr.name && lettersOnly(qr.name).length >= 3 && lettersOnly(t).indexOf(lettersOnly(qr.name)) < 0) mism.push("name");
+          if (qr.last4) {
+            const printedA = (t.match(/[2-9]\d{3}[ -]\d{4}[ -](\d{4})/g) || []).map((x) => x.slice(-4));
+            if (printedA.length && printedA.indexOf(String(qr.last4)) < 0) mism.push("Aadhaar number");
+          }
+          if (qr.dob && /\d{2}[-\/.]\d{2}[-\/.]\d{4}/.test(qr.dob)) {
+            const qd = qr.dob.replace(/[-\/.]/g, "");
+            const printedD = (t.match(/\b\d{2}[-\/.]\d{2}[-\/.]\d{4}\b/g) || []).map((x) => x.replace(/[-\/.]/g, ""));
+            if (printedD.length && printedD.indexOf(qd) < 0) mism.push("date of birth");
+          }
+          if (mism.length) add("doc_qr_mismatch", "Printed details don't match the QR (" + mism.join(", ") + ")", "The QR code holds the real details. When the printed card shows something different, the card was edited or someone else's QR was pasted on.", 50);
+        }
+      }
+
+      // ---- bank statement maths
+      if (docType === "statement" || /opening balance|closing balance/i.test(t)) {
+        const sm = statementMaths(t);
+        info.statement = { rows: sm.rows, checked: sm.checked, mismatched: sm.mismatches.length, outOfOrder: sm.outOfOrder, summaryOk: sm.summaryOk == null ? null : sm.summaryOk };
+        if (sm.checked >= 2 && sm.mismatches.length) {
+          const many = sm.mismatches.length >= 2;
+          add("doc_balance_mismatch", "Balances don't add up in " + sm.mismatches.length + " of " + sm.checked + " rows", "In a real statement every balance equals the previous balance plus credits minus debits. " + (many ? "Several rows break this, which is a strong sign the amounts were edited." : "One row breaks this. It may be a misread, so look at that row: ") + "\"" + sm.mismatches[0] + "\"", many ? 45 : 25);
+        }
+        if (sm.summary && sm.summaryOk === false) add("doc_summary_mismatch", "Statement totals don't add up", "Opening balance + total credits − total debits should equal the closing balance. Here it doesn't.", 45);
+        if (sm.outOfOrder >= 2) add("doc_dates_order", "Transaction dates are out of order", "Bank statements list transactions in date order. Rows appear to have been moved or added.", 15);
+        if (sm.lastDate && file.created) {
+          const c = Date.parse(file.created);
+          if (!isNaN(c) && c < sm.lastDate - 86400000) add("doc_created_before_content", "File was created before the dates printed in it", "The file says it was made on " + String(file.created).slice(0, 10) + ", but it lists transactions after that. That can't happen in a statement downloaded from a bank.", 40);
+        }
+        if (docType === "statement" && sm.rows < 3) add("doc_statement_unread", "Couldn't read the transaction rows", "Amount checks need the rows as text. Try a clearer photo or the original PDF.", 0);
+      }
+
+      // ---- file signs (PDF metadata or image editor)
+      const prog = (String(file.producer || "") + " " + String(file.creator || "")).toLowerCase();
+      info.file = { kind: file.kind || null, program: (String(file.creator || "") + (file.producer && file.producer !== file.creator ? " / " + file.producer : "")).trim() || null, created: file.created || null, modified: file.modified || null, revisions: file.revisions || 0 };
+      const editor = D.pdfEditors.find((e) => prog.indexOf(e) >= 0);
+      const office = !editor && D.officeApps.find((e) => prog.indexOf(e) >= 0);
+      if (editor) add("doc_pdf_editor", "Made or re-saved with a PDF editing app", "Documents issued by banks and government offices come straight from their systems. A file that passed through an editing app may have been changed.", 30);
+      else if (office) add("doc_office_app", docType === "statement" ? "Statement made with a word processor or design app" : "Made with a word processor or design app", docType === "statement" ? "Banks generate statements from their own systems, not from word-processing or design apps. This is a common sign of a fake statement." : "Official documents are usually generated by the issuer's system. A document typed in a general app could have been made by anyone.", docType === "statement" ? 35 : 15);
+      if (file.imageEditor) add("doc_image_edited", "The image was saved by a photo-editing app", "Photos of real documents come straight from a camera or scanner. This one passed through an editor.", 35);
+      const revs = Number(file.revisions || 0);
+      const cT = Date.parse(file.created || ""), mT = Date.parse(file.modified || "");
+      if (revs > 1) add("doc_modified", "Changed after it was first saved (" + (revs - 1) + (revs - 1 === 1 ? " edit" : " edits") + " recorded)", "The file keeps a record of later changes. Genuine downloads from a bank or government site are normally saved once.", 25);
+      else if (!isNaN(cT) && !isNaN(mT) && mT - cT > 10 * 60000) add("doc_modified", "Changed after it was first created", "The file was modified " + String(file.modified).slice(0, 10) + ", after it was created " + String(file.created).slice(0, 10) + ".", 20);
+
+      // ---- fake-letter tricks (same rules as messages)
+      const msg = analyzeMessage(t.slice(0, MAX_TEXT));
+      const have = new Set(reasons.map((r) => r.id));
+      for (const r of msg.reasons) if (!have.has(r.id) && r.id !== "shouting") reasons.push(r);
+
+      add("doc_not_proof", "A check like this can't prove a document is genuine", "Only the issuer can confirm it. Use the official verification steps below before you rely on it.", 0);
+      const res = finish("document", { docType, text: t.slice(0, 2000) }, reasons, info);
+      if (res.level.key === "safe") res.level = { key: "safe", label: "No signs of forgery found. Confirm with the issuer" };
+      return res;
+    }
+
+    return { analyzeDocument, verhoeffOk, gstinOk, analyzeUpi, analyzePayment, extractUpi, analyzeSms, analyzeSender, callerKind, communityReasons, rescore, analyzeNumber, lookupNumber: (n, o) => (phone ? phone.lookup(n, Object.assign({ home: homeRegion }, o || {})) : null), analyzeLink, analyzeMessage, analyzeCall, analyzeAuto, extractUrls, registrable, buildAiPrompt, rules: R, level };
   }
 
   return { create, level };
@@ -2567,6 +2956,11 @@ var SL = (function () {
       var o = {};
       try { o = JSON.parse(inputJson || "{}") || {}; } catch (e) { o = {}; }
       return JSON.stringify(eng.analyzePayment({ text: String(o.text || ""), expectedAmount: o.expectedAmount, myUpi: o.myUpi, imageEditor: o.imageEditor }));
+    },
+    analyzeDocument: function (inputJson) {
+      var o = {};
+      try { o = JSON.parse(inputJson || "{}") || {}; } catch (e) { o = {}; }
+      return JSON.stringify(eng.analyzeDocument({ text: String(o.text || ""), docType: o.docType, file: o.file || {}, aadhaarQr: o.aadhaarQr || null }));
     },
     lookupNumber: function (number) { return JSON.stringify(eng.lookupNumber(number)); },
     reportTypes: function () { return JSON.stringify(g.SECONDLOOK_RULES.reportTypes); },
