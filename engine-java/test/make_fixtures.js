@@ -80,7 +80,7 @@ fs.writeFileSync(path.join(root, "python/tests/new_checks_expected.json"), JSON.
 // Cases from tests/test_documents.js (rules 1.2: IDs, passports, statements, letters, file signs), collected the same way.
 const docCalls = [];
 {
-  const stub = { create: () => new Proxy({}, { get: (_, method) => (arg) => { docCalls.push({ method, arg }); return { score: 0, level: { key: "safe" }, reasons: [] }; } }) };
+  const stub = { create: () => new Proxy({}, { get: (_, method) => (arg) => { docCalls.push({ method, arg }); return { score: 0, level: { key: "safe" }, reasons: [], advice: [], info: { detected: { key: "", signals: [] } } }; } }) };
   const src = fs.readFileSync(path.join(root, "tests/test_documents.js"), "utf8");
   const req = (m) => (/engine\.js$/.test(m) ? stub : require(path.join(root, "tests", m)));
   new Function("require", "console", "process", src)(req, { log() {} }, { exit() {} });
@@ -118,6 +118,13 @@ const docCalls = [];
     { text: "Office of the Commissioner of Police\nNotice u/s 41A\n\nYou must deposit Rs 50,000 for verification of your account.\nReply to: complaint.cell.mumbai@gmail.com", file: { kind: "image", imageEditor: "Snapseed" } },
     { text: "", docType: "id" },
     {},
+    // rules 1.3: type detection edge cases and device forensics with odd values
+    { text: "AADHAAR\nVID: 9134-5678-9012-3456\n2345 6789 0124\nभारत सरकार", docType: "auto" },
+    { text: "Election Commission of India\nabc1234567\nDriving Licence KA-0120110012345", docType: "passport" },
+    { text: "FIR no 12 fir registered. ED notice. ed", file: { kind: "pdf", whiteBoxes: 1.9, fonts: { checked: 1, count: 2, rare: [{ name: null, chars: 2.5, digitShare: 1 }, null, 7] } } },
+    { text: "Pay slip\nBasic 1,000.00\nNet pay 900.00", file: { kind: "image", screenshot: true, width: 1080, height: 2400, camera: false, layout: { checked: true, lines: 3, odd: 1.7, samples: [5, "  ", "\u00a0Net\u00a0", "a very long sample word that goes past thirty chars", "x"] }, ela: { checked: true, score: 0.95, hotspots: 4 } } },
+    { text: "photo", file: { kind: "image", camera: true, ela: { checked: "yes", score: "0.9", hotspots: 2 }, layout: { checked: true, odd: -3 }, fonts: { checked: true, rare: [{ name: "QWERTY+Helvetica", chars: 1, digitShare: 1 }] }, whiteBoxes: -1 } },
+    { text: "Tax Invoice\nPayment successful\nUPI Ref 123456789012" },
   ];
   for (const d of docs) docCalls.push({ method: "analyzeDocument", arg: Object.assign({ now: DNOW }, d) });
   for (const a of ["", "0", "12a4", "499118665246", "4991 1866 5246", "27aapfu0939f1zv", "27AAPFU0939F1Z", "27AAPFU0939F1ZVX", "\u0967\u0968"]) {
@@ -125,7 +132,7 @@ const docCalls = [];
     docCalls.push({ method: "gstinOk", arg: a });
   }
 }
-const pick = (info) => { const o = {}; for (const k of ["docType", "ids", "statement", "file", "passport", "qr"]) if (k in info) o[k] = info[k]; return o; };
+const pick = (info) => { const o = {}; for (const k of ["docType", "detected", "ids", "statement", "file", "passport", "qr"]) if (k in info) o[k] = info[k]; return o; };
 const documents = [];
 for (const c of docCalls) {
   let e;

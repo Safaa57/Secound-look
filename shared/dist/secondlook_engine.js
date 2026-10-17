@@ -157,7 +157,7 @@ var SECONDLOOK_PHONE_DATA = {"source":"Google libphonenumber via phonenumbers 9.
 
 ;
 var SECONDLOOK_RULES = {
- "version": "1.2.0",
+ "version": "1.3.0",
  "brands": {
   "sbi": {
    "name": "State Bank of India",
@@ -1883,9 +1883,780 @@ var SECONDLOOK_RULES = {
    "keynote",
    "paint.net"
   ],
-  "panEntity": "ABCEFGHJLPT"
+  "panEntity": "ABCEFGHJLPT",
+  "types": [
+   {
+    "key": "aadhaar",
+    "signals": [
+     [
+      "unique\\s*identification\\s*authority",
+      4,
+      "\"Unique Identification Authority\""
+     ],
+     [
+      "\\buidai\\b",
+      3,
+      "UIDAI"
+     ],
+     [
+      "aadhaa?r",
+      3,
+      "\"Aadhaar\""
+     ],
+     [
+      "आधार",
+      3,
+      "\"आधार\""
+     ],
+     [
+      "\\bVID\\s*:?\\s*\\d{4}\\s?\\d{4}\\s?\\d{4}\\s?\\d{4}\\b",
+      2,
+      "VID number"
+     ],
+     [
+      "enrol(?:l?ment)?\\s*(?:no|number)",
+      2,
+      "Enrolment number"
+     ],
+     [
+      "mera aadhaa?r|meri pehchaa?n|मेरा आधार",
+      2,
+      "\"Mera Aadhaar, Meri Pehchan\""
+     ],
+     [
+      "government of india|भारत सरकार",
+      1,
+      "\"Government of India\""
+     ],
+     [
+      "\\bdob\\b|year of birth|जन्म",
+      1,
+      "Date of birth"
+     ],
+     [
+      "\\b(?:fe)?male\\b|पुरुष|महिला",
+      1,
+      "Gender"
+     ]
+    ]
+   },
+   {
+    "key": "pan",
+    "signals": [
+     [
+      "income\\s*tax\\s*department",
+      4,
+      "\"Income Tax Department\""
+     ],
+     [
+      "permanent\\s*account\\s*number",
+      4,
+      "\"Permanent Account Number\""
+     ],
+     [
+      "आयकर\\s*विभाग",
+      3,
+      "\"आयकर विभाग\""
+     ],
+     [
+      "स्थायी\\s*लेखा\\s*संख्या",
+      3,
+      "\"स्थायी लेखा संख्या\""
+     ],
+     [
+      "\\b[A-Z]{5}[0-9]{4}[A-Z]\\b",
+      2,
+      "PAN-style number"
+     ],
+     [
+      "\\bpan\\s*card\\b",
+      2,
+      "\"PAN card\""
+     ],
+     [
+      "father'?s\\s*name|पिता का नाम",
+      1,
+      "Father's name"
+     ]
+    ]
+   },
+   {
+    "key": "passport",
+    "signals": [
+     [
+      "P<IND",
+      4,
+      "\"P<IND\" code line"
+     ],
+     [
+      "republic\\s*of\\s*india|भारत गणराज्य",
+      3,
+      "\"Republic of India\""
+     ],
+     [
+      "passport\\s*no",
+      3,
+      "\"Passport No.\""
+     ],
+     [
+      "\\bpassport\\b|पासपोर्ट",
+      2,
+      "\"Passport\""
+     ],
+     [
+      "place\\s*of\\s*issue",
+      1,
+      "Place of issue"
+     ],
+     [
+      "\\bnationality\\b",
+      1,
+      "Nationality"
+     ]
+    ]
+   },
+   {
+    "key": "voter_id",
+    "signals": [
+     [
+      "election\\s*commission\\s*of\\s*india|भारत निर्वाचन आयोग",
+      5,
+      "\"Election Commission of India\""
+     ],
+     [
+      "elector'?s?\\s*photo\\s*identity\\s*card|\\bEPIC\\b",
+      3,
+      "\"Elector's Photo Identity Card\""
+     ],
+     [
+      "\\b[A-Z]{3}[0-9]{7}\\b",
+      2,
+      "EPIC number (3 letters + 7 digits)"
+     ],
+     [
+      "elector'?s?\\s*name|निर्वाचक",
+      2,
+      "\"Elector's Name\""
+     ],
+     [
+      "\\bvoter\\b|मतदाता",
+      2,
+      "\"Voter\""
+     ]
+    ]
+   },
+   {
+    "key": "driving_licence",
+    "signals": [
+     [
+      "driving\\s*licen[cs]e|ड्राइविंग लाइसेंस",
+      4,
+      "\"Driving Licence\""
+     ],
+     [
+      "\\b[A-Z]{2}[- ]?\\d{2}[- ]?(?:19|20)\\d{2}\\s?\\d{7}\\b",
+      3,
+      "DL number"
+     ],
+     [
+      "union\\s*of\\s*india",
+      2,
+      "\"Union of India\""
+     ],
+     [
+      "transport\\s*department|regional\\s*transport|\\bRTO\\b",
+      2,
+      "\"Transport Department\""
+     ],
+     [
+      "\\bCOV\\b|class\\s*of\\s*vehicle|\\bLMV\\b|\\bMCWG\\b",
+      2,
+      "Vehicle class"
+     ],
+     [
+      "\\bvalid\\s*till\\b|\\bvalidity\\b",
+      1,
+      "Validity"
+     ]
+    ]
+   },
+   {
+    "key": "itr",
+    "signals": [
+     [
+      "\\bITR-?V\\b",
+      5,
+      "\"ITR-V\""
+     ],
+     [
+      "indian\\s*income\\s*tax\\s*return",
+      4,
+      "\"Indian Income Tax Return\""
+     ],
+     [
+      "acknowledge?ment\\s*(?:number|no)",
+      3,
+      "\"Acknowledgement Number\""
+     ],
+     [
+      "assessment\\s*year",
+      3,
+      "\"Assessment Year\""
+     ],
+     [
+      "gross\\s*total\\s*income|total\\s*income",
+      2,
+      "Total income"
+     ],
+     [
+      "e-?filing|e-?verif",
+      1,
+      "e-filing"
+     ],
+     [
+      "income\\s*tax",
+      1,
+      "\"Income Tax\""
+     ]
+    ]
+   },
+   {
+    "key": "gst_certificate",
+    "signals": [
+     [
+      "form\\s*gst\\s*reg-?\\s*06",
+      6,
+      "\"Form GST REG-06\""
+     ],
+     [
+      "constitution\\s*of\\s*business",
+      3,
+      "\"Constitution of Business\""
+     ],
+     [
+      "registration\\s*certificate",
+      2,
+      "\"Registration Certificate\""
+     ],
+     [
+      "goods\\s*and\\s*services\\s*tax",
+      2,
+      "\"Goods and Services Tax\""
+     ],
+     [
+      "\\b[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9A-Z]Z[0-9A-Z]\\b",
+      2,
+      "GSTIN"
+     ],
+     [
+      "legal\\s*name|trade\\s*name",
+      1,
+      "Legal / trade name"
+     ]
+    ]
+   },
+   {
+    "key": "cheque",
+    "signals": [
+     [
+      "or\\s*bearer",
+      4,
+      "\"or bearer\""
+     ],
+     [
+      "\\b\\d{6}\\D{0,3}\\d{9}\\D{0,3}\\d{6}\\b",
+      3,
+      "MICR code line"
+     ],
+     [
+      "valid\\s*for\\s*(?:three|3)\\s*months",
+      2,
+      "\"Valid for 3 months\""
+     ],
+     [
+      "a/?c\\.?\\s*payee|account\\s*payee",
+      2,
+      "\"A/c payee\""
+     ],
+     [
+      "\\brupees\\b|रुपये",
+      2,
+      "\"Rupees\""
+     ],
+     [
+      "please\\s*sign\\s*above|authori[sz]ed\\s*signator",
+      1,
+      "Signature line"
+     ],
+     [
+      "\\bpay\\b",
+      1,
+      "\"Pay\""
+     ],
+     [
+      "\\bIFS(?:C|\\s*code)\\b",
+      1,
+      "IFSC"
+     ],
+     [
+      "\\ba/?c\\.?\\s*no\\b",
+      1,
+      "A/c no."
+     ]
+    ]
+   },
+   {
+    "key": "salary_slip",
+    "signals": [
+     [
+      "pay\\s*slip|salary\\s*slip|salary\\s*statement",
+      5,
+      "\"Pay slip\""
+     ],
+     [
+      "\\bHRA\\b|house\\s*rent\\s*allowance",
+      2,
+      "\"HRA\""
+     ],
+     [
+      "net\\s*pay|net\\s*salary|take\\s*home",
+      2,
+      "\"Net pay\""
+     ],
+     [
+      "total\\s*deductions?",
+      2,
+      "\"Total deductions\""
+     ],
+     [
+      "\\bbasic\\b",
+      1,
+      "\"Basic\""
+     ],
+     [
+      "gross\\s*(?:earnings|salary|pay)",
+      1,
+      "Gross earnings"
+     ],
+     [
+      "provident\\s*fund|\\bE?PF\\b",
+      1,
+      "PF"
+     ],
+     [
+      "professional\\s*tax",
+      1,
+      "Professional tax"
+     ],
+     [
+      "\\bUAN\\b",
+      1,
+      "UAN"
+     ],
+     [
+      "employee\\s*(?:id|code|name|no)",
+      1,
+      "Employee details"
+     ],
+     [
+      "pay\\s*period|month\\s*of",
+      1,
+      "Pay period"
+     ]
+    ]
+   },
+   {
+    "key": "bank_statement",
+    "signals": [
+     [
+      "statement\\s*of\\s*account|account\\s*statement|bank\\s*statement",
+      4,
+      "\"Statement of account\""
+     ],
+     [
+      "opening\\s*balance",
+      3,
+      "\"Opening balance\""
+     ],
+     [
+      "closing\\s*balance",
+      3,
+      "\"Closing balance\""
+     ],
+     [
+      "value\\s*date|txn\\s*date|transaction\\s*date|narration|particulars|chq\\.?\\s*/\\s*ref",
+      2,
+      "Transaction columns"
+     ],
+     [
+      "\\bwithdrawals?\\b|\\bdebits?\\b|\\bDr\\b",
+      1,
+      "Debits"
+     ],
+     [
+      "\\bdeposits?\\b|\\bcredits?\\b|\\bCr\\b",
+      1,
+      "Credits"
+     ],
+     [
+      "\\bbalance\\b",
+      1,
+      "\"Balance\""
+     ],
+     [
+      "account\\s*(?:no|number)|a/c\\s*no",
+      1,
+      "Account number"
+     ],
+     [
+      "\\bIFS(?:C|\\s*code)\\b",
+      1,
+      "IFSC"
+     ]
+    ]
+   },
+   {
+    "key": "payment_screenshot",
+    "signals": [
+     [
+      "upi\\s*(?:ref|transaction\\s*id|txn)",
+      4,
+      "\"UPI Ref / Transaction ID\""
+     ],
+     [
+      "payment\\s*(?:successful|success|completed|done)|transaction\\s*successful|money\\s*sent",
+      4,
+      "\"Payment successful\""
+     ],
+     [
+      "paid\\s*to|sent\\s*to|received\\s*from",
+      2,
+      "\"Paid to\""
+     ],
+     [
+      "\\bUTR\\b",
+      2,
+      "UTR"
+     ],
+     [
+      "debited\\s*from|credited\\s*to",
+      1,
+      "Debited / credited"
+     ]
+    ]
+   },
+   {
+    "key": "utility_bill",
+    "signals": [
+     [
+      "units?\\s*consumed|consumption",
+      2,
+      "\"Units consumed\""
+     ],
+     [
+      "consumer\\s*(?:no|number|id)|\\bCA\\s*no",
+      2,
+      "\"Consumer No.\""
+     ],
+     [
+      "bill\\s*amount|amount\\s*payable|net\\s*payable",
+      2,
+      "\"Bill amount\""
+     ],
+     [
+      "electricity|बिजली|\\bkwh\\b",
+      2,
+      "\"Electricity\""
+     ],
+     [
+      "meter\\s*(?:no|reading)|previous\\s*reading|present\\s*reading",
+      2,
+      "Meter reading"
+     ],
+     [
+      "water\\s*bill|gas\\s*bill|telephone\\s*bill|broadband|postpaid",
+      2,
+      "Utility service"
+     ],
+     [
+      "due\\s*date",
+      1,
+      "\"Due date\""
+     ],
+     [
+      "disconnect",
+      1,
+      "Disconnection"
+     ]
+    ]
+   },
+   {
+    "key": "invoice",
+    "signals": [
+     [
+      "tax\\s*invoice",
+      4,
+      "\"Tax Invoice\""
+     ],
+     [
+      "invoice\\s*(?:no|number|#|date)",
+      3,
+      "\"Invoice No.\""
+     ],
+     [
+      "\\bHSN\\b|\\bSAC\\b",
+      2,
+      "HSN / SAC code"
+     ],
+     [
+      "\\b[CSI]GST\\b",
+      2,
+      "CGST / SGST / IGST"
+     ],
+     [
+      "\\binvoice\\b",
+      1,
+      "\"Invoice\""
+     ],
+     [
+      "bill\\s*to|ship\\s*to|sold\\s*by",
+      1,
+      "Bill to / ship to"
+     ],
+     [
+      "grand\\s*total|sub\\s*-?total",
+      1,
+      "Totals"
+     ],
+     [
+      "\\bqty\\b|quantity",
+      1,
+      "Quantity"
+     ]
+    ]
+   },
+   {
+    "key": "offer_letter",
+    "signals": [
+     [
+      "offer\\s*letter|letter\\s*of\\s*offer|offer\\s*of\\s*employment",
+      5,
+      "\"Offer letter\""
+     ],
+     [
+      "appointment\\s*letter|letter\\s*of\\s*appointment",
+      4,
+      "\"Appointment letter\""
+     ],
+     [
+      "\\bCTC\\b|cost\\s*to\\s*(?:the\\s*)?company",
+      2,
+      "\"CTC\""
+     ],
+     [
+      "date\\s*of\\s*joining|joining\\s*date|report\\s*for\\s*joining|you\\s*will\\s*join",
+      2,
+      "\"Joining date\""
+     ],
+     [
+      "you\\s*have\\s*been\\s*selected|pleased\\s*to\\s*(?:offer|inform)",
+      2,
+      "\"You have been selected\""
+     ],
+     [
+      "\\bdesignation\\b",
+      1,
+      "Designation"
+     ],
+     [
+      "probation",
+      1,
+      "Probation"
+     ],
+     [
+      "human\\s*resources|\\bHR\\b",
+      1,
+      "HR"
+     ],
+     [
+      "annual\\s*(?:salary|package)",
+      1,
+      "Annual salary"
+     ]
+    ]
+   },
+   {
+    "key": "legal_notice",
+    "signals": [
+     [
+      "legal\\s*notice",
+      4,
+      "\"Legal notice\""
+     ],
+     [
+      "\\bsummons?\\b",
+      3,
+      "\"Summons\""
+     ],
+     [
+      "\\bwarrant\\b",
+      3,
+      "\"Warrant\""
+     ],
+     [
+      "\\bCBI\\b|central\\s*bureau\\s*of\\s*investigation",
+      3,
+      "\"CBI\""
+     ],
+     [
+      "enforcement\\s*directorate",
+      3,
+      "\"Enforcement Directorate\""
+     ],
+     [
+      "\\bFIR\\b",
+      3,
+      "\"FIR\"",
+      "cs"
+     ],
+     [
+      "\\bcourt\\b|magistrate",
+      2,
+      "\"Court\""
+     ],
+     [
+      "\\bpolice\\b|पुलिस",
+      2,
+      "\"Police\""
+     ],
+     [
+      "cyber\\s*crime|cyber\\s*cell",
+      2,
+      "\"Cyber crime\""
+     ],
+     [
+      "\\bu/s\\b|under\\s*section|\\bsection\\s*\\d+",
+      2,
+      "Legal section"
+     ],
+     [
+      "\\bIPC\\b|\\bBNSS?\\b|\\bCrPC\\b|\\bPMLA\\b|\\bNDPS\\b",
+      2,
+      "Law named"
+     ],
+     [
+      "\\barrest",
+      2,
+      "\"Arrest\""
+     ],
+     [
+      "narcotics|\\bNCB\\b",
+      2,
+      "\"Narcotics\""
+     ],
+     [
+      "\\bED\\b",
+      1,
+      "\"ED\"",
+      "cs"
+     ],
+     [
+      "\\bnotice\\b|नोटिस",
+      1,
+      "\"Notice\""
+     ]
+    ]
+   },
+   {
+    "key": "certificate",
+    "signals": [
+     [
+      "this\\s*is\\s*to\\s*certify|certif(?:y|ied)\\s*that",
+      4,
+      "\"This is to certify\""
+     ],
+     [
+      "marks?\\s*(?:sheet|card|statement|obtained)|grade\\s*card|\\b[CS]GPA\\b",
+      3,
+      "Marks"
+     ],
+     [
+      "\\bcertificate\\b|प्रमाण\\s*पत्र",
+      2,
+      "\"Certificate\""
+     ],
+     [
+      "universit(?:y|ies)|board\\s*of\\s*(?:secondary|higher)|\\bCBSE\\b|\\bICSE\\b",
+      2,
+      "\"University\" / board"
+     ],
+     [
+      "\\bdegree\\b|\\bdiploma\\b|\\bbachelor\\b|master\\s*of",
+      2,
+      "Degree"
+     ],
+     [
+      "registrar|controller\\s*of\\s*examinations|\\bprincipal\\b",
+      1,
+      "Issuing officer"
+     ],
+     [
+      "roll\\s*no|register\\s*no|registration\\s*no",
+      1,
+      "Roll / registration number"
+     ]
+    ]
+   },
+   {
+    "key": "letter",
+    "signals": [
+     [
+      "\\bdear\\b",
+      2,
+      "\"Dear\""
+     ],
+     [
+      "\\bsub(?:ject)?\\s*:|\\bre\\s*:",
+      2,
+      "\"Subject:\""
+     ],
+     [
+      "yours\\s*(?:faithfully|sincerely|truly)|\\bregards\\b|thanking\\s*you",
+      2,
+      "Sign-off"
+     ],
+     [
+      "\\bletter\\b",
+      1,
+      "\"Letter\""
+     ],
+     [
+      "\\bref(?:erence)?\\s*no",
+      1,
+      "Reference number"
+     ],
+     [
+      "\\bto,|\\bfrom,",
+      1,
+      "To / From"
+     ]
+    ]
+   }
+  ],
+  "detect": {
+   "min": 2,
+   "high": 7,
+   "highMargin": 3,
+   "medium": 4,
+   "mediumMargin": 2,
+   "maxSignals": 6,
+   "mrz": 6,
+   "aadhaarValid": 3,
+   "aadhaarNumber": 2
+  }
  }
-};
+}
+;
 ;
 /*
  * Second Look — scam detection engine (rules layer).
@@ -2571,10 +3342,10 @@ var SECONDLOOK_RULES = {
       if (strong >= 2) score += 10;
       if (reasons.some((r) => critical.has(r.id))) score = Math.max(score, R.criticalFloor);
       score = Math.max(0, Math.min(100, Math.round(score)));
-      return { kind, input, score, level: level(score, R.thresholds), reasons, info, advice: adviceFor(kind, reasons, score) };
+      return { kind, input, score, level: level(score, R.thresholds), reasons, info, advice: adviceFor(kind, reasons, score, info) };
     }
 
-    function adviceFor(kind, reasons, score) {
+    function adviceFor(kind, reasons, score, info) {
       const ids = new Set(reasons.map((r) => r.id));
       const a = [];
       if (score >= R.thresholds.warning) {
@@ -2607,12 +3378,35 @@ var SECONDLOOK_RULES = {
         const all = reasons.map((r) => r.id).join(" ");
         if (/aadhaar|doc_qr/.test(all) || ids.has("doc_aadhaar_bad")) a.push("Aadhaar: scan the QR code with UIDAI's official QR scanner app, or check the number at myaadhaar.uidai.gov.in (Verify Aadhaar).");
         if (ids.has("doc_pan_bad")) a.push("PAN: use \"Verify Your PAN\" on the Income Tax e-filing website (incometax.gov.in).");
-        if (/doc_mrz|doc_expired/.test(all)) a.push("Passport: ask to see the original passport and compare the photo page and code lines carefully.");
+        if (/doc_mrz|doc_expired/.test(all)) a.push(DOC_ADVICE.passport);
         if (/doc_balance|doc_summary|doc_statement|doc_dates_order|doc_created_before/.test(all)) a.push("Bank statement: ask for it to be downloaded from net banking in front of you, shared through the RBI Account Aggregator system, or confirmed by the bank.");
         if (/doc_official|doc_pay_to_close|doc_rbi|authority/.test(all)) a.push("Government or police notice: look up the office's number on its official .gov.in website and call them. Agencies never ask for money to close cases.");
+        // The official way to confirm the kind of document that was detected.
+        const key = info && info.detected ? info.detected.key : "unknown";
+        const tip = DOC_ADVICE[key];
+        if (tip && a.indexOf(tip) < 0) a.push(tip);
       }
       return a;
     }
+
+    const DOC_ADVICE = {
+      aadhaar: "Aadhaar: scan the QR code with UIDAI's official QR scanner app, or check the number at myaadhaar.uidai.gov.in (Verify Aadhaar).",
+      pan: "PAN: use \"Verify Your PAN\" on the Income Tax e-filing website (incometax.gov.in).",
+      passport: "Passport: ask to see the original passport and compare the photo page and code lines carefully. For anything else, use only the official Passport Seva website (passportindia.gov.in).",
+      voter_id: "Voter ID: search the EPIC number on the official Voters' Service Portal (voters.eci.gov.in).",
+      driving_licence: "Driving licence: check the DL number with \"DL status\" on the official Parivahan website (parivahan.gov.in).",
+      bank_statement: "Bank statement: ask for it to be downloaded from net banking in front of you, shared through the RBI Account Aggregator system, or confirmed by the bank.",
+      cheque: "Cheque: confirm with the bank that issued it, using the number on the bank's official website. Don't hand anything over until the money is in your account; a cheque can bounce days later.",
+      salary_slip: "Salary slip: confirm with the employer's HR department using contact details from the company's official website, and compare it with the salary credits in the bank statement.",
+      itr: "ITR: ask for the e-verified ITR-V, or have the person show the return after logging in to the Income Tax e-filing website (incometax.gov.in).",
+      gst_certificate: "GST: check the GSTIN with \"Search Taxpayer\" on the official GST portal (gst.gov.in). The name shown must match the document.",
+      invoice: "Invoice: check the seller's GSTIN with \"Search Taxpayer\" on the official GST portal (gst.gov.in) before you pay.",
+      utility_bill: "Bill: pay only through the provider's official website or app, or your UPI app's bill-payment section. Never pay a number from an SMS or call that threatens disconnection.",
+      offer_letter: "Job offer: confirm with the company's HR using contact details from its official website. Real employers never ask you to pay to join.",
+      legal_notice: "Government or police notice: look up the office's number on its official .gov.in website and call them. Agencies never ask for money to close cases.",
+      payment_screenshot: "Payment screenshot: use the Payment check instead, and look for the money in your own bank or UPI app. A screenshot is not proof.",
+      certificate: "Certificate: confirm it with the university or board that issued it, or ask for it through DigiLocker (digilocker.gov.in).",
+    };
 
     function buildAiPrompt(result) {
       const kind = result.kind;
@@ -2753,13 +3547,54 @@ var SECONDLOOK_RULES = {
       return res;
     }
 
-    function guessDocType(t, hasMrz) {
-      const low = t.toLowerCase();
-      if (hasMrz || /\bpassport\b|republic of india/.test(low)) return "passport";
-      if (/aadhaar|आधार|unique identification|uidai|government of india/.test(low) && /\b[2-9]\d{3}[ -]\d{4}[ -]\d{4}\b/.test(t)) return "id";
-      if (/income tax department|permanent account number/.test(low)) return "id";
-      if (/statement of account|account statement|bank statement|opening balance|closing balance/.test(low)) return "statement";
+    // Document type detection: every type in rules.documents.types has weighted signals (phrases and number formats).
+    // The type with the highest total wins; MRZ lines and Aadhaar-format numbers add computed signals.
+    const DET = D.detect || { min: 2, high: 7, highMargin: 3, medium: 4, mediumMargin: 2, maxSignals: 6, mrz: 6, aadhaarValid: 3, aadhaarNumber: 2 };
+    const DOC_TYPES = (D.types || []).map((ty) => ({ key: ty.key, signals: ty.signals.map((x) => ({ re: new RegExp(x[0], x[3] === "cs" ? "" : "i"), w: x[1], label: x[2] })) }));
+    const AADHAAR_ANY = /(^|[^\d])([2-9]\d{3})[ -](\d{4})[ -](\d{4})(?!\d)/g;
+    const ID_KEYS = ["aadhaar", "pan", "voter_id", "driving_licence"];
+
+    /** Hides 16-digit Aadhaar Virtual IDs (4-4-4-4) so their digits aren't read as an Aadhaar number. */
+    function maskVids(t) {
+      return t.replace(/\d{4}[ -]\d{4}[ -]\d{4}[ -]\d{4}/g, (x) => x.replace(/\d/g, "#"));
+    }
+
+    function detectDocType(t, hasMrz) {
+      let aValid = false, aAny = false, m;
+      const tv = maskVids(t);
+      AADHAAR_ANY.lastIndex = 0;
+      while ((m = AADHAAR_ANY.exec(tv))) { aAny = true; if (verhoeffOk(m[2] + m[3] + m[4])) { aValid = true; break; } }
+      let best = null, bestScore = 0, second = 0;
+      for (const ty of DOC_TYPES) {
+        const got = [];
+        if (ty.key === "passport" && hasMrz) got.push([DET.mrz, "Passport code lines (MRZ)"]);
+        if (ty.key === "aadhaar" && aValid) got.push([DET.aadhaarValid, "12-digit Aadhaar number (check digit OK)"]);
+        else if (ty.key === "aadhaar" && aAny) got.push([DET.aadhaarNumber, "12-digit number in 4-4-4 groups"]);
+        for (const sg of ty.signals) if (sg.re.test(t)) got.push([sg.w, sg.label]);
+        const sc = got.reduce((a, x) => a + x[0], 0);
+        if (sc > bestScore) { second = bestScore; bestScore = sc; best = { key: ty.key, got }; }
+        else if (sc > second) second = sc;
+      }
+      if (!best || bestScore < DET.min) return { key: "unknown", confidence: "low", signals: [] };
+      const margin = bestScore - second;
+      const confidence = bestScore >= DET.high && margin >= DET.highMargin ? "high" : bestScore >= DET.medium && margin >= DET.mediumMargin ? "medium" : "low";
+      return { key: best.key, confidence, signals: best.got.slice(0, DET.maxSignals).map((x) => x[1]) };
+    }
+
+    function modeFor(key) {
+      if (ID_KEYS.indexOf(key) >= 0) return "id";
+      if (key === "bank_statement" || key === "salary_slip") return "statement";
+      if (key === "passport") return "passport";
       return "letter";
+    }
+
+    function isObj(v) {
+      return !!v && typeof v === "object" && !Array.isArray(v);
+    }
+
+    /** A finite JSON number from an optional input field, rounded down (anything else is 0). */
+    function intOf(v) {
+      return typeof v === "number" && isFinite(v) ? Math.floor(v) : 0;
     }
 
     function maskAadhaar(n) {
@@ -2775,14 +3610,18 @@ var SECONDLOOK_RULES = {
      * input: { text, docType: auto|id|passport|statement|letter, file: { kind, producer, creator, created, modified, revisions, imageEditor },
      *          aadhaarQr: { decoded, oldXml, signatureChecked, signatureValid, name, dob, gender, last4 }, now }
      */
+    const LEGACY_MODES = ["id", "passport", "statement", "letter"];
+
     function analyzeDocument(input) {
       input = input || {};
       const t = String(input.text || "").slice(0, MAX_TEXT * 5);
       const reasons = [];
       const add = (id, title, detail, weight) => reasons.push({ id, title, detail, weight });
       const mrz = findMrz(t);
-      const docType = input.docType && input.docType !== "auto" ? input.docType : guessDocType(t, !!mrz);
-      const info = { docType, ids: [] };
+      const explicit = LEGACY_MODES.indexOf(input.docType) >= 0;
+      const detected = detectDocType(t, !!mrz);
+      const docType = explicit ? input.docType : modeFor(detected.key);
+      const info = { docType, detected, ids: [] };
       const file = input.file || {};
       const qr = input.aadhaarQr || null;
       const now = typeof input.now === "number" ? input.now : Date.now();
@@ -2814,7 +3653,8 @@ var SECONDLOOK_RULES = {
         const re = /(^|[^\d])([2-9]\d{3})[ -](\d{4})[ -](\d{4})(?![\d])/g;
         let m;
         const seen = new Set();
-        while ((m = re.exec(t)) && seen.size < 4) {
+        const tv = maskVids(t);
+        while ((m = re.exec(tv)) && seen.size < 4) {
           const n = m[2] + m[3] + m[4];
           if (seen.has(n)) continue;
           seen.add(n);
@@ -2885,7 +3725,7 @@ var SECONDLOOK_RULES = {
           const c = Date.parse(file.created);
           if (!isNaN(c) && c < sm.lastDate - 86400000) add("doc_created_before_content", "File was created before the dates printed in it", "The file says it was made on " + String(file.created).slice(0, 10) + ", but it lists transactions after that. That can't happen in a statement downloaded from a bank.", 40);
         }
-        if (docType === "statement" && sm.rows < 3) add("doc_statement_unread", "Couldn't read the transaction rows", "Amount checks need the rows as text. Try a clearer photo or the original PDF.", 0);
+        if ((explicit ? docType === "statement" : detected.key === "bank_statement") && sm.rows < 3) add("doc_statement_unread", "Couldn't read the transaction rows", "Amount checks need the rows as text. Try a clearer photo or the original PDF.", 0);
       }
 
       // ---- file signs (PDF metadata or image editor)
@@ -2893,13 +3733,38 @@ var SECONDLOOK_RULES = {
       info.file = { kind: file.kind || null, program: (String(file.creator || "") + (file.producer && file.producer !== file.creator ? " / " + file.producer : "")).trim() || null, created: file.created || null, modified: file.modified || null, revisions: file.revisions || 0 };
       const editor = D.pdfEditors.find((e) => prog.indexOf(e) >= 0);
       const office = !editor && D.officeApps.find((e) => prog.indexOf(e) >= 0);
+      const stmt = docType === "statement" && detected.key !== "salary_slip";
       if (editor) add("doc_pdf_editor", "Made or re-saved with a PDF editing app", "Documents issued by banks and government offices come straight from their systems. A file that passed through an editing app may have been changed.", 30);
-      else if (office) add("doc_office_app", docType === "statement" ? "Statement made with a word processor or design app" : "Made with a word processor or design app", docType === "statement" ? "Banks generate statements from their own systems, not from word-processing or design apps. This is a common sign of a fake statement." : "Official documents are usually generated by the issuer's system. A document typed in a general app could have been made by anyone.", docType === "statement" ? 35 : 15);
+      else if (office) add("doc_office_app", stmt ? "Statement made with a word processor or design app" : "Made with a word processor or design app", stmt ? "Banks generate statements from their own systems, not from word-processing or design apps. This is a common sign of a fake statement." : "Official documents are usually generated by the issuer's system. A document typed in a general app could have been made by anyone.", stmt ? 35 : 15);
       if (file.imageEditor) add("doc_image_edited", "The image was saved by a photo-editing app", "Photos of real documents come straight from a camera or scanner. This one passed through an editor.", 35);
       const revs = Number(file.revisions || 0);
       const cT = Date.parse(file.created || ""), mT = Date.parse(file.modified || "");
       if (revs > 1) add("doc_modified", "Changed after it was first saved (" + (revs - 1) + (revs - 1 === 1 ? " edit" : " edits") + " recorded)", "The file keeps a record of later changes. Genuine downloads from a bank or government site are normally saved once.", 25);
       else if (!isNaN(cT) && !isNaN(mT) && mT - cT > 10 * 60000) add("doc_modified", "Changed after it was first created", "The file was modified " + String(file.modified).slice(0, 10) + ", after it was created " + String(file.created).slice(0, 10) + ".", 20);
+
+      // ---- content forensics measured on the device (text geometry, JPEG error levels, PDF fonts and white boxes)
+      const layout = isObj(file.layout) ? file.layout : null;
+      const odd = layout && layout.checked ? intOf(layout.odd) : 0;
+      if (odd >= 1) {
+        const smp = (Array.isArray(layout.samples) ? layout.samples : []).filter((x) => typeof x === "string" && x.trim()).slice(0, 3).map((x) => "\"" + x.trim().slice(0, 30) + "\"");
+        add("doc_layout_odd", "Some text doesn't line up with the rest", (odd === 1 ? "1 word is a different size or sits higher or lower than the words around it" : odd + " words are a different size or sit higher or lower than the words around them") + (smp.length ? " (" + smp.join(", ") + ")" : "") + ". Text pasted onto a document often looks like this. A tilted or curved photo can also cause it, so look closely at those words.", odd >= 2 ? 25 : 12);
+      }
+      const ela = isObj(file.ela) ? file.ela : null;
+      if (ela && ela.checked && file.screenshot !== true) {
+        const es = typeof ela.score === "number" && isFinite(ela.score) ? ela.score : 0, hs = intOf(ela.hotspots);
+        if (es >= 0.6 && hs >= 1) add("doc_ela_regions", "Parts of the photo may have been edited", "When a JPEG photo is saved again, edited areas often compress differently from the rest. " + (hs === 1 ? "One area" : hs + " areas") + " of this photo stand" + (hs === 1 ? "s" : "") + " out. Filters, resaving or strong compression can also cause this, so treat it as a hint, not proof.", 20);
+      }
+      const fonts = isObj(file.fonts) ? file.fonts : null;
+      const rare = fonts && fonts.checked && Array.isArray(fonts.rare) ? fonts.rare.filter(isObj) : [];
+      if (rare.length) {
+        const fname = (typeof rare[0].name === "string" ? rare[0].name : "").replace(/^[A-Z]{6}\+/, "").slice(0, 40) || "unnamed";
+        const ch = intOf(rare[0].chars);
+        add("doc_font_rare", "A few numbers use a different font from the rest", "The font \"" + fname + "\" is used for only " + ch + (ch === 1 ? " character" : " characters") + ", mostly digits" + (rare.length > 1 ? " (and " + (rare.length - 1) + " more font" + (rare.length > 2 ? "s" : "") + " like it)" : "") + ". Amounts or dates typed into an edited document often end up in a different font.", 35);
+      }
+      const wb = intOf(file.whiteBoxes);
+      if (wb >= 1) add("doc_white_boxes", "White boxes are drawn over parts of the page", "The PDF draws " + (wb === 1 ? "a white rectangle" : wb + " white rectangles") + " on top of text. That's a common way to hide the original numbers and type new ones over them.", 30);
+      if (file.screenshot === true) add("doc_screenshot", "This is a screenshot, not the original file", "A screenshot can't be checked for edits as well as the original. Ask for the original PDF, or a photo of the paper document.", 0);
+      if (!explicit && detected.key === "unknown") add("doc_type_unknown", "Couldn't tell what kind of document this is", "Only general checks were run. A clearer photo or the original PDF helps if it's an ID card, a statement or a notice.", 0);
 
       // ---- fake-letter tricks (same rules as messages)
       const msg = analyzeMessage(t.slice(0, MAX_TEXT));

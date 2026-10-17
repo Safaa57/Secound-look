@@ -2133,7 +2133,7 @@
    "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
    "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
    "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
-   "Passport: ask to see the original passport and compare the photo page and code lines carefully."
+   "Passport: ask to see the original passport and compare the photo page and code lines carefully. For anything else, use only the official Passport Seva website (passportindia.gov.in)."
   ],
   "reasons": [
    [
@@ -2151,6 +2151,14 @@
   ],
   "info": {
    "docType": "passport",
+   "detected": {
+    "key": "passport",
+    "confidence": "high",
+    "signals": [
+     "Passport code lines (MRZ)",
+     "\"Passport\""
+    ]
+   },
    "ids": [
     {
      "type": "passport",
@@ -2196,7 +2204,7 @@
    "Don't act on this document, pay anything or share it further until the issuer confirms it.",
    "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
    "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.",
-   "Passport: ask to see the original passport and compare the photo page and code lines carefully."
+   "Passport: ask to see the original passport and compare the photo page and code lines carefully. For anything else, use only the official Passport Seva website (passportindia.gov.in)."
   ],
   "reasons": [
    [
@@ -2220,6 +2228,13 @@
   ],
   "info": {
    "docType": "passport",
+   "detected": {
+    "key": "passport",
+    "confidence": "medium",
+    "signals": [
+     "Passport code lines (MRZ)"
+    ]
+   },
    "ids": [
     {
      "type": "passport",
@@ -2265,7 +2280,7 @@
    "Don't act on this document, pay anything or share it further until the issuer confirms it.",
    "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
    "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.",
-   "Passport: ask to see the original passport and compare the photo page and code lines carefully."
+   "Passport: ask to see the original passport and compare the photo page and code lines carefully. For anything else, use only the official Passport Seva website (passportindia.gov.in)."
   ],
   "reasons": [
    [
@@ -2289,6 +2304,15 @@
   ],
   "info": {
    "docType": "passport",
+   "detected": {
+    "key": "passport",
+    "confidence": "high",
+    "signals": [
+     "Passport code lines (MRZ)",
+     "\"Passport No.\"",
+     "\"Passport\""
+    ]
+   },
    "ids": [
     {
      "type": "passport",
@@ -2331,7 +2355,8 @@
   "advice": [
    "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
    "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
-   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message."
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Aadhaar: scan the QR code with UIDAI's official QR scanner app, or check the number at myaadhaar.uidai.gov.in (Verify Aadhaar)."
   ],
   "reasons": [
    [
@@ -2343,6 +2368,15 @@
   ],
   "info": {
    "docType": "id",
+   "detected": {
+    "key": "aadhaar",
+    "confidence": "medium",
+    "signals": [
+     "12-digit Aadhaar number (check digit OK)",
+     "\"Government of India\"",
+     "Date of birth"
+    ]
+   },
    "ids": [
     {
      "type": "aadhaar",
@@ -2398,6 +2432,14 @@
   ],
   "info": {
    "docType": "id",
+   "detected": {
+    "key": "aadhaar",
+    "confidence": "low",
+    "signals": [
+     "12-digit number in 4-4-4 groups",
+     "\"Government of India\""
+    ]
+   },
    "ids": [
     {
      "type": "aadhaar",
@@ -2461,6 +2503,15 @@
   ],
   "info": {
    "docType": "id",
+   "detected": {
+    "key": "aadhaar",
+    "confidence": "medium",
+    "signals": [
+     "12-digit Aadhaar number (check digit OK)",
+     "\"Government of India\"",
+     "Date of birth"
+    ]
+   },
    "ids": [
     {
      "type": "aadhaar",
@@ -2540,6 +2591,15 @@
   ],
   "info": {
    "docType": "id",
+   "detected": {
+    "key": "aadhaar",
+    "confidence": "medium",
+    "signals": [
+     "12-digit Aadhaar number (check digit OK)",
+     "\"Government of India\"",
+     "Date of birth"
+    ]
+   },
    "ids": [
     {
      "type": "aadhaar",
@@ -2608,7 +2668,14 @@
    ]
   ],
   "info": {
-   "docType": "letter",
+   "docType": "id",
+   "detected": {
+    "key": "aadhaar",
+    "confidence": "low",
+    "signals": [
+     "\"Aadhaar\""
+    ]
+   },
    "ids": [],
    "file": {
     "kind": null,
@@ -2628,7 +2695,7 @@
    }
   },
   "echo": {
-   "docType": "letter",
+   "docType": "id",
    "text": "Aadhaar"
   }
  },
@@ -2670,7 +2737,14 @@
    ]
   ],
   "info": {
-   "docType": "letter",
+   "docType": "id",
+   "detected": {
+    "key": "aadhaar",
+    "confidence": "low",
+    "signals": [
+     "\"Aadhaar\""
+    ]
+   },
    "ids": [],
    "file": {
     "kind": null,
@@ -2690,7 +2764,7 @@
    }
   },
   "echo": {
-   "docType": "letter",
+   "docType": "id",
    "text": "Aadhaar"
   }
  },
@@ -2709,7 +2783,8 @@
   "advice": [
    "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
    "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
-   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message."
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "PAN: use \"Verify Your PAN\" on the Income Tax e-filing website (incometax.gov.in)."
   ],
   "reasons": [
    [
@@ -2721,6 +2796,15 @@
   ],
   "info": {
    "docType": "id",
+   "detected": {
+    "key": "pan",
+    "confidence": "high",
+    "signals": [
+     "\"Income Tax Department\"",
+     "\"Permanent Account Number\"",
+     "PAN-style number"
+    ]
+   },
    "ids": [
     {
      "type": "pan",
@@ -2776,6 +2860,15 @@
   ],
   "info": {
    "docType": "id",
+   "detected": {
+    "key": "pan",
+    "confidence": "high",
+    "signals": [
+     "\"Income Tax Department\"",
+     "\"Permanent Account Number\"",
+     "PAN-style number"
+    ]
+   },
    "ids": [
     {
      "type": "pan",
@@ -2812,7 +2905,8 @@
   "advice": [
    "Don't act on this document, pay anything or share it further until the issuer confirms it.",
    "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
-   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.",
+   "GST: check the GSTIN with \"Search Taxpayer\" on the official GST portal (gst.gov.in). The name shown must match the document."
   ],
   "reasons": [
    [
@@ -2830,6 +2924,13 @@
   ],
   "info": {
    "docType": "letter",
+   "detected": {
+    "key": "gst_certificate",
+    "confidence": "low",
+    "signals": [
+     "GSTIN"
+    ]
+   },
    "ids": [
     {
      "type": "gstin",
@@ -2861,7 +2962,8 @@
   "label": "Suspicious",
   "ids": [
    "doc_ifsc_bad",
-   "doc_not_proof"
+   "doc_not_proof",
+   "doc_type_unknown"
   ],
   "advice": [
    "Don't act on this document, pay anything or share it further until the issuer confirms it.",
@@ -2876,6 +2978,12 @@
     20
    ],
    [
+    "doc_type_unknown",
+    "Couldn't tell what kind of document this is",
+    "Only general checks were run. A clearer photo or the original PDF helps if it's an ID card, a statement or a notice.",
+    0
+   ],
+   [
     "doc_not_proof",
     "A check like this can't prove a document is genuine",
     "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
@@ -2884,6 +2992,11 @@
   ],
   "info": {
    "docType": "letter",
+   "detected": {
+    "key": "unknown",
+    "confidence": "low",
+    "signals": []
+   },
    "ids": [
     {
      "type": "ifsc",
@@ -2919,7 +3032,8 @@
   "advice": [
    "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
    "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
-   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message."
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Bank statement: ask for it to be downloaded from net banking in front of you, shared through the RBI Account Aggregator system, or confirmed by the bank."
   ],
   "reasons": [
    [
@@ -2931,6 +3045,18 @@
   ],
   "info": {
    "docType": "statement",
+   "detected": {
+    "key": "bank_statement",
+    "confidence": "high",
+    "signals": [
+     "\"Statement of account\"",
+     "\"Opening balance\"",
+     "\"Closing balance\"",
+     "Debits",
+     "Credits",
+     "\"Balance\""
+    ]
+   },
    "ids": [],
    "statement": {
     "rows": 4,
@@ -2987,6 +3113,18 @@
   ],
   "info": {
    "docType": "statement",
+   "detected": {
+    "key": "bank_statement",
+    "confidence": "high",
+    "signals": [
+     "\"Statement of account\"",
+     "\"Opening balance\"",
+     "\"Closing balance\"",
+     "Debits",
+     "Credits",
+     "\"Balance\""
+    ]
+   },
    "ids": [],
    "statement": {
     "rows": 4,
@@ -3043,6 +3181,18 @@
   ],
   "info": {
    "docType": "statement",
+   "detected": {
+    "key": "bank_statement",
+    "confidence": "high",
+    "signals": [
+     "\"Statement of account\"",
+     "\"Opening balance\"",
+     "\"Closing balance\"",
+     "Debits",
+     "Credits",
+     "\"Balance\""
+    ]
+   },
    "ids": [],
    "statement": {
     "rows": 4,
@@ -3085,7 +3235,8 @@
   "advice": [
    "Don't act on this document, pay anything or share it further until the issuer confirms it.",
    "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
-   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.",
+   "Bank statement: ask for it to be downloaded from net banking in front of you, shared through the RBI Account Aggregator system, or confirmed by the bank."
   ],
   "reasons": [
    [
@@ -3103,6 +3254,18 @@
   ],
   "info": {
    "docType": "statement",
+   "detected": {
+    "key": "bank_statement",
+    "confidence": "high",
+    "signals": [
+     "\"Statement of account\"",
+     "\"Opening balance\"",
+     "\"Closing balance\"",
+     "Debits",
+     "Credits",
+     "\"Balance\""
+    ]
+   },
    "ids": [],
    "statement": {
     "rows": 4,
@@ -3180,6 +3343,18 @@
   ],
   "info": {
    "docType": "statement",
+   "detected": {
+    "key": "bank_statement",
+    "confidence": "high",
+    "signals": [
+     "\"Statement of account\"",
+     "\"Opening balance\"",
+     "\"Closing balance\"",
+     "Debits",
+     "Credits",
+     "\"Balance\""
+    ]
+   },
    "ids": [],
    "statement": {
     "rows": 4,
@@ -3223,7 +3398,8 @@
   "advice": [
    "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
    "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
-   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message."
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Bank statement: ask for it to be downloaded from net banking in front of you, shared through the RBI Account Aggregator system, or confirmed by the bank."
   ],
   "reasons": [
    [
@@ -3235,6 +3411,18 @@
   ],
   "info": {
    "docType": "statement",
+   "detected": {
+    "key": "bank_statement",
+    "confidence": "high",
+    "signals": [
+     "\"Statement of account\"",
+     "\"Opening balance\"",
+     "\"Closing balance\"",
+     "Debits",
+     "Credits",
+     "\"Balance\""
+    ]
+   },
    "ids": [],
    "statement": {
     "rows": 4,
@@ -3305,6 +3493,15 @@
   ],
   "info": {
    "docType": "letter",
+   "detected": {
+    "key": "legal_notice",
+    "confidence": "high",
+    "signals": [
+     "\"Warrant\"",
+     "\"CBI\"",
+     "\"Arrest\""
+    ]
+   },
    "ids": [],
    "file": {
     "kind": null,
@@ -3332,6 +3529,7 @@
    "advance_fee",
    "doc_not_proof",
    "doc_rbi_fee",
+   "doc_type_unknown",
    "prize_lottery"
   ],
   "advice": [
@@ -3360,6 +3558,12 @@
     30
    ],
    [
+    "doc_type_unknown",
+    "Couldn't tell what kind of document this is",
+    "Only general checks were run. A clearer photo or the original PDF helps if it's an ID card, a statement or a notice.",
+    0
+   ],
+   [
     "doc_not_proof",
     "A check like this can't prove a document is genuine",
     "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
@@ -3368,6 +3572,11 @@
   ],
   "info": {
    "docType": "letter",
+   "detected": {
+    "key": "unknown",
+    "confidence": "low",
+    "signals": []
+   },
    "ids": [],
    "file": {
     "kind": null,
@@ -3400,7 +3609,8 @@
   "advice": [
    "Don't act on this document, pay anything or share it further until the issuer confirms it.",
    "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
-   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.",
+   "Job offer: confirm with the company's HR using contact details from its official website. Real employers never ask you to pay to join."
   ],
   "reasons": [
    [
@@ -3430,6 +3640,14 @@
   ],
   "info": {
    "docType": "letter",
+   "detected": {
+    "key": "offer_letter",
+    "confidence": "high",
+    "signals": [
+     "\"Offer letter\"",
+     "\"You have been selected\""
+    ]
+   },
    "ids": [],
    "file": {
     "kind": null,
@@ -3456,7 +3674,8 @@
   "ids": [
    "advance_fee",
    "doc_loan_fee",
-   "doc_not_proof"
+   "doc_not_proof",
+   "doc_type_unknown"
   ],
   "advice": [
    "Don't act on this document, pay anything or share it further until the issuer confirms it.",
@@ -3477,6 +3696,12 @@
     30
    ],
    [
+    "doc_type_unknown",
+    "Couldn't tell what kind of document this is",
+    "Only general checks were run. A clearer photo or the original PDF helps if it's an ID card, a statement or a notice.",
+    0
+   ],
+   [
     "doc_not_proof",
     "A check like this can't prove a document is genuine",
     "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
@@ -3485,6 +3710,11 @@
   ],
   "info": {
    "docType": "letter",
+   "detected": {
+    "key": "unknown",
+    "confidence": "low",
+    "signals": []
+   },
    "ids": [],
    "file": {
     "kind": null,
@@ -3526,6 +3756,14 @@
   ],
   "info": {
    "docType": "letter",
+   "detected": {
+    "key": "letter",
+    "confidence": "medium",
+    "signals": [
+     "\"Dear\"",
+     "Sign-off"
+    ]
+   },
    "ids": [],
    "file": {
     "kind": null,
@@ -3560,7 +3798,8 @@
   "advice": [
    "Don't act on this document, pay anything or share it further until the issuer confirms it.",
    "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
-   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.",
+   "Aadhaar: scan the QR code with UIDAI's official QR scanner app, or check the number at myaadhaar.uidai.gov.in (Verify Aadhaar)."
   ],
   "reasons": [
    [
@@ -3578,6 +3817,14 @@
   ],
   "info": {
    "docType": "id",
+   "detected": {
+    "key": "aadhaar",
+    "confidence": "medium",
+    "signals": [
+     "12-digit Aadhaar number (check digit OK)",
+     "\"Government of India\""
+    ]
+   },
    "ids": [
     {
      "type": "aadhaar",
@@ -3602,7 +3849,1042 @@
   "kind": "document",
   "input": {
    "now": 1792238400000,
-   "text": "REPUBLIC OF INDIA\nPassport No. Z1234567\np<ind sharm a‹<ra hul<k umar< ‹<‹<< ‹<‹<< ‹<‹<< ‹<‹<\nZ1234 567〈1 IND99 01018 M3101 012AB 12345 C‹<‹< ‹<28«\t"
+   "text": "भारत सरकार\nGovernment of India\nRahul Sharma\nजन्म तिथि/DOB: 12/05/1990\nपुरुष/ MALE\n4991 1866 5246\nमेरा आधार, मेरी पहचान"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Aadhaar: scan the QR code with UIDAI's official QR scanner app, or check the number at myaadhaar.uidai.gov.in (Verify Aadhaar)."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "id",
+   "detected": {
+    "key": "aadhaar",
+    "confidence": "high",
+    "signals": [
+     "12-digit Aadhaar number (check digit OK)",
+     "\"आधार\"",
+     "\"Mera Aadhaar, Meri Pehchan\"",
+     "\"Government of India\"",
+     "Date of birth",
+     "Gender"
+    ]
+   },
+   "ids": [
+    {
+     "type": "aadhaar",
+     "value": "XXXX XXXX 5246",
+     "valid": true
+    }
+   ],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "id",
+   "text": "भारत सरकार\nGovernment of India\nRahul Sharma\nजन्म तिथि/DOB: 12/05/1990\nपुरुष/ MALE\n4991 1866 5246\nमेरा आधार, मेरी पहचान"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Unique Identification Authority of India\nAddress: S/O Ramesh Sharma, 12 MG Road, Bengaluru 560001\n4991 1866 5246\nVID : 9134 5678 9012 3456\nhelp@uidai.gov.in www.uidai.gov.in"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Aadhaar: scan the QR code with UIDAI's official QR scanner app, or check the number at myaadhaar.uidai.gov.in (Verify Aadhaar)."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "id",
+   "detected": {
+    "key": "aadhaar",
+    "confidence": "high",
+    "signals": [
+     "12-digit Aadhaar number (check digit OK)",
+     "\"Unique Identification Authority\"",
+     "UIDAI",
+     "VID number"
+    ]
+   },
+   "ids": [
+    {
+     "type": "aadhaar",
+     "value": "XXXX XXXX 5246",
+     "valid": true
+    }
+   ],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "id",
+   "text": "Unique Identification Authority of India\nAddress: S/O Ramesh Sharma, 12 MG Road, Bengaluru 560001\n4991 1866 5246\nVID : 9134 5678 9012 3456\nhelp@uidai.gov.in www.uidai.gov.in"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Enrolment No.: 1234/56789/01234\nTo\nRahul Sharma\nAadhaar no. issued: 01/02/2015\nYour Aadhaar No. :\n4991 1866 5246\nVID : 9134 5678 9012 3456"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Aadhaar: scan the QR code with UIDAI's official QR scanner app, or check the number at myaadhaar.uidai.gov.in (Verify Aadhaar)."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "id",
+   "detected": {
+    "key": "aadhaar",
+    "confidence": "high",
+    "signals": [
+     "12-digit Aadhaar number (check digit OK)",
+     "\"Aadhaar\"",
+     "VID number",
+     "Enrolment number"
+    ]
+   },
+   "ids": [
+    {
+     "type": "aadhaar",
+     "value": "XXXX XXXX 5246",
+     "valid": true
+    }
+   ],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "id",
+   "text": "Enrolment No.: 1234/56789/01234\nTo\nRahul Sharma\nAadhaar no. issued: 01/02/2015\nYour Aadhaar No. :\n4991 1866 5246\nVID : 9134 5678 9012 3456"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "आयकर विभाग INCOME TAX DEPARTMENT भारत सरकार GOVT. OF INDIA\nस्थायी लेखा संख्या कार्ड Permanent Account Number Card\nABCPE1234F\nनाम / Name RAHUL SHARMA\nपिता का नाम / Father's Name RAMESH SHARMA\nजन्म की तारीख / Date of Birth 12/05/1990"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "PAN: use \"Verify Your PAN\" on the Income Tax e-filing website (incometax.gov.in)."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "id",
+   "detected": {
+    "key": "pan",
+    "confidence": "high",
+    "signals": [
+     "\"Income Tax Department\"",
+     "\"Permanent Account Number\"",
+     "\"आयकर विभाग\"",
+     "\"स्थायी लेखा संख्या\"",
+     "PAN-style number",
+     "Father's name"
+    ]
+   },
+   "ids": [
+    {
+     "type": "pan",
+     "value": "ABCPE1234F",
+     "valid": true
+    }
+   ],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "id",
+   "text": "आयकर विभाग INCOME TAX DEPARTMENT भारत सरकार GOVT. OF INDIA\nस्थायी लेखा संख्या कार्ड Permanent Account Number Card\nABCPE1234F\nनाम / Name RAHUL SHARMA\nपिता का नाम / Father's Name RAMESH SHARMA\nजन्म की तारीख / Date of Birth 12/05/1990"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "REPUBLIC OF INDIA\nType P Country Code IND Passport No. Z1234567\nSurname SHARMA Given Name RAHUL\nNationality INDIAN Place of Issue BENGALURU\nP<INDSHARMA<<RAHUL<<<<<<<<<<<<<<<<<<<<<<<<<<"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Passport: ask to see the original passport and compare the photo page and code lines carefully. For anything else, use only the official Passport Seva website (passportindia.gov.in)."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "passport",
+   "detected": {
+    "key": "passport",
+    "confidence": "high",
+    "signals": [
+     "\"P<IND\" code line",
+     "\"Republic of India\"",
+     "\"Passport No.\"",
+     "\"Passport\"",
+     "Place of issue",
+     "Nationality"
+    ]
+   },
+   "ids": [],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "passport",
+   "text": "REPUBLIC OF INDIA\nType P Country Code IND Passport No. Z1234567\nSurname SHARMA Given Name RAHUL\nNationality INDIAN Place of Issue BENGALURU\nP<INDSHARMA<<RAHUL<<<<<<<<<<<<<<<<<<<<<<<<<<"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "ELECTION COMMISSION OF INDIA\nIDENTITY CARD\nABC1234567\nElector's Name : Rahul Sharma\nFather's Name : Ramesh Sharma\nSex : Male\nDate of Birth : 12/05/1990"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Voter ID: search the EPIC number on the official Voters' Service Portal (voters.eci.gov.in)."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "id",
+   "detected": {
+    "key": "voter_id",
+    "confidence": "high",
+    "signals": [
+     "\"Election Commission of India\"",
+     "EPIC number (3 letters + 7 digits)",
+     "\"Elector's Name\""
+    ]
+   },
+   "ids": [],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "id",
+   "text": "ELECTION COMMISSION OF INDIA\nIDENTITY CARD\nABC1234567\nElector's Name : Rahul Sharma\nFather's Name : Ramesh Sharma\nSex : Male\nDate of Birth : 12/05/1990"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Union of India\nDriving Licence\nKarnataka State Transport Department\nDL No. KA01 20110012345\nName: RAHUL SHARMA  DOB 12-05-1990\nValid Till (NT) 11-05-2030  COV: LMV MCWG"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Driving licence: check the DL number with \"DL status\" on the official Parivahan website (parivahan.gov.in)."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "id",
+   "detected": {
+    "key": "driving_licence",
+    "confidence": "high",
+    "signals": [
+     "\"Driving Licence\"",
+     "DL number",
+     "\"Union of India\"",
+     "\"Transport Department\"",
+     "Vehicle class",
+     "Validity"
+    ]
+   },
+   "ids": [],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "id",
+   "text": "Union of India\nDriving Licence\nKarnataka State Transport Department\nDL No. KA01 20110012345\nName: RAHUL SHARMA  DOB 12-05-1990\nValid Till (NT) 11-05-2030  COV: LMV MCWG"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Indian Bank Statement of Account\nAccount No: 123456789012  IFSC: SBIN0001234\nDate Narration Chq./Ref.No. Value Dt Withdrawal Amt. Deposit Amt. Closing Balance\n01/10/26 UPI-RAMESH 500.00 9,500.00\n02/10/26 NEFT SALARY 25,000.00 34,500.00"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof",
+   "doc_statement_unread"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Bank statement: ask for it to be downloaded from net banking in front of you, shared through the RBI Account Aggregator system, or confirmed by the bank."
+  ],
+  "reasons": [
+   [
+    "doc_statement_unread",
+    "Couldn't read the transaction rows",
+    "Amount checks need the rows as text. Try a clearer photo or the original PDF.",
+    0
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "statement",
+   "detected": {
+    "key": "bank_statement",
+    "confidence": "high",
+    "signals": [
+     "\"Statement of account\"",
+     "\"Closing balance\"",
+     "Transaction columns",
+     "Debits",
+     "Credits",
+     "\"Balance\""
+    ]
+   },
+   "ids": [
+    {
+     "type": "ifsc",
+     "value": "SBIN0001234",
+     "valid": true
+    }
+   ],
+   "statement": {
+    "rows": 2,
+    "checked": 1,
+    "mismatched": 0,
+    "outOfOrder": 0,
+    "summaryOk": null
+   },
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "statement",
+   "text": "Indian Bank Statement of Account\nAccount No: 123456789012  IFSC: SBIN0001234\nDate Narration Chq./Ref.No. Value Dt Withdrawal Amt. Deposit Amt. Closing Balance\n01/10/26 UPI-RAMESH 500.00 9,500.00\n02/10/26 NEFT SALARY 25,000.00 34,500.00"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "PAY TO Ramesh Kumar OR BEARER\nRUPEES Fifty thousand only   ₹ 50,000/-\nA/c No. 12345678901  IFSC SBIN0001234\nPlease sign above\n123456\" 560002001: 000123\" 31"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Cheque: confirm with the bank that issued it, using the number on the bank's official website. Don't hand anything over until the money is in your account; a cheque can bounce days later."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "letter",
+   "detected": {
+    "key": "cheque",
+    "confidence": "high",
+    "signals": [
+     "\"or bearer\"",
+     "MICR code line",
+     "\"Rupees\"",
+     "Signature line",
+     "\"Pay\"",
+     "IFSC"
+    ]
+   },
+   "ids": [
+    {
+     "type": "ifsc",
+     "value": "SBIN0001234",
+     "valid": true
+    }
+   ],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "letter",
+   "text": "PAY TO Ramesh Kumar OR BEARER\nRUPEES Fifty thousand only   ₹ 50,000/-\nA/c No. 12345678901  IFSC SBIN0001234\nPlease sign above\n123456\" 560002001: 000123\" 31"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Pay Slip for the month of September 2026\nEmployee Name: Rahul Sharma   Employee ID: E1023  UAN: 100200300400\nEarnings: Basic 30,000.00  HRA 12,000.00  Special Allowance 8,000.00\nDeductions: Provident Fund 1,800.00 Professional Tax 200.00  Total Deductions 2,000.00\nNet Pay 48,000.00"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Salary slip: confirm with the employer's HR department using contact details from the company's official website, and compare it with the salary credits in the bank statement."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "statement",
+   "detected": {
+    "key": "salary_slip",
+    "confidence": "high",
+    "signals": [
+     "\"Pay slip\"",
+     "\"HRA\"",
+     "\"Net pay\"",
+     "\"Total deductions\"",
+     "\"Basic\"",
+     "PF"
+    ]
+   },
+   "ids": [],
+   "statement": {
+    "rows": 0,
+    "checked": 0,
+    "mismatched": 0,
+    "outOfOrder": 0,
+    "summaryOk": null
+   },
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "statement",
+   "text": "Pay Slip for the month of September 2026\nEmployee Name: Rahul Sharma   Employee ID: E1023  UAN: 100200300400\nEarnings: Basic 30,000.00  HRA 12,000.00  Special Allowance 8,000.00\nDeductions: Provident Fund 1,800.00 Professional Tax 200.00  Total Deductions 2,000.00\nNet Pay 48,000.00"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "INDIAN INCOME TAX RETURN ACKNOWLEDGEMENT\nITR-V\nAssessment Year 2026-27\nPAN ABCPE1234F  Name RAHUL SHARMA\nAcknowledgement Number 123456789012345 Date of filing 31-07-2026\nGross total income 12,00,000"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "ITR: ask for the e-verified ITR-V, or have the person show the return after logging in to the Income Tax e-filing website (incometax.gov.in)."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "letter",
+   "detected": {
+    "key": "itr",
+    "confidence": "high",
+    "signals": [
+     "\"ITR-V\"",
+     "\"Indian Income Tax Return\"",
+     "\"Acknowledgement Number\"",
+     "\"Assessment Year\"",
+     "Total income",
+     "\"Income Tax\""
+    ]
+   },
+   "ids": [
+    {
+     "type": "pan",
+     "value": "ABCPE1234F",
+     "valid": true
+    }
+   ],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "letter",
+   "text": "INDIAN INCOME TAX RETURN ACKNOWLEDGEMENT\nITR-V\nAssessment Year 2026-27\nPAN ABCPE1234F  Name RAHUL SHARMA\nAcknowledgement Number 123456789012345 Date of filing 31-07-2026\nGross total income 12,00,000"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Government of India\nForm GST REG-06\nRegistration Certificate\nRegistration Number: 27AAPFU0939F1ZV\nLegal Name ACME TRADERS\nConstitution of Business: Partnership"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "GST: check the GSTIN with \"Search Taxpayer\" on the official GST portal (gst.gov.in). The name shown must match the document."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "letter",
+   "detected": {
+    "key": "gst_certificate",
+    "confidence": "high",
+    "signals": [
+     "\"Form GST REG-06\"",
+     "\"Constitution of Business\"",
+     "\"Registration Certificate\"",
+     "GSTIN",
+     "Legal / trade name"
+    ]
+   },
+   "ids": [
+    {
+     "type": "gstin",
+     "value": "27AAPFU0939F1ZV",
+     "valid": true
+    }
+   ],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "letter",
+   "text": "Government of India\nForm GST REG-06\nRegistration Certificate\nRegistration Number: 27AAPFU0939F1ZV\nLegal Name ACME TRADERS\nConstitution of Business: Partnership"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "BANGALORE ELECTRICITY SUPPLY COMPANY\nConsumer No. 1234567890  Meter No. 98765\nPrevious Reading 1200 Present Reading 1350 Units Consumed 150\nBill Amount Rs 1,245.00  Due Date 25/10/2026"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Bill: pay only through the provider's official website or app, or your UPI app's bill-payment section. Never pay a number from an SMS or call that threatens disconnection."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "letter",
+   "detected": {
+    "key": "utility_bill",
+    "confidence": "high",
+    "signals": [
+     "\"Units consumed\"",
+     "\"Consumer No.\"",
+     "\"Bill amount\"",
+     "\"Electricity\"",
+     "Meter reading",
+     "\"Due date\""
+    ]
+   },
+   "ids": [],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "letter",
+   "text": "BANGALORE ELECTRICITY SUPPLY COMPANY\nConsumer No. 1234567890  Meter No. 98765\nPrevious Reading 1200 Present Reading 1350 Units Consumed 150\nBill Amount Rs 1,245.00  Due Date 25/10/2026"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "TAX INVOICE\nInvoice No: INV-2026-0012  Invoice Date: 12/10/2026\nSold By: Acme Traders GSTIN 27AAPFU0939F1ZV\nBill To: Rahul Sharma\nItem HSN Qty Rate CGST SGST Amount\nGrand Total 11,800.00"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Invoice: check the seller's GSTIN with \"Search Taxpayer\" on the official GST portal (gst.gov.in) before you pay."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "letter",
+   "detected": {
+    "key": "invoice",
+    "confidence": "high",
+    "signals": [
+     "\"Tax Invoice\"",
+     "\"Invoice No.\"",
+     "HSN / SAC code",
+     "CGST / SGST / IGST",
+     "\"Invoice\"",
+     "Bill to / ship to"
+    ]
+   },
+   "ids": [
+    {
+     "type": "gstin",
+     "value": "27AAPFU0939F1ZV",
+     "valid": true
+    }
+   ],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "letter",
+   "text": "TAX INVOICE\nInvoice No: INV-2026-0012  Invoice Date: 12/10/2026\nSold By: Acme Traders GSTIN 27AAPFU0939F1ZV\nBill To: Rahul Sharma\nItem HSN Qty Rate CGST SGST Amount\nGrand Total 11,800.00"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "OFFER LETTER\nDear Rahul,\nWe are pleased to offer you the position with designation Software Engineer.\nYour annual CTC will be Rs 12,00,000. Date of joining: 01/11/2026.\nRegards, HR Department"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Job offer: confirm with the company's HR using contact details from its official website. Real employers never ask you to pay to join."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "letter",
+   "detected": {
+    "key": "offer_letter",
+    "confidence": "high",
+    "signals": [
+     "\"Offer letter\"",
+     "\"CTC\"",
+     "\"Joining date\"",
+     "\"You have been selected\"",
+     "Designation",
+     "HR"
+    ]
+   },
+   "ids": [],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "letter",
+   "text": "OFFER LETTER\nDear Rahul,\nWe are pleased to offer you the position with designation Software Engineer.\nYour annual CTC will be Rs 12,00,000. Date of joining: 01/11/2026.\nRegards, HR Department"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "CENTRAL BUREAU OF INVESTIGATION\nNotice under section 41A CrPC\nFIR No. 123/2026 registered at Cyber Crime Police Station\nYou are summoned to appear before the court."
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Government or police notice: look up the office's number on its official .gov.in website and call them. Agencies never ask for money to close cases."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "letter",
+   "detected": {
+    "key": "legal_notice",
+    "confidence": "high",
+    "signals": [
+     "\"CBI\"",
+     "\"FIR\"",
+     "\"Court\"",
+     "\"Police\"",
+     "\"Cyber crime\"",
+     "Legal section"
+    ]
+   },
+   "ids": [],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "letter",
+   "text": "CENTRAL BUREAU OF INVESTIGATION\nNotice under section 41A CrPC\nFIR No. 123/2026 registered at Cyber Crime Police Station\nYou are summoned to appear before the court."
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Payment Successful\n₹2,500\nPaid to Ramesh Kumar\nramesh@okaxis\nUPI Ref No 628612345678\n13 Oct 2026, 10:32 AM"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Payment screenshot: use the Payment check instead, and look for the money in your own bank or UPI app. A screenshot is not proof."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "letter",
+   "detected": {
+    "key": "payment_screenshot",
+    "confidence": "high",
+    "signals": [
+     "\"UPI Ref / Transaction ID\"",
+     "\"Payment successful\"",
+     "\"Paid to\""
+    ]
+   },
+   "ids": [],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "letter",
+   "text": "Payment Successful\n₹2,500\nPaid to Ramesh Kumar\nramesh@okaxis\nUPI Ref No 628612345678\n13 Oct 2026, 10:32 AM"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "VISVESVARAYA TECHNOLOGICAL UNIVERSITY\nThis is to certify that Rahul Sharma has been awarded the degree of Bachelor of Engineering\nGrade Card  CGPA 8.4\nRegistrar"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Certificate: confirm it with the university or board that issued it, or ask for it through DigiLocker (digilocker.gov.in)."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "letter",
+   "detected": {
+    "key": "certificate",
+    "confidence": "high",
+    "signals": [
+     "\"This is to certify\"",
+     "Marks",
+     "\"University\" / board",
+     "Degree",
+     "Issuing officer"
+    ]
+   },
+   "ids": [],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "letter",
+   "text": "VISVESVARAYA TECHNOLOGICAL UNIVERSITY\nThis is to certify that Rahul Sharma has been awarded the degree of Bachelor of Engineering\nGrade Card  CGPA 8.4\nRegistrar"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "To,\nThe Manager\nSubject: Request for change of address\nDear Sir,\nI request you to update my address in your records.\nYours faithfully,\nAnil"
   },
   "score": 0,
   "level": "safe",
@@ -3624,7 +4906,2046 @@
    ]
   ],
   "info": {
+   "docType": "letter",
+   "detected": {
+    "key": "letter",
+    "confidence": "high",
+    "signals": [
+     "\"Dear\"",
+     "\"Subject:\"",
+     "Sign-off",
+     "To / From"
+    ]
+   },
+   "ids": [],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "letter",
+   "text": "To,\nThe Manager\nSubject: Request for change of address\nDear Sir,\nI request you to update my address in your records.\nYours faithfully,\nAnil"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "lorem ipsum dolor sit amet"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof",
+   "doc_type_unknown"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message."
+  ],
+  "reasons": [
+   [
+    "doc_type_unknown",
+    "Couldn't tell what kind of document this is",
+    "Only general checks were run. A clearer photo or the original PDF helps if it's an ID card, a statement or a notice.",
+    0
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "letter",
+   "detected": {
+    "key": "unknown",
+    "confidence": "low",
+    "signals": []
+   },
+   "ids": [],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "letter",
+   "text": "lorem ipsum dolor sit amet"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "आयकर विभाग INCOME TAX DEPARTMENT भारत सरकार GOVT. OF INDIA\nस्थायी लेखा संख्या कार्ड Permanent Account Number Card\nABCPE1234F\nनाम / Name RAHUL SHARMA\nपिता का नाम / Father's Name RAMESH SHARMA\nजन्म की तारीख / Date of Birth 12/05/1990",
+   "docType": "statement"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof",
+   "doc_statement_unread"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Bank statement: ask for it to be downloaded from net banking in front of you, shared through the RBI Account Aggregator system, or confirmed by the bank.",
+   "PAN: use \"Verify Your PAN\" on the Income Tax e-filing website (incometax.gov.in)."
+  ],
+  "reasons": [
+   [
+    "doc_statement_unread",
+    "Couldn't read the transaction rows",
+    "Amount checks need the rows as text. Try a clearer photo or the original PDF.",
+    0
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "statement",
+   "detected": {
+    "key": "pan",
+    "confidence": "high",
+    "signals": [
+     "\"Income Tax Department\"",
+     "\"Permanent Account Number\"",
+     "\"आयकर विभाग\"",
+     "\"स्थायी लेखा संख्या\"",
+     "PAN-style number",
+     "Father's name"
+    ]
+   },
+   "ids": [
+    {
+     "type": "pan",
+     "value": "ABCPE1234F",
+     "valid": true
+    }
+   ],
+   "statement": {
+    "rows": 0,
+    "checked": 0,
+    "mismatched": 0,
+    "outOfOrder": 0,
+    "summaryOk": null
+   },
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "statement",
+   "text": "आयकर विभाग INCOME TAX DEPARTMENT भारत सरकार GOVT. OF INDIA\nस्थायी लेखा संख्या कार्ड Permanent Account Number Card\nABCPE1234F\nनाम / Name RAHUL SHARMA\nपिता का नाम / Father's Name RAMESH SHARMA\nजन्म की तारीख / Date of Birth 12/05/1990"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "आयकर विभाग INCOME TAX DEPARTMENT भारत सरकार GOVT. OF INDIA\nस्थायी लेखा संख्या कार्ड Permanent Account Number Card\nABCPE1234F\nनाम / Name RAHUL SHARMA\nपिता का नाम / Father's Name RAMESH SHARMA\nजन्म की तारीख / Date of Birth 12/05/1990",
+   "docType": "statement"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof",
+   "doc_statement_unread"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Bank statement: ask for it to be downloaded from net banking in front of you, shared through the RBI Account Aggregator system, or confirmed by the bank.",
+   "PAN: use \"Verify Your PAN\" on the Income Tax e-filing website (incometax.gov.in)."
+  ],
+  "reasons": [
+   [
+    "doc_statement_unread",
+    "Couldn't read the transaction rows",
+    "Amount checks need the rows as text. Try a clearer photo or the original PDF.",
+    0
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "statement",
+   "detected": {
+    "key": "pan",
+    "confidence": "high",
+    "signals": [
+     "\"Income Tax Department\"",
+     "\"Permanent Account Number\"",
+     "\"आयकर विभाग\"",
+     "\"स्थायी लेखा संख्या\"",
+     "PAN-style number",
+     "Father's name"
+    ]
+   },
+   "ids": [
+    {
+     "type": "pan",
+     "value": "ABCPE1234F",
+     "valid": true
+    }
+   ],
+   "statement": {
+    "rows": 0,
+    "checked": 0,
+    "mismatched": 0,
+    "outOfOrder": 0,
+    "summaryOk": null
+   },
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "statement",
+   "text": "आयकर विभाग INCOME TAX DEPARTMENT भारत सरकार GOVT. OF INDIA\nस्थायी लेखा संख्या कार्ड Permanent Account Number Card\nABCPE1234F\nनाम / Name RAHUL SHARMA\nपिता का नाम / Father's Name RAMESH SHARMA\nजन्म की तारीख / Date of Birth 12/05/1990"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "आयकर विभाग INCOME TAX DEPARTMENT भारत सरकार GOVT. OF INDIA\nस्थायी लेखा संख्या कार्ड Permanent Account Number Card\nABCPE1234F\nनाम / Name RAHUL SHARMA\nपिता का नाम / Father's Name RAMESH SHARMA\nजन्म की तारीख / Date of Birth 12/05/1990",
+   "docType": "pan"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "PAN: use \"Verify Your PAN\" on the Income Tax e-filing website (incometax.gov.in)."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "id",
+   "detected": {
+    "key": "pan",
+    "confidence": "high",
+    "signals": [
+     "\"Income Tax Department\"",
+     "\"Permanent Account Number\"",
+     "\"आयकर विभाग\"",
+     "\"स्थायी लेखा संख्या\"",
+     "PAN-style number",
+     "Father's name"
+    ]
+   },
+   "ids": [
+    {
+     "type": "pan",
+     "value": "ABCPE1234F",
+     "valid": true
+    }
+   ],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "id",
+   "text": "आयकर विभाग INCOME TAX DEPARTMENT भारत सरकार GOVT. OF INDIA\nस्थायी लेखा संख्या कार्ड Permanent Account Number Card\nABCPE1234F\nनाम / Name RAHUL SHARMA\nपिता का नाम / Father's Name RAMESH SHARMA\nजन्म की तारीख / Date of Birth 12/05/1990"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "आयकर विभाग INCOME TAX DEPARTMENT भारत सरकार GOVT. OF INDIA\nस्थायी लेखा संख्या कार्ड Permanent Account Number Card\nABCPE1234F\nनाम / Name RAHUL SHARMA\nपिता का नाम / Father's Name RAMESH SHARMA\nजन्म की तारीख / Date of Birth 12/05/1990"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "PAN: use \"Verify Your PAN\" on the Income Tax e-filing website (incometax.gov.in)."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "id",
+   "detected": {
+    "key": "pan",
+    "confidence": "high",
+    "signals": [
+     "\"Income Tax Department\"",
+     "\"Permanent Account Number\"",
+     "\"आयकर विभाग\"",
+     "\"स्थायी लेखा संख्या\"",
+     "PAN-style number",
+     "Father's name"
+    ]
+   },
+   "ids": [
+    {
+     "type": "pan",
+     "value": "ABCPE1234F",
+     "valid": true
+    }
+   ],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "id",
+   "text": "आयकर विभाग INCOME TAX DEPARTMENT भारत सरकार GOVT. OF INDIA\nस्थायी लेखा संख्या कार्ड Permanent Account Number Card\nABCPE1234F\nनाम / Name RAHUL SHARMA\nपिता का नाम / Father's Name RAMESH SHARMA\nजन्म की तारीख / Date of Birth 12/05/1990"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Dear sir please call me"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "letter",
+   "detected": {
+    "key": "letter",
+    "confidence": "low",
+    "signals": [
+     "\"Dear\""
+    ]
+   },
+   "ids": [],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "letter",
+   "text": "Dear sir please call me"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Unique Identification Authority of India\nAddress: S/O Ramesh Sharma, 12 MG Road, Bengaluru 560001\n4991 1866 5246\nVID : 9134 5678 9012 3456\nhelp@uidai.gov.in www.uidai.gov.in"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Aadhaar: scan the QR code with UIDAI's official QR scanner app, or check the number at myaadhaar.uidai.gov.in (Verify Aadhaar)."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "id",
+   "detected": {
+    "key": "aadhaar",
+    "confidence": "high",
+    "signals": [
+     "12-digit Aadhaar number (check digit OK)",
+     "\"Unique Identification Authority\"",
+     "UIDAI",
+     "VID number"
+    ]
+   },
+   "ids": [
+    {
+     "type": "aadhaar",
+     "value": "XXXX XXXX 5246",
+     "valid": true
+    }
+   ],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "id",
+   "text": "Unique Identification Authority of India\nAddress: S/O Ramesh Sharma, 12 MG Road, Bengaluru 560001\n4991 1866 5246\nVID : 9134 5678 9012 3456\nhelp@uidai.gov.in www.uidai.gov.in"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "lorem ipsum dolor sit amet"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof",
+   "doc_type_unknown"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message."
+  ],
+  "reasons": [
+   [
+    "doc_type_unknown",
+    "Couldn't tell what kind of document this is",
+    "Only general checks were run. A clearer photo or the original PDF helps if it's an ID card, a statement or a notice.",
+    0
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "letter",
+   "detected": {
+    "key": "unknown",
+    "confidence": "low",
+    "signals": []
+   },
+   "ids": [],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "letter",
+   "text": "lorem ipsum dolor sit amet"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "lorem ipsum dolor sit amet",
+   "docType": "letter"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "letter",
+   "detected": {
+    "key": "unknown",
+    "confidence": "low",
+    "signals": []
+   },
+   "ids": [],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "letter",
+   "text": "lorem ipsum dolor sit amet"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Pay Slip for the month of September 2026\nEmployee Name: Rahul Sharma   Employee ID: E1023  UAN: 100200300400\nEarnings: Basic 30,000.00  HRA 12,000.00  Special Allowance 8,000.00\nDeductions: Provident Fund 1,800.00 Professional Tax 200.00  Total Deductions 2,000.00\nNet Pay 48,000.00",
+   "file": {
+    "kind": "pdf",
+    "creator": "Microsoft Word"
+   }
+  },
+  "score": 15,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof",
+   "doc_office_app"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Salary slip: confirm with the employer's HR department using contact details from the company's official website, and compare it with the salary credits in the bank statement."
+  ],
+  "reasons": [
+   [
+    "doc_office_app",
+    "Made with a word processor or design app",
+    "Official documents are usually generated by the issuer's system. A document typed in a general app could have been made by anyone.",
+    15
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "statement",
+   "detected": {
+    "key": "salary_slip",
+    "confidence": "high",
+    "signals": [
+     "\"Pay slip\"",
+     "\"HRA\"",
+     "\"Net pay\"",
+     "\"Total deductions\"",
+     "\"Basic\"",
+     "PF"
+    ]
+   },
+   "ids": [],
+   "statement": {
+    "rows": 0,
+    "checked": 0,
+    "mismatched": 0,
+    "outOfOrder": 0,
+    "summaryOk": null
+   },
+   "file": {
+    "kind": "pdf",
+    "program": "Microsoft Word",
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "statement",
+   "text": "Pay Slip for the month of September 2026\nEmployee Name: Rahul Sharma   Employee ID: E1023  UAN: 100200300400\nEarnings: Basic 30,000.00  HRA 12,000.00  Special Allowance 8,000.00\nDeductions: Provident Fund 1,800.00 Professional Tax 200.00  Total Deductions 2,000.00\nNet Pay 48,000.00"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Pay Slip for the month of September 2026\nEmployee Name: Rahul Sharma   Employee ID: E1023  UAN: 100200300400\nEarnings: Basic 30,000.00  HRA 12,000.00  Special Allowance 8,000.00\nDeductions: Provident Fund 1,800.00 Professional Tax 200.00  Total Deductions 2,000.00\nNet Pay 48,000.00",
+   "file": {
+    "kind": "pdf",
+    "creator": "Microsoft Word"
+   }
+  },
+  "score": 15,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof",
+   "doc_office_app"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Salary slip: confirm with the employer's HR department using contact details from the company's official website, and compare it with the salary credits in the bank statement."
+  ],
+  "reasons": [
+   [
+    "doc_office_app",
+    "Made with a word processor or design app",
+    "Official documents are usually generated by the issuer's system. A document typed in a general app could have been made by anyone.",
+    15
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "statement",
+   "detected": {
+    "key": "salary_slip",
+    "confidence": "high",
+    "signals": [
+     "\"Pay slip\"",
+     "\"HRA\"",
+     "\"Net pay\"",
+     "\"Total deductions\"",
+     "\"Basic\"",
+     "PF"
+    ]
+   },
+   "ids": [],
+   "statement": {
+    "rows": 0,
+    "checked": 0,
+    "mismatched": 0,
+    "outOfOrder": 0,
+    "summaryOk": null
+   },
+   "file": {
+    "kind": "pdf",
+    "program": "Microsoft Word",
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "statement",
+   "text": "Pay Slip for the month of September 2026\nEmployee Name: Rahul Sharma   Employee ID: E1023  UAN: 100200300400\nEarnings: Basic 30,000.00  HRA 12,000.00  Special Allowance 8,000.00\nDeductions: Provident Fund 1,800.00 Professional Tax 200.00  Total Deductions 2,000.00\nNet Pay 48,000.00"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "ELECTION COMMISSION OF INDIA\nIDENTITY CARD\nABC1234567\nElector's Name : Rahul Sharma\nFather's Name : Ramesh Sharma\nSex : Male\nDate of Birth : 12/05/1990"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Voter ID: search the EPIC number on the official Voters' Service Portal (voters.eci.gov.in)."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "id",
+   "detected": {
+    "key": "voter_id",
+    "confidence": "high",
+    "signals": [
+     "\"Election Commission of India\"",
+     "EPIC number (3 letters + 7 digits)",
+     "\"Elector's Name\""
+    ]
+   },
+   "ids": [],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "id",
+   "text": "ELECTION COMMISSION OF INDIA\nIDENTITY CARD\nABC1234567\nElector's Name : Rahul Sharma\nFather's Name : Ramesh Sharma\nSex : Male\nDate of Birth : 12/05/1990"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Union of India\nDriving Licence\nKarnataka State Transport Department\nDL No. KA01 20110012345\nName: RAHUL SHARMA  DOB 12-05-1990\nValid Till (NT) 11-05-2030  COV: LMV MCWG"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Driving licence: check the DL number with \"DL status\" on the official Parivahan website (parivahan.gov.in)."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "id",
+   "detected": {
+    "key": "driving_licence",
+    "confidence": "high",
+    "signals": [
+     "\"Driving Licence\"",
+     "DL number",
+     "\"Union of India\"",
+     "\"Transport Department\"",
+     "Vehicle class",
+     "Validity"
+    ]
+   },
+   "ids": [],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "id",
+   "text": "Union of India\nDriving Licence\nKarnataka State Transport Department\nDL No. KA01 20110012345\nName: RAHUL SHARMA  DOB 12-05-1990\nValid Till (NT) 11-05-2030  COV: LMV MCWG"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Government of India\nForm GST REG-06\nRegistration Certificate\nRegistration Number: 27AAPFU0939F1ZV\nLegal Name ACME TRADERS\nConstitution of Business: Partnership"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "GST: check the GSTIN with \"Search Taxpayer\" on the official GST portal (gst.gov.in). The name shown must match the document."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "letter",
+   "detected": {
+    "key": "gst_certificate",
+    "confidence": "high",
+    "signals": [
+     "\"Form GST REG-06\"",
+     "\"Constitution of Business\"",
+     "\"Registration Certificate\"",
+     "GSTIN",
+     "Legal / trade name"
+    ]
+   },
+   "ids": [
+    {
+     "type": "gstin",
+     "value": "27AAPFU0939F1ZV",
+     "valid": true
+    }
+   ],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "letter",
+   "text": "Government of India\nForm GST REG-06\nRegistration Certificate\nRegistration Number: 27AAPFU0939F1ZV\nLegal Name ACME TRADERS\nConstitution of Business: Partnership"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "REPUBLIC OF INDIA\nType P Country Code IND Passport No. Z1234567\nSurname SHARMA Given Name RAHUL\nNationality INDIAN Place of Issue BENGALURU\nP<INDSHARMA<<RAHUL<<<<<<<<<<<<<<<<<<<<<<<<<<"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Passport: ask to see the original passport and compare the photo page and code lines carefully. For anything else, use only the official Passport Seva website (passportindia.gov.in)."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
    "docType": "passport",
+   "detected": {
+    "key": "passport",
+    "confidence": "high",
+    "signals": [
+     "\"P<IND\" code line",
+     "\"Republic of India\"",
+     "\"Passport No.\"",
+     "\"Passport\"",
+     "Place of issue",
+     "Nationality"
+    ]
+   },
+   "ids": [],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "passport",
+   "text": "REPUBLIC OF INDIA\nType P Country Code IND Passport No. Z1234567\nSurname SHARMA Given Name RAHUL\nNationality INDIAN Place of Issue BENGALURU\nP<INDSHARMA<<RAHUL<<<<<<<<<<<<<<<<<<<<<<<<<<"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "भारत सरकार\nGovernment of India\nRahul Sharma\nजन्म तिथि/DOB: 12/05/1990\nपुरुष/ MALE\n4991 1866 5246\nमेरा आधार, मेरी पहचान",
+   "file": {
+    "kind": "image",
+    "layout": {
+     "checked": true,
+     "lines": 6,
+     "odd": 1,
+     "samples": [
+      "5246"
+     ]
+    }
+   }
+  },
+  "score": 12,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_layout_odd",
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Aadhaar: scan the QR code with UIDAI's official QR scanner app, or check the number at myaadhaar.uidai.gov.in (Verify Aadhaar)."
+  ],
+  "reasons": [
+   [
+    "doc_layout_odd",
+    "Some text doesn't line up with the rest",
+    "1 word is a different size or sits higher or lower than the words around it (\"5246\"). Text pasted onto a document often looks like this. A tilted or curved photo can also cause it, so look closely at those words.",
+    12
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "id",
+   "detected": {
+    "key": "aadhaar",
+    "confidence": "high",
+    "signals": [
+     "12-digit Aadhaar number (check digit OK)",
+     "\"आधार\"",
+     "\"Mera Aadhaar, Meri Pehchan\"",
+     "\"Government of India\"",
+     "Date of birth",
+     "Gender"
+    ]
+   },
+   "ids": [
+    {
+     "type": "aadhaar",
+     "value": "XXXX XXXX 5246",
+     "valid": true
+    }
+   ],
+   "file": {
+    "kind": "image",
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "id",
+   "text": "भारत सरकार\nGovernment of India\nRahul Sharma\nजन्म तिथि/DOB: 12/05/1990\nपुरुष/ MALE\n4991 1866 5246\nमेरा आधार, मेरी पहचान"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "भारत सरकार\nGovernment of India\nRahul Sharma\nजन्म तिथि/DOB: 12/05/1990\nपुरुष/ MALE\n4991 1866 5246\nमेरा आधार, मेरी पहचान",
+   "file": {
+    "kind": "image",
+    "layout": {
+     "checked": true,
+     "lines": 6,
+     "odd": 1,
+     "samples": [
+      "5246"
+     ]
+    }
+   }
+  },
+  "score": 12,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_layout_odd",
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Aadhaar: scan the QR code with UIDAI's official QR scanner app, or check the number at myaadhaar.uidai.gov.in (Verify Aadhaar)."
+  ],
+  "reasons": [
+   [
+    "doc_layout_odd",
+    "Some text doesn't line up with the rest",
+    "1 word is a different size or sits higher or lower than the words around it (\"5246\"). Text pasted onto a document often looks like this. A tilted or curved photo can also cause it, so look closely at those words.",
+    12
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "id",
+   "detected": {
+    "key": "aadhaar",
+    "confidence": "high",
+    "signals": [
+     "12-digit Aadhaar number (check digit OK)",
+     "\"आधार\"",
+     "\"Mera Aadhaar, Meri Pehchan\"",
+     "\"Government of India\"",
+     "Date of birth",
+     "Gender"
+    ]
+   },
+   "ids": [
+    {
+     "type": "aadhaar",
+     "value": "XXXX XXXX 5246",
+     "valid": true
+    }
+   ],
+   "file": {
+    "kind": "image",
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "id",
+   "text": "भारत सरकार\nGovernment of India\nRahul Sharma\nजन्म तिथि/DOB: 12/05/1990\nपुरुष/ MALE\n4991 1866 5246\nमेरा आधार, मेरी पहचान"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "भारत सरकार\nGovernment of India\nRahul Sharma\nजन्म तिथि/DOB: 12/05/1990\nपुरुष/ MALE\n4991 1866 5246\nमेरा आधार, मेरी पहचान",
+   "file": {
+    "kind": "image",
+    "layout": {
+     "checked": true,
+     "lines": 6,
+     "odd": 3,
+     "samples": [
+      "XXXX5246",
+      "12/05/1990",
+      "Sharma",
+      "x",
+      "y"
+     ]
+    }
+   }
+  },
+  "score": 25,
+  "level": "warning",
+  "label": "Suspicious",
+  "ids": [
+   "doc_layout_odd",
+   "doc_not_proof"
+  ],
+  "advice": [
+   "Don't act on this document, pay anything or share it further until the issuer confirms it.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.",
+   "Aadhaar: scan the QR code with UIDAI's official QR scanner app, or check the number at myaadhaar.uidai.gov.in (Verify Aadhaar)."
+  ],
+  "reasons": [
+   [
+    "doc_layout_odd",
+    "Some text doesn't line up with the rest",
+    "3 words are a different size or sit higher or lower than the words around them (\"XXXX5246\", \"12/05/1990\", \"Sharma\"). Text pasted onto a document often looks like this. A tilted or curved photo can also cause it, so look closely at those words.",
+    25
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "id",
+   "detected": {
+    "key": "aadhaar",
+    "confidence": "high",
+    "signals": [
+     "12-digit Aadhaar number (check digit OK)",
+     "\"आधार\"",
+     "\"Mera Aadhaar, Meri Pehchan\"",
+     "\"Government of India\"",
+     "Date of birth",
+     "Gender"
+    ]
+   },
+   "ids": [
+    {
+     "type": "aadhaar",
+     "value": "XXXX XXXX 5246",
+     "valid": true
+    }
+   ],
+   "file": {
+    "kind": "image",
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "id",
+   "text": "भारत सरकार\nGovernment of India\nRahul Sharma\nजन्म तिथि/DOB: 12/05/1990\nपुरुष/ MALE\n4991 1866 5246\nमेरा आधार, मेरी पहचान"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "भारत सरकार\nGovernment of India\nRahul Sharma\nजन्म तिथि/DOB: 12/05/1990\nपुरुष/ MALE\n4991 1866 5246\nमेरा आधार, मेरी पहचान",
+   "file": {
+    "kind": "image",
+    "layout": {
+     "checked": false,
+     "odd": 5
+    }
+   }
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Aadhaar: scan the QR code with UIDAI's official QR scanner app, or check the number at myaadhaar.uidai.gov.in (Verify Aadhaar)."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "id",
+   "detected": {
+    "key": "aadhaar",
+    "confidence": "high",
+    "signals": [
+     "12-digit Aadhaar number (check digit OK)",
+     "\"आधार\"",
+     "\"Mera Aadhaar, Meri Pehchan\"",
+     "\"Government of India\"",
+     "Date of birth",
+     "Gender"
+    ]
+   },
+   "ids": [
+    {
+     "type": "aadhaar",
+     "value": "XXXX XXXX 5246",
+     "valid": true
+    }
+   ],
+   "file": {
+    "kind": "image",
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "id",
+   "text": "भारत सरकार\nGovernment of India\nRahul Sharma\nजन्म तिथि/DOB: 12/05/1990\nपुरुष/ MALE\n4991 1866 5246\nमेरा आधार, मेरी पहचान"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "भारत सरकार\nGovernment of India\nRahul Sharma\nजन्म तिथि/DOB: 12/05/1990\nपुरुष/ MALE\n4991 1866 5246\nमेरा आधार, मेरी पहचान",
+   "file": {
+    "kind": "image",
+    "ela": {
+     "checked": true,
+     "score": 0.8,
+     "hotspots": 2
+    }
+   }
+  },
+  "score": 20,
+  "level": "warning",
+  "label": "Suspicious",
+  "ids": [
+   "doc_ela_regions",
+   "doc_not_proof"
+  ],
+  "advice": [
+   "Don't act on this document, pay anything or share it further until the issuer confirms it.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.",
+   "Aadhaar: scan the QR code with UIDAI's official QR scanner app, or check the number at myaadhaar.uidai.gov.in (Verify Aadhaar)."
+  ],
+  "reasons": [
+   [
+    "doc_ela_regions",
+    "Parts of the photo may have been edited",
+    "When a JPEG photo is saved again, edited areas often compress differently from the rest. 2 areas of this photo stand out. Filters, resaving or strong compression can also cause this, so treat it as a hint, not proof.",
+    20
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "id",
+   "detected": {
+    "key": "aadhaar",
+    "confidence": "high",
+    "signals": [
+     "12-digit Aadhaar number (check digit OK)",
+     "\"आधार\"",
+     "\"Mera Aadhaar, Meri Pehchan\"",
+     "\"Government of India\"",
+     "Date of birth",
+     "Gender"
+    ]
+   },
+   "ids": [
+    {
+     "type": "aadhaar",
+     "value": "XXXX XXXX 5246",
+     "valid": true
+    }
+   ],
+   "file": {
+    "kind": "image",
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "id",
+   "text": "भारत सरकार\nGovernment of India\nRahul Sharma\nजन्म तिथि/DOB: 12/05/1990\nपुरुष/ MALE\n4991 1866 5246\nमेरा आधार, मेरी पहचान"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "भारत सरकार\nGovernment of India\nRahul Sharma\nजन्म तिथि/DOB: 12/05/1990\nपुरुष/ MALE\n4991 1866 5246\nमेरा आधार, मेरी पहचान",
+   "file": {
+    "kind": "image",
+    "ela": {
+     "checked": true,
+     "score": 0.4,
+     "hotspots": 3
+    }
+   }
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Aadhaar: scan the QR code with UIDAI's official QR scanner app, or check the number at myaadhaar.uidai.gov.in (Verify Aadhaar)."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "id",
+   "detected": {
+    "key": "aadhaar",
+    "confidence": "high",
+    "signals": [
+     "12-digit Aadhaar number (check digit OK)",
+     "\"आधार\"",
+     "\"Mera Aadhaar, Meri Pehchan\"",
+     "\"Government of India\"",
+     "Date of birth",
+     "Gender"
+    ]
+   },
+   "ids": [
+    {
+     "type": "aadhaar",
+     "value": "XXXX XXXX 5246",
+     "valid": true
+    }
+   ],
+   "file": {
+    "kind": "image",
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "id",
+   "text": "भारत सरकार\nGovernment of India\nRahul Sharma\nजन्म तिथि/DOB: 12/05/1990\nपुरुष/ MALE\n4991 1866 5246\nमेरा आधार, मेरी पहचान"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "भारत सरकार\nGovernment of India\nRahul Sharma\nजन्म तिथि/DOB: 12/05/1990\nपुरुष/ MALE\n4991 1866 5246\nमेरा आधार, मेरी पहचान",
+   "file": {
+    "kind": "image",
+    "screenshot": true,
+    "ela": {
+     "checked": true,
+     "score": 0.9,
+     "hotspots": 1
+    }
+   }
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof",
+   "doc_screenshot"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Aadhaar: scan the QR code with UIDAI's official QR scanner app, or check the number at myaadhaar.uidai.gov.in (Verify Aadhaar)."
+  ],
+  "reasons": [
+   [
+    "doc_screenshot",
+    "This is a screenshot, not the original file",
+    "A screenshot can't be checked for edits as well as the original. Ask for the original PDF, or a photo of the paper document.",
+    0
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "id",
+   "detected": {
+    "key": "aadhaar",
+    "confidence": "high",
+    "signals": [
+     "12-digit Aadhaar number (check digit OK)",
+     "\"आधार\"",
+     "\"Mera Aadhaar, Meri Pehchan\"",
+     "\"Government of India\"",
+     "Date of birth",
+     "Gender"
+    ]
+   },
+   "ids": [
+    {
+     "type": "aadhaar",
+     "value": "XXXX XXXX 5246",
+     "valid": true
+    }
+   ],
+   "file": {
+    "kind": "image",
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "id",
+   "text": "भारत सरकार\nGovernment of India\nRahul Sharma\nजन्म तिथि/DOB: 12/05/1990\nपुरुष/ MALE\n4991 1866 5246\nमेरा आधार, मेरी पहचान"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "भारत सरकार\nGovernment of India\nRahul Sharma\nजन्म तिथि/DOB: 12/05/1990\nपुरुष/ MALE\n4991 1866 5246\nमेरा आधार, मेरी पहचान",
+   "file": {
+    "kind": "image",
+    "ela": {
+     "checked": true,
+     "score": 0.7,
+     "hotspots": 1
+    },
+    "layout": {
+     "checked": true,
+     "odd": 2,
+     "samples": []
+    }
+   }
+  },
+  "score": 45,
+  "level": "warning",
+  "label": "Suspicious",
+  "ids": [
+   "doc_ela_regions",
+   "doc_layout_odd",
+   "doc_not_proof"
+  ],
+  "advice": [
+   "Don't act on this document, pay anything or share it further until the issuer confirms it.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.",
+   "Aadhaar: scan the QR code with UIDAI's official QR scanner app, or check the number at myaadhaar.uidai.gov.in (Verify Aadhaar)."
+  ],
+  "reasons": [
+   [
+    "doc_layout_odd",
+    "Some text doesn't line up with the rest",
+    "2 words are a different size or sit higher or lower than the words around them. Text pasted onto a document often looks like this. A tilted or curved photo can also cause it, so look closely at those words.",
+    25
+   ],
+   [
+    "doc_ela_regions",
+    "Parts of the photo may have been edited",
+    "When a JPEG photo is saved again, edited areas often compress differently from the rest. One area of this photo stands out. Filters, resaving or strong compression can also cause this, so treat it as a hint, not proof.",
+    20
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "id",
+   "detected": {
+    "key": "aadhaar",
+    "confidence": "high",
+    "signals": [
+     "12-digit Aadhaar number (check digit OK)",
+     "\"आधार\"",
+     "\"Mera Aadhaar, Meri Pehchan\"",
+     "\"Government of India\"",
+     "Date of birth",
+     "Gender"
+    ]
+   },
+   "ids": [
+    {
+     "type": "aadhaar",
+     "value": "XXXX XXXX 5246",
+     "valid": true
+    }
+   ],
+   "file": {
+    "kind": "image",
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "id",
+   "text": "भारत सरकार\nGovernment of India\nRahul Sharma\nजन्म तिथि/DOB: 12/05/1990\nपुरुष/ MALE\n4991 1866 5246\nमेरा आधार, मेरी पहचान"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "STATEMENT OF ACCOUNT\nOpening Balance 10,000.00\n01/10/2026 UPI/ramesh/grocery 500.00 9,500.00\n02/10/2026 SALARY CREDIT 25,000.00 34,500.00\n05/10/2026 ATM WDL 2,000.00 32,500.00\n08/10/2026 NEFT rent 12,000.00 20,500.00\nTotal Credits 25,000.00\nTotal Debits 14,500.00\nClosing Balance 20,500.00",
+   "file": {
+    "kind": "pdf",
+    "producer": "iText 5.5.13",
+    "fonts": {
+     "checked": true,
+     "count": 3,
+     "rare": [
+      {
+       "name": "ABCDEF+Arial-BoldMT",
+       "chars": 9,
+       "digitShare": 0.89
+      }
+     ]
+    }
+   }
+  },
+  "score": 35,
+  "level": "warning",
+  "label": "Suspicious",
+  "ids": [
+   "doc_font_rare",
+   "doc_not_proof"
+  ],
+  "advice": [
+   "Don't act on this document, pay anything or share it further until the issuer confirms it.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.",
+   "Bank statement: ask for it to be downloaded from net banking in front of you, shared through the RBI Account Aggregator system, or confirmed by the bank."
+  ],
+  "reasons": [
+   [
+    "doc_font_rare",
+    "A few numbers use a different font from the rest",
+    "The font \"Arial-BoldMT\" is used for only 9 characters, mostly digits. Amounts or dates typed into an edited document often end up in a different font.",
+    35
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "statement",
+   "detected": {
+    "key": "bank_statement",
+    "confidence": "high",
+    "signals": [
+     "\"Statement of account\"",
+     "\"Opening balance\"",
+     "\"Closing balance\"",
+     "Debits",
+     "Credits",
+     "\"Balance\""
+    ]
+   },
+   "ids": [],
+   "statement": {
+    "rows": 4,
+    "checked": 3,
+    "mismatched": 0,
+    "outOfOrder": 0,
+    "summaryOk": true
+   },
+   "file": {
+    "kind": "pdf",
+    "program": "/ iText 5.5.13",
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "statement",
+   "text": "STATEMENT OF ACCOUNT\nOpening Balance 10,000.00\n01/10/2026 UPI/ramesh/grocery 500.00 9,500.00\n02/10/2026 SALARY CREDIT 25,000.00 34,500.00\n05/10/2026 ATM WDL 2,000.00 32,500.00\n08/10/2026 NEFT rent 12,000.00 20,500.00\nTotal Credits 25,000.00\nTotal Debits 14,500.00\nClosing Balance 20,500.00"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "STATEMENT OF ACCOUNT\nOpening Balance 10,000.00\n01/10/2026 UPI/ramesh/grocery 500.00 9,500.00\n02/10/2026 SALARY CREDIT 25,000.00 34,500.00\n05/10/2026 ATM WDL 2,000.00 32,500.00\n08/10/2026 NEFT rent 12,000.00 20,500.00\nTotal Credits 25,000.00\nTotal Debits 14,500.00\nClosing Balance 20,500.00",
+   "file": {
+    "kind": "pdf",
+    "producer": "iText 5.5.13",
+    "whiteBoxes": 2
+   }
+  },
+  "score": 30,
+  "level": "warning",
+  "label": "Suspicious",
+  "ids": [
+   "doc_not_proof",
+   "doc_white_boxes"
+  ],
+  "advice": [
+   "Don't act on this document, pay anything or share it further until the issuer confirms it.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.",
+   "Bank statement: ask for it to be downloaded from net banking in front of you, shared through the RBI Account Aggregator system, or confirmed by the bank."
+  ],
+  "reasons": [
+   [
+    "doc_white_boxes",
+    "White boxes are drawn over parts of the page",
+    "The PDF draws 2 white rectangles on top of text. That's a common way to hide the original numbers and type new ones over them.",
+    30
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "statement",
+   "detected": {
+    "key": "bank_statement",
+    "confidence": "high",
+    "signals": [
+     "\"Statement of account\"",
+     "\"Opening balance\"",
+     "\"Closing balance\"",
+     "Debits",
+     "Credits",
+     "\"Balance\""
+    ]
+   },
+   "ids": [],
+   "statement": {
+    "rows": 4,
+    "checked": 3,
+    "mismatched": 0,
+    "outOfOrder": 0,
+    "summaryOk": true
+   },
+   "file": {
+    "kind": "pdf",
+    "program": "/ iText 5.5.13",
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "statement",
+   "text": "STATEMENT OF ACCOUNT\nOpening Balance 10,000.00\n01/10/2026 UPI/ramesh/grocery 500.00 9,500.00\n02/10/2026 SALARY CREDIT 25,000.00 34,500.00\n05/10/2026 ATM WDL 2,000.00 32,500.00\n08/10/2026 NEFT rent 12,000.00 20,500.00\nTotal Credits 25,000.00\nTotal Debits 14,500.00\nClosing Balance 20,500.00"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "STATEMENT OF ACCOUNT\nOpening Balance 10,000.00\n01/10/2026 UPI/ramesh/grocery 500.00 9,500.00\n02/10/2026 SALARY CREDIT 25,000.00 34,500.00\n05/10/2026 ATM WDL 2,000.00 32,500.00\n08/10/2026 NEFT rent 12,000.00 20,500.00\nTotal Credits 25,000.00\nTotal Debits 14,500.00\nClosing Balance 20,500.00",
+   "file": {
+    "kind": "pdf",
+    "producer": "iLovePDF",
+    "whiteBoxes": 1,
+    "fonts": {
+     "checked": true,
+     "count": 2,
+     "rare": [
+      {
+       "name": "F9",
+       "chars": 1,
+       "digitShare": 1
+      },
+      {
+       "name": "F10",
+       "chars": 4,
+       "digitShare": 0.75
+      }
+     ]
+    }
+   }
+  },
+  "score": 100,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "doc_font_rare",
+   "doc_not_proof",
+   "doc_pdf_editor",
+   "doc_white_boxes"
+  ],
+  "advice": [
+   "Don't act on this document, pay anything or share it further until the issuer confirms it.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.",
+   "Bank statement: ask for it to be downloaded from net banking in front of you, shared through the RBI Account Aggregator system, or confirmed by the bank."
+  ],
+  "reasons": [
+   [
+    "doc_font_rare",
+    "A few numbers use a different font from the rest",
+    "The font \"F9\" is used for only 1 character, mostly digits (and 1 more font like it). Amounts or dates typed into an edited document often end up in a different font.",
+    35
+   ],
+   [
+    "doc_pdf_editor",
+    "Made or re-saved with a PDF editing app",
+    "Documents issued by banks and government offices come straight from their systems. A file that passed through an editing app may have been changed.",
+    30
+   ],
+   [
+    "doc_white_boxes",
+    "White boxes are drawn over parts of the page",
+    "The PDF draws a white rectangle on top of text. That's a common way to hide the original numbers and type new ones over them.",
+    30
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "statement",
+   "detected": {
+    "key": "bank_statement",
+    "confidence": "high",
+    "signals": [
+     "\"Statement of account\"",
+     "\"Opening balance\"",
+     "\"Closing balance\"",
+     "Debits",
+     "Credits",
+     "\"Balance\""
+    ]
+   },
+   "ids": [],
+   "statement": {
+    "rows": 4,
+    "checked": 3,
+    "mismatched": 0,
+    "outOfOrder": 0,
+    "summaryOk": true
+   },
+   "file": {
+    "kind": "pdf",
+    "program": "/ iLovePDF",
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "statement",
+   "text": "STATEMENT OF ACCOUNT\nOpening Balance 10,000.00\n01/10/2026 UPI/ramesh/grocery 500.00 9,500.00\n02/10/2026 SALARY CREDIT 25,000.00 34,500.00\n05/10/2026 ATM WDL 2,000.00 32,500.00\n08/10/2026 NEFT rent 12,000.00 20,500.00\nTotal Credits 25,000.00\nTotal Debits 14,500.00\nClosing Balance 20,500.00"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "STATEMENT OF ACCOUNT\nOpening Balance 10,000.00\n01/10/2026 UPI/ramesh/grocery 500.00 9,500.00\n02/10/2026 SALARY CREDIT 25,000.00 34,500.00\n05/10/2026 ATM WDL 2,000.00 32,500.00\n08/10/2026 NEFT rent 12,000.00 20,500.00\nTotal Credits 25,000.00\nTotal Debits 14,500.00\nClosing Balance 20,500.00",
+   "file": {
+    "kind": "pdf",
+    "fonts": {
+     "checked": false,
+     "rare": [
+      {
+       "name": "F1",
+       "chars": 2
+      }
+     ]
+    },
+    "whiteBoxes": 0
+   }
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Bank statement: ask for it to be downloaded from net banking in front of you, shared through the RBI Account Aggregator system, or confirmed by the bank."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "statement",
+   "detected": {
+    "key": "bank_statement",
+    "confidence": "high",
+    "signals": [
+     "\"Statement of account\"",
+     "\"Opening balance\"",
+     "\"Closing balance\"",
+     "Debits",
+     "Credits",
+     "\"Balance\""
+    ]
+   },
+   "ids": [],
+   "statement": {
+    "rows": 4,
+    "checked": 3,
+    "mismatched": 0,
+    "outOfOrder": 0,
+    "summaryOk": true
+   },
+   "file": {
+    "kind": "pdf",
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "statement",
+   "text": "STATEMENT OF ACCOUNT\nOpening Balance 10,000.00\n01/10/2026 UPI/ramesh/grocery 500.00 9,500.00\n02/10/2026 SALARY CREDIT 25,000.00 34,500.00\n05/10/2026 ATM WDL 2,000.00 32,500.00\n08/10/2026 NEFT rent 12,000.00 20,500.00\nTotal Credits 25,000.00\nTotal Debits 14,500.00\nClosing Balance 20,500.00"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Payment Successful\n₹2,500\nPaid to Ramesh Kumar\nramesh@okaxis\nUPI Ref No 628612345678\n13 Oct 2026, 10:32 AM",
+   "file": {
+    "kind": "image",
+    "screenshot": true,
+    "width": 1080,
+    "height": 2400,
+    "camera": false
+   }
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof",
+   "doc_screenshot"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Payment screenshot: use the Payment check instead, and look for the money in your own bank or UPI app. A screenshot is not proof."
+  ],
+  "reasons": [
+   [
+    "doc_screenshot",
+    "This is a screenshot, not the original file",
+    "A screenshot can't be checked for edits as well as the original. Ask for the original PDF, or a photo of the paper document.",
+    0
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "letter",
+   "detected": {
+    "key": "payment_screenshot",
+    "confidence": "high",
+    "signals": [
+     "\"UPI Ref / Transaction ID\"",
+     "\"Payment successful\"",
+     "\"Paid to\""
+    ]
+   },
+   "ids": [],
+   "file": {
+    "kind": "image",
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "letter",
+   "text": "Payment Successful\n₹2,500\nPaid to Ramesh Kumar\nramesh@okaxis\nUPI Ref No 628612345678\n13 Oct 2026, 10:32 AM"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "भारत सरकार\nGovernment of India\nRahul Sharma\nजन्म तिथि/DOB: 12/05/1990\nपुरुष/ MALE\n4991 1866 5246\nमेरा आधार, मेरी पहचान",
+   "file": {
+    "kind": "image",
+    "layout": "x",
+    "ela": [
+     1
+    ],
+    "fonts": {
+     "checked": true,
+     "rare": "F1"
+    },
+    "whiteBoxes": "3",
+    "screenshot": "yes"
+   }
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Aadhaar: scan the QR code with UIDAI's official QR scanner app, or check the number at myaadhaar.uidai.gov.in (Verify Aadhaar)."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "id",
+   "detected": {
+    "key": "aadhaar",
+    "confidence": "high",
+    "signals": [
+     "12-digit Aadhaar number (check digit OK)",
+     "\"आधार\"",
+     "\"Mera Aadhaar, Meri Pehchan\"",
+     "\"Government of India\"",
+     "Date of birth",
+     "Gender"
+    ]
+   },
+   "ids": [
+    {
+     "type": "aadhaar",
+     "value": "XXXX XXXX 5246",
+     "valid": true
+    }
+   ],
+   "file": {
+    "kind": "image",
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "id",
+   "text": "भारत सरकार\nGovernment of India\nRahul Sharma\nजन्म तिथि/DOB: 12/05/1990\nपुरुष/ MALE\n4991 1866 5246\nमेरा आधार, मेरी पहचान"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "REPUBLIC OF INDIA\nPassport No. Z1234567\np<ind sharm a‹<ra hul<k umar< ‹<‹<< ‹<‹<< ‹<‹<< ‹<‹<\nZ1234 567〈1 IND99 01018 M3101 012AB 12345 C‹<‹< ‹<28«\t"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Passport: ask to see the original passport and compare the photo page and code lines carefully. For anything else, use only the official Passport Seva website (passportindia.gov.in)."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "passport",
+   "detected": {
+    "key": "passport",
+    "confidence": "high",
+    "signals": [
+     "Passport code lines (MRZ)",
+     "\"P<IND\" code line",
+     "\"Republic of India\"",
+     "\"Passport No.\"",
+     "\"Passport\""
+    ]
+   },
    "ids": [
     {
      "type": "passport",
@@ -3669,7 +6990,7 @@
    "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
    "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
    "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
-   "Passport: ask to see the original passport and compare the photo page and code lines carefully."
+   "Passport: ask to see the original passport and compare the photo page and code lines carefully. For anything else, use only the official Passport Seva website (passportindia.gov.in)."
   ],
   "reasons": [
    [
@@ -3687,6 +7008,15 @@
   ],
   "info": {
    "docType": "passport",
+   "detected": {
+    "key": "passport",
+    "confidence": "high",
+    "signals": [
+     "Passport code lines (MRZ)",
+     "\"P<IND\" code line",
+     "\"Passport\""
+    ]
+   },
    "ids": [
     {
      "type": "passport",
@@ -3731,7 +7061,7 @@
    "Don't act on this document, pay anything or share it further until the issuer confirms it.",
    "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
    "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.",
-   "Passport: ask to see the original passport and compare the photo page and code lines carefully."
+   "Passport: ask to see the original passport and compare the photo page and code lines carefully. For anything else, use only the official Passport Seva website (passportindia.gov.in)."
   ],
   "reasons": [
    [
@@ -3749,6 +7079,14 @@
   ],
   "info": {
    "docType": "passport",
+   "detected": {
+    "key": "passport",
+    "confidence": "high",
+    "signals": [
+     "Passport code lines (MRZ)",
+     "\"P<IND\" code line"
+    ]
+   },
    "ids": [
     {
      "type": "passport",
@@ -3792,7 +7130,8 @@
   "advice": [
    "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
    "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
-   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message."
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Passport: ask to see the original passport and compare the photo page and code lines carefully. For anything else, use only the official Passport Seva website (passportindia.gov.in)."
   ],
   "reasons": [
    [
@@ -3804,6 +7143,13 @@
   ],
   "info": {
    "docType": "letter",
+   "detected": {
+    "key": "passport",
+    "confidence": "low",
+    "signals": [
+     "\"Passport\""
+    ]
+   },
    "ids": [],
    "file": {
     "kind": null,
@@ -3833,7 +7179,8 @@
   "advice": [
    "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
    "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
-   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message."
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Bank statement: ask for it to be downloaded from net banking in front of you, shared through the RBI Account Aggregator system, or confirmed by the bank."
   ],
   "reasons": [
    [
@@ -3845,6 +7192,15 @@
   ],
   "info": {
    "docType": "statement",
+   "detected": {
+    "key": "bank_statement",
+    "confidence": "medium",
+    "signals": [
+     "\"Statement of account\"",
+     "Debits",
+     "Credits"
+    ]
+   },
    "ids": [],
    "statement": {
     "rows": 5,
@@ -3937,6 +7293,18 @@
   ],
   "info": {
    "docType": "statement",
+   "detected": {
+    "key": "bank_statement",
+    "confidence": "high",
+    "signals": [
+     "\"Statement of account\"",
+     "\"Opening balance\"",
+     "\"Closing balance\"",
+     "Debits",
+     "Credits",
+     "\"Balance\""
+    ]
+   },
    "ids": [],
    "statement": {
     "rows": 4,
@@ -4008,6 +7376,13 @@
   ],
   "info": {
    "docType": "statement",
+   "detected": {
+    "key": "bank_statement",
+    "confidence": "medium",
+    "signals": [
+     "\"Statement of account\""
+    ]
+   },
    "ids": [],
    "statement": {
     "rows": 3,
@@ -4084,6 +7459,14 @@
   ],
   "info": {
    "docType": "statement",
+   "detected": {
+    "key": "bank_statement",
+    "confidence": "medium",
+    "signals": [
+     "\"Opening balance\"",
+     "\"Balance\""
+    ]
+   },
    "ids": [],
    "statement": {
     "rows": 1,
@@ -4116,7 +7499,8 @@
   "label": "Suspicious",
   "ids": [
    "doc_ifsc_bad",
-   "doc_not_proof"
+   "doc_not_proof",
+   "doc_type_unknown"
   ],
   "advice": [
    "Don't act on this document, pay anything or share it further until the issuer confirms it.",
@@ -4131,6 +7515,12 @@
     20
    ],
    [
+    "doc_type_unknown",
+    "Couldn't tell what kind of document this is",
+    "Only general checks were run. A clearer photo or the original PDF helps if it's an ID card, a statement or a notice.",
+    0
+   ],
+   [
     "doc_not_proof",
     "A check like this can't prove a document is genuine",
     "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
@@ -4139,6 +7529,11 @@
   ],
   "info": {
    "docType": "letter",
+   "detected": {
+    "key": "unknown",
+    "confidence": "low",
+    "signals": []
+   },
    "ids": [
     {
      "type": "ifsc",
@@ -4189,7 +7584,8 @@
    "Don't act on this document, pay anything or share it further until the issuer confirms it.",
    "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
    "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.",
-   "PAN: use \"Verify Your PAN\" on the Income Tax e-filing website (incometax.gov.in)."
+   "PAN: use \"Verify Your PAN\" on the Income Tax e-filing website (incometax.gov.in).",
+   "Invoice: check the seller's GSTIN with \"Search Taxpayer\" on the official GST portal (gst.gov.in) before you pay."
   ],
   "reasons": [
    [
@@ -4225,6 +7621,14 @@
   ],
   "info": {
    "docType": "letter",
+   "detected": {
+    "key": "invoice",
+    "confidence": "medium",
+    "signals": [
+     "\"Tax Invoice\"",
+     "\"Invoice\""
+    ]
+   },
    "ids": [
     {
      "type": "pan",
@@ -4300,6 +7704,16 @@
   ],
   "info": {
    "docType": "id",
+   "detected": {
+    "key": "aadhaar",
+    "confidence": "high",
+    "signals": [
+     "12-digit number in 4-4-4 groups",
+     "\"आधार\"",
+     "\"Government of India\"",
+     "Date of birth"
+    ]
+   },
    "ids": [
     {
      "type": "aadhaar",
@@ -4327,40 +7741,19 @@
    "text": "UIDAI 4991 1866 5246 4991-1866-5246 2345 6789 0123 3456 7890 1234 5678 9012 3456 6789 0123 4567",
    "docType": "auto"
   },
-  "score": 100,
-  "level": "danger",
-  "label": "Likely scam",
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
   "ids": [
-   "doc_aadhaar_bad",
-   "doc_aadhaar_bad",
-   "doc_aadhaar_bad",
    "doc_not_proof"
   ],
   "advice": [
-   "Don't act on this document, pay anything or share it further until the issuer confirms it.",
-   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
-   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.",
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
    "Aadhaar: scan the QR code with UIDAI's official QR scanner app, or check the number at myaadhaar.uidai.gov.in (Verify Aadhaar)."
   ],
   "reasons": [
-   [
-    "doc_aadhaar_bad",
-    "Aadhaar number XXXX XXXX 0123 fails its built-in check",
-    "Every real Aadhaar number ends with a check digit calculated from the others. This one doesn't match: the number was changed, or a photo misread a digit. Compare it carefully with the card.",
-    35
-   ],
-   [
-    "doc_aadhaar_bad",
-    "Aadhaar number XXXX XXXX 1234 fails its built-in check",
-    "Every real Aadhaar number ends with a check digit calculated from the others. This one doesn't match: the number was changed, or a photo misread a digit. Compare it carefully with the card.",
-    35
-   ],
-   [
-    "doc_aadhaar_bad",
-    "Aadhaar number XXXX XXXX 3456 fails its built-in check",
-    "Every real Aadhaar number ends with a check digit calculated from the others. This one doesn't match: the number was changed, or a photo misread a digit. Compare it carefully with the card.",
-    35
-   ],
    [
     "doc_not_proof",
     "A check like this can't prove a document is genuine",
@@ -4370,28 +7763,14 @@
   ],
   "info": {
    "docType": "id",
-   "ids": [
-    {
-     "type": "aadhaar",
-     "value": "XXXX XXXX 5246",
-     "valid": true
-    },
-    {
-     "type": "aadhaar",
-     "value": "XXXX XXXX 0123",
-     "valid": false
-    },
-    {
-     "type": "aadhaar",
-     "value": "XXXX XXXX 1234",
-     "valid": false
-    },
-    {
-     "type": "aadhaar",
-     "value": "XXXX XXXX 3456",
-     "valid": false
-    }
-   ],
+   "detected": {
+    "key": "aadhaar",
+    "confidence": "low",
+    "signals": [
+     "UIDAI"
+    ]
+   },
+   "ids": [],
    "file": {
     "kind": null,
     "program": null,
@@ -4455,6 +7834,15 @@
   ],
   "info": {
    "docType": "id",
+   "detected": {
+    "key": "aadhaar",
+    "confidence": "high",
+    "signals": [
+     "12-digit Aadhaar number (check digit OK)",
+     "\"Aadhaar\"",
+     "Date of birth"
+    ]
+   },
    "ids": [
     {
      "type": "aadhaar",
@@ -4534,6 +7922,14 @@
   ],
   "info": {
    "docType": "id",
+   "detected": {
+    "key": "aadhaar",
+    "confidence": "medium",
+    "signals": [
+     "12-digit Aadhaar number (check digit OK)",
+     "\"Government of India\""
+    ]
+   },
    "ids": [
     {
      "type": "aadhaar",
@@ -4582,7 +7978,8 @@
   "advice": [
    "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
    "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
-   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message."
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Aadhaar: scan the QR code with UIDAI's official QR scanner app, or check the number at myaadhaar.uidai.gov.in (Verify Aadhaar)."
   ],
   "reasons": [
    [
@@ -4593,7 +7990,14 @@
    ]
   ],
   "info": {
-   "docType": "letter",
+   "docType": "id",
+   "detected": {
+    "key": "aadhaar",
+    "confidence": "low",
+    "signals": [
+     "\"Aadhaar\""
+    ]
+   },
    "ids": [],
    "file": {
     "kind": null,
@@ -4604,7 +8008,7 @@
    }
   },
   "echo": {
-   "docType": "letter",
+   "docType": "id",
    "text": "Aadhaar"
   }
  },
@@ -4661,6 +8065,15 @@
   ],
   "info": {
    "docType": "letter",
+   "detected": {
+    "key": "legal_notice",
+    "confidence": "medium",
+    "signals": [
+     "\"Police\"",
+     "Legal section",
+     "\"Notice\""
+    ]
+   },
    "ids": [],
    "file": {
     "kind": "image",
@@ -4703,6 +8116,11 @@
   ],
   "info": {
    "docType": "id",
+   "detected": {
+    "key": "unknown",
+    "confidence": "low",
+    "signals": []
+   },
    "ids": [],
    "file": {
     "kind": null,
@@ -4726,7 +8144,8 @@
   "level": "safe",
   "label": "No signs of forgery found. Confirm with the issuer",
   "ids": [
-   "doc_not_proof"
+   "doc_not_proof",
+   "doc_type_unknown"
   ],
   "advice": [
    "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
@@ -4734,6 +8153,12 @@
    "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message."
   ],
   "reasons": [
+   [
+    "doc_type_unknown",
+    "Couldn't tell what kind of document this is",
+    "Only general checks were run. A clearer photo or the original PDF helps if it's an ID card, a statement or a notice.",
+    0
+   ],
    [
     "doc_not_proof",
     "A check like this can't prove a document is genuine",
@@ -4743,6 +8168,11 @@
   ],
   "info": {
    "docType": "letter",
+   "detected": {
+    "key": "unknown",
+    "confidence": "low",
+    "signals": []
+   },
    "ids": [],
    "file": {
     "kind": null,
@@ -4755,6 +8185,427 @@
   "echo": {
    "docType": "letter",
    "text": ""
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "AADHAAR\nVID: 9134-5678-9012-3456\n2345 6789 0124\nभारत सरकार",
+   "docType": "auto"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Aadhaar: scan the QR code with UIDAI's official QR scanner app, or check the number at myaadhaar.uidai.gov.in (Verify Aadhaar)."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "id",
+   "detected": {
+    "key": "aadhaar",
+    "confidence": "high",
+    "signals": [
+     "12-digit Aadhaar number (check digit OK)",
+     "\"Aadhaar\"",
+     "\"Government of India\""
+    ]
+   },
+   "ids": [
+    {
+     "type": "aadhaar",
+     "value": "XXXX XXXX 0124",
+     "valid": true
+    }
+   ],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "id",
+   "text": "AADHAAR\nVID: 9134-5678-9012-3456\n2345 6789 0124\nभारत सरकार"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Election Commission of India\nabc1234567\nDriving Licence KA-0120110012345",
+   "docType": "passport"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Voter ID: search the EPIC number on the official Voters' Service Portal (voters.eci.gov.in)."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "passport",
+   "detected": {
+    "key": "voter_id",
+    "confidence": "low",
+    "signals": [
+     "\"Election Commission of India\"",
+     "EPIC number (3 letters + 7 digits)"
+    ]
+   },
+   "ids": [],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "passport",
+   "text": "Election Commission of India\nabc1234567\nDriving Licence KA-0120110012345"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "FIR no 12 fir registered. ED notice. ed",
+   "file": {
+    "kind": "pdf",
+    "whiteBoxes": 1.9,
+    "fonts": {
+     "checked": 1,
+     "count": 2,
+     "rare": [
+      {
+       "name": null,
+       "chars": 2.5,
+       "digitShare": 1
+      },
+      null,
+      7
+     ]
+    }
+   }
+  },
+  "score": 75,
+  "level": "danger",
+  "label": "Likely scam",
+  "ids": [
+   "doc_font_rare",
+   "doc_not_proof",
+   "doc_white_boxes"
+  ],
+  "advice": [
+   "Don't act on this document, pay anything or share it further until the issuer confirms it.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in.",
+   "Government or police notice: look up the office's number on its official .gov.in website and call them. Agencies never ask for money to close cases."
+  ],
+  "reasons": [
+   [
+    "doc_font_rare",
+    "A few numbers use a different font from the rest",
+    "The font \"unnamed\" is used for only 2 characters, mostly digits. Amounts or dates typed into an edited document often end up in a different font.",
+    35
+   ],
+   [
+    "doc_white_boxes",
+    "White boxes are drawn over parts of the page",
+    "The PDF draws a white rectangle on top of text. That's a common way to hide the original numbers and type new ones over them.",
+    30
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "letter",
+   "detected": {
+    "key": "legal_notice",
+    "confidence": "medium",
+    "signals": [
+     "\"FIR\"",
+     "\"ED\"",
+     "\"Notice\""
+    ]
+   },
+   "ids": [],
+   "file": {
+    "kind": "pdf",
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "letter",
+   "text": "FIR no 12 fir registered. ED notice. ed"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Pay slip\nBasic 1,000.00\nNet pay 900.00",
+   "file": {
+    "kind": "image",
+    "screenshot": true,
+    "width": 1080,
+    "height": 2400,
+    "camera": false,
+    "layout": {
+     "checked": true,
+     "lines": 3,
+     "odd": 1.7,
+     "samples": [
+      5,
+      "  ",
+      " Net ",
+      "a very long sample word that goes past thirty chars",
+      "x"
+     ]
+    },
+    "ela": {
+     "checked": true,
+     "score": 0.95,
+     "hotspots": 4
+    }
+   }
+  },
+  "score": 12,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_layout_odd",
+   "doc_not_proof",
+   "doc_screenshot"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Salary slip: confirm with the employer's HR department using contact details from the company's official website, and compare it with the salary credits in the bank statement."
+  ],
+  "reasons": [
+   [
+    "doc_layout_odd",
+    "Some text doesn't line up with the rest",
+    "1 word is a different size or sits higher or lower than the words around it (\"Net\", \"a very long sample word that g\", \"x\"). Text pasted onto a document often looks like this. A tilted or curved photo can also cause it, so look closely at those words.",
+    12
+   ],
+   [
+    "doc_screenshot",
+    "This is a screenshot, not the original file",
+    "A screenshot can't be checked for edits as well as the original. Ask for the original PDF, or a photo of the paper document.",
+    0
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "statement",
+   "detected": {
+    "key": "salary_slip",
+    "confidence": "high",
+    "signals": [
+     "\"Pay slip\"",
+     "\"Net pay\"",
+     "\"Basic\""
+    ]
+   },
+   "ids": [],
+   "statement": {
+    "rows": 0,
+    "checked": 0,
+    "mismatched": 0,
+    "outOfOrder": 0,
+    "summaryOk": null
+   },
+   "file": {
+    "kind": "image",
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "statement",
+   "text": "Pay slip\nBasic 1,000.00\nNet pay 900.00"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "photo",
+   "file": {
+    "kind": "image",
+    "camera": true,
+    "ela": {
+     "checked": "yes",
+     "score": "0.9",
+     "hotspots": 2
+    },
+    "layout": {
+     "checked": true,
+     "odd": -3
+    },
+    "fonts": {
+     "checked": true,
+     "rare": [
+      {
+       "name": "QWERTY+Helvetica",
+       "chars": 1,
+       "digitShare": 1
+      }
+     ]
+    },
+    "whiteBoxes": -1
+   }
+  },
+  "score": 35,
+  "level": "warning",
+  "label": "Suspicious",
+  "ids": [
+   "doc_font_rare",
+   "doc_not_proof",
+   "doc_type_unknown"
+  ],
+  "advice": [
+   "Don't act on this document, pay anything or share it further until the issuer confirms it.",
+   "Lost money? Call 1930 (India's cyber-crime helpline) as fast as possible. Quick reports can freeze the stolen money.",
+   "Report it at cybercrime.gov.in, and report fraud calls or SMS on the Chakshu page of sancharsaathi.gov.in."
+  ],
+  "reasons": [
+   [
+    "doc_font_rare",
+    "A few numbers use a different font from the rest",
+    "The font \"Helvetica\" is used for only 1 character, mostly digits. Amounts or dates typed into an edited document often end up in a different font.",
+    35
+   ],
+   [
+    "doc_type_unknown",
+    "Couldn't tell what kind of document this is",
+    "Only general checks were run. A clearer photo or the original PDF helps if it's an ID card, a statement or a notice.",
+    0
+   ],
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "letter",
+   "detected": {
+    "key": "unknown",
+    "confidence": "low",
+    "signals": []
+   },
+   "ids": [],
+   "file": {
+    "kind": "image",
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "letter",
+   "text": "photo"
+  }
+ },
+ {
+  "kind": "document",
+  "input": {
+   "now": 1792238400000,
+   "text": "Tax Invoice\nPayment successful\nUPI Ref 123456789012"
+  },
+  "score": 0,
+  "level": "safe",
+  "label": "No signs of forgery found. Confirm with the issuer",
+  "ids": [
+   "doc_not_proof"
+  ],
+  "advice": [
+   "A clean result only means no signs of forgery were found. Confirm important documents with the issuer.",
+   "No strong warning signs were found, but rules can't catch everything. If it asks for money, OTPs or personal details, treat it as a scam.",
+   "When in doubt, contact the organisation using the official app or the number on your card, not the one in the message.",
+   "Payment screenshot: use the Payment check instead, and look for the money in your own bank or UPI app. A screenshot is not proof."
+  ],
+  "reasons": [
+   [
+    "doc_not_proof",
+    "A check like this can't prove a document is genuine",
+    "Only the issuer can confirm it. Use the official verification steps below before you rely on it.",
+    0
+   ]
+  ],
+  "info": {
+   "docType": "letter",
+   "detected": {
+    "key": "payment_screenshot",
+    "confidence": "high",
+    "signals": [
+     "\"UPI Ref / Transaction ID\"",
+     "\"Payment successful\""
+    ]
+   },
+   "ids": [],
+   "file": {
+    "kind": null,
+    "program": null,
+    "created": null,
+    "modified": null,
+    "revisions": 0
+   }
+  },
+  "echo": {
+   "docType": "letter",
+   "text": "Tax Invoice\nPayment successful\nUPI Ref 123456789012"
   }
  },
  {

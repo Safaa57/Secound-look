@@ -73,7 +73,7 @@ node tests/test_engine.js && node tests/test_sms.js && node tests/test_phone.js 
 cd mobile/engine-java && node test/make_fixtures.js && javac -d build src/com/secondlook/engine/Engine.java src/com/secondlook/engine/Json.java test/EngineTest.java && java -cp build EngineTest
 ```
 
-The Java test checks that the Android engine gives the same scores and reasons as the JS engine on 170 cases (including every UPI, payment and new-rule case from `tests/test_new_checks.js` and every document case from `tests/test_documents.js`, compared down to level labels, reason texts and advice, plus the document info fields). `make_fixtures.js` also writes `python/tests/new_checks_expected.json` and `python/tests/documents_expected.json` for the same checks in Python.
+The Java test checks that the Android engine gives the same scores and reasons as the JS engine on 224 cases (including every UPI, payment and new-rule case from `tests/test_new_checks.js` and every document case from `tests/test_documents.js`, compared down to level labels, reason texts and advice, plus the document info fields). `make_fixtures.js` also writes `python/tests/new_checks_expected.json` and `python/tests/documents_expected.json` for the same checks in Python.
 
 ## Security
 

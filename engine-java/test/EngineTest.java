@@ -34,7 +34,7 @@ public class EngineTest {
         if (!reasons.equals(want)) return "reasons java " + reasons + "\n  js " + want;
         if (kind.equals("document")) {  // info fields and the echoed input, compared as JSON text
             Map<String, Object> info = Json.obj(r.get("info")), picked = new LinkedHashMap<>();
-            for (String k : new String[]{"docType", "ids", "statement", "file", "passport", "qr"}) if (info.containsKey(k)) picked.put(k, info.get(k));
+            for (String k : new String[]{"docType", "detected", "ids", "statement", "file", "passport", "qr"}) if (info.containsKey(k)) picked.put(k, info.get(k));
             String got = Json.stringify(picked), exp = Json.stringify(c.get("info"));
             if (!got.equals(exp)) return "info java " + got + "\n  js " + exp;
             if (!Json.stringify(r.get("input")).equals(Json.stringify(c.get("echo")))) return "input java " + Json.stringify(r.get("input")) + "\n  js " + Json.stringify(c.get("echo"));

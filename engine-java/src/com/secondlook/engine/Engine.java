@@ -58,6 +58,10 @@ public final class Engine {
     private final Pattern payPrank, payPending, payFailed, paySuccess;
     private final Map<String, Object> docs;
     private final List<String> pdfEditors, officeApps;
+    /** Document types from rules.documents.types: key, then signals as {Pattern, weight, label}. */
+    private final List<String> docTypeKeys = new ArrayList<>();
+    private final List<List<Object[]>> docTypeSignals = new ArrayList<>();
+    private final Map<String, Object> det;
     private final int dangerT, warningT;
 
     public Engine(String rulesJson, PhoneLookup phone, String homeRegion) {
@@ -94,6 +98,19 @@ public final class Engine {
         docs = R.get("documents") == null ? new HashMap<>() : Json.obj(R.get("documents"));
         pdfEditors = strList(docs.get("pdfEditors"));
         officeApps = strList(docs.get("officeApps"));
+        if (docs.get("types") != null) for (Object o : Json.arr(docs.get("types"))) {
+            Map<String, Object> ty = Json.obj(o);
+            List<Object[]> sigs = new ArrayList<>();
+            for (Object x : Json.arr(ty.get("signals"))) {
+                List<Object> l = Json.arr(x);
+                boolean cs = l.size() > 3 && "cs".equals(l.get(3));
+                sigs.add(new Object[]{Pattern.compile(jsRe((String) l.get(0)), cs ? 0 : CI), Json.num(l.get(1)), (String) l.get(2)});
+            }
+            docTypeKeys.add((String) ty.get("key"));
+            docTypeSignals.add(sigs);
+        }
+        det = docs.get("detect") != null ? Json.obj(docs.get("detect"))
+                : Json.map("min", 2, "high", 7, "highMargin", 3, "medium", 4, "mediumMargin", 2, "maxSignals", 6, "mrz", 6, "aadhaarValid", 3, "aadhaarNumber", 2);
         Map<String, Object> t = Json.obj(R.get("thresholds"));
         dangerT = Json.num(t.get("danger"));
         warningT = Json.num(t.get("warning"));
@@ -1033,19 +1050,63 @@ public final class Engine {
         return res;
     }
 
-    private static final Pattern G_PASSPORT = Pattern.compile(jsRe("\\bpassport\\b|republic of india"));
-    private static final Pattern G_AADHAAR = Pattern.compile("aadhaar|\u0906\u0927\u093e\u0930|unique identification|uidai|government of india");
-    private static final Pattern G_AADHAAR_NUM = Pattern.compile(jsRe("\\b[2-9]\\d{3}[ -]\\d{4}[ -]\\d{4}\\b"));
-    private static final Pattern G_PAN_CARD = Pattern.compile("income tax department|permanent account number");
-    private static final Pattern G_STATEMENT = Pattern.compile("statement of account|account statement|bank statement|opening balance|closing balance");
+    private static final Pattern VID_RE = Pattern.compile(jsRe("\\d{4}[ -]\\d{4}[ -]\\d{4}[ -]\\d{4}"));
+    private static final List<String> ID_KEYS = Arrays.asList("aadhaar", "pan", "voter_id", "driving_licence");
+    private static final List<String> LEGACY_MODES = Arrays.asList("id", "passport", "statement", "letter");
 
-    private static String guessDocType(String t, boolean hasMrz) {
-        String low = t.toLowerCase(Locale.ROOT);
-        if (hasMrz || G_PASSPORT.matcher(low).find()) return "passport";
-        if (G_AADHAAR.matcher(low).find() && G_AADHAAR_NUM.matcher(t).find()) return "id";
-        if (G_PAN_CARD.matcher(low).find()) return "id";
-        if (G_STATEMENT.matcher(low).find()) return "statement";
+    /** Hides 16-digit Aadhaar Virtual IDs (4-4-4-4) so their digits aren't read as an Aadhaar number. */
+    private static String maskVids(String t) {
+        Matcher m = VID_RE.matcher(t);
+        StringBuilder b = null;
+        while (m.find()) {
+            if (b == null) b = new StringBuilder(t);
+            for (int i = m.start(); i < m.end(); i++) if (b.charAt(i) >= '0' && b.charAt(i) <= '9') b.setCharAt(i, '#');
+        }
+        return b == null ? t : b.toString();
+    }
+
+    private int detNum(String k) { return Json.num(det.get(k)); }
+
+    /** Document type detection: weighted signals per type from the rules; the highest total wins. */
+    private Map<String, Object> detectDocType(String t, boolean hasMrz) {
+        boolean aValid = false, aAny = false;
+        Matcher m = AADHAAR_RE.matcher(maskVids(t));
+        while (m.find()) { aAny = true; if (verhoeffOk(m.group(2) + m.group(3) + m.group(4))) { aValid = true; break; } }
+        String bestKey = null;
+        List<Object[]> bestGot = null;
+        int bestScore = 0, second = 0;
+        for (int i = 0; i < docTypeKeys.size(); i++) {
+            String key = docTypeKeys.get(i);
+            List<Object[]> got = new ArrayList<>();
+            if (key.equals("passport") && hasMrz) got.add(new Object[]{detNum("mrz"), "Passport code lines (MRZ)"});
+            if (key.equals("aadhaar") && aValid) got.add(new Object[]{detNum("aadhaarValid"), "12-digit Aadhaar number (check digit OK)"});
+            else if (key.equals("aadhaar") && aAny) got.add(new Object[]{detNum("aadhaarNumber"), "12-digit number in 4-4-4 groups"});
+            for (Object[] sg : docTypeSignals.get(i)) if (((Pattern) sg[0]).matcher(t).find()) got.add(new Object[]{sg[1], sg[2]});
+            int sc = 0;
+            for (Object[] g : got) sc += (Integer) g[0];
+            if (sc > bestScore) { second = bestScore; bestScore = sc; bestKey = key; bestGot = got; }
+            else if (sc > second) second = sc;
+        }
+        if (bestKey == null || bestScore < detNum("min")) return Json.map("key", "unknown", "confidence", "low", "signals", new ArrayList<Object>());
+        int margin = bestScore - second;
+        String conf = bestScore >= detNum("high") && margin >= detNum("highMargin") ? "high" : bestScore >= detNum("medium") && margin >= detNum("mediumMargin") ? "medium" : "low";
+        List<Object> sigs = new ArrayList<>();
+        for (int i = 0; i < bestGot.size() && i < detNum("maxSignals"); i++) sigs.add(bestGot.get(i)[1]);
+        return Json.map("key", bestKey, "confidence", conf, "signals", sigs);
+    }
+
+    private static String modeFor(String key) {
+        if (ID_KEYS.contains(key)) return "id";
+        if (key.equals("bank_statement") || key.equals("salary_slip")) return "statement";
+        if (key.equals("passport")) return "passport";
         return "letter";
+    }
+
+    /** A finite number from an optional input field, rounded down (anything else is 0). */
+    private static int intOf(Object v) {
+        if (!(v instanceof Number)) return 0;
+        double d = ((Number) v).doubleValue();
+        return Double.isNaN(d) || Double.isInfinite(d) ? 0 : (int) Math.floor(d);
     }
 
     private static String maskAadhaar(String n) { return "XXXX XXXX " + n.substring(Math.max(0, n.length() - 4)); }
@@ -1087,9 +1148,12 @@ public final class Engine {
         List<Map<String, Object>> reasons = new ArrayList<>();
         String[] mrz = findMrz(t);
         Object dt = input.get("docType");
-        Object docType = truthy(dt) && !"auto".equals(dt) ? dt : guessDocType(t, mrz != null);
+        boolean explicit = dt instanceof String && LEGACY_MODES.contains(dt);
+        Map<String, Object> detected = detectDocType(t, mrz != null);
+        String detKey = (String) detected.get("key");
+        String docType = explicit ? (String) dt : modeFor(detKey);
         List<Object> ids = new ArrayList<>();
-        Map<String, Object> info = Json.map("docType", docType, "ids", ids);
+        Map<String, Object> info = Json.map("docType", docType, "detected", detected, "ids", ids);
         Map<String, Object> file = mapOrEmpty(input.get("file"));
         Object qrO = input.get("aadhaarQr");
         Map<String, Object> qr = qrO instanceof Map ? mapOrEmpty(qrO) : null;
@@ -1127,7 +1191,7 @@ public final class Engine {
 
         // ---- Aadhaar numbers (4-4-4 groups on an Aadhaar document)
         if ("id".equals(docType) || AADHAAR_MENTION.matcher(t).find()) {
-            Matcher m = AADHAAR_RE.matcher(t);
+            Matcher m = AADHAAR_RE.matcher(maskVids(t));
             Set<String> seen = new HashSet<>();
             while (m.find() && seen.size() < 4) {
                 String n = m.group(2) + m.group(3) + m.group(4);
@@ -1210,7 +1274,7 @@ public final class Engine {
                 double c = jsDateParse(jsStr(file.get("created")));
                 if (!Double.isNaN(c) && c < lastDate - 86400000.0) reasons.add(reason("doc_created_before_content", "File was created before the dates printed in it", "The file says it was made on " + cap(jsStr(file.get("created")), 10) + ", but it lists transactions after that. That can't happen in a statement downloaded from a bank.", 40));
             }
-            if ("statement".equals(docType) && rows < 3) reasons.add(reason("doc_statement_unread", "Couldn't read the transaction rows", "Amount checks need the rows as text. Try a clearer photo or the original PDF.", 0));
+            if ((explicit ? "statement".equals(docType) : "bank_statement".equals(detKey)) && rows < 3) reasons.add(reason("doc_statement_unread", "Couldn't read the transaction rows", "Amount checks need the rows as text. Try a clearer photo or the original PDF.", 0));
         }
 
         // ---- file signs (PDF metadata or image editor)
@@ -1221,7 +1285,7 @@ public final class Engine {
         String editor = null, office = null;
         for (String e : pdfEditors) if (prog.contains(e)) { editor = e; break; }
         if (editor == null) for (String e : officeApps) if (prog.contains(e)) { office = e; break; }
-        boolean isStatement = "statement".equals(docType);
+        boolean isStatement = "statement".equals(docType) && !"salary_slip".equals(detKey);
         if (editor != null) reasons.add(reason("doc_pdf_editor", "Made or re-saved with a PDF editing app", "Documents issued by banks and government offices come straight from their systems. A file that passed through an editing app may have been changed.", 30));
         else if (office != null) reasons.add(reason("doc_office_app", isStatement ? "Statement made with a word processor or design app" : "Made with a word processor or design app", isStatement ? "Banks generate statements from their own systems, not from word-processing or design apps. This is a common sign of a fake statement." : "Official documents are usually generated by the issuer's system. A document typed in a general app could have been made by anyone.", isStatement ? 35 : 15));
         if (truthy(file.get("imageEditor"))) reasons.add(reason("doc_image_edited", "The image was saved by a photo-editing app", "Photos of real documents come straight from a camera or scanner. This one passed through an editor.", 35));
@@ -1229,6 +1293,39 @@ public final class Engine {
         double cT = jsDateParse(truthy(created) ? jsStr(created) : ""), mT = jsDateParse(truthy(modified) ? jsStr(modified) : "");
         if (revs > 1) reasons.add(reason("doc_modified", "Changed after it was first saved (" + numStr(revs - 1) + (revs - 1 == 1 ? " edit" : " edits") + " recorded)", "The file keeps a record of later changes. Genuine downloads from a bank or government site are normally saved once.", 25));
         else if (!Double.isNaN(cT) && !Double.isNaN(mT) && mT - cT > 10 * 60000) reasons.add(reason("doc_modified", "Changed after it was first created", "The file was modified " + cap(jsStr(modified), 10) + ", after it was created " + cap(jsStr(created), 10) + ".", 20));
+
+        // ---- content forensics measured on the device (text geometry, JPEG error levels, PDF fonts and white boxes)
+        Map<String, Object> layout = file.get("layout") instanceof Map ? mapOrEmpty(file.get("layout")) : null;
+        int odd = layout != null && truthy(layout.get("checked")) ? intOf(layout.get("odd")) : 0;
+        if (odd >= 1) {
+            List<String> smp = new ArrayList<>();
+            if (layout.get("samples") instanceof List) for (Object x : (List<?>) layout.get("samples")) {
+                if (smp.size() >= 3) break;
+                if (x instanceof String && !jsTrim((String) x).isEmpty()) smp.add("\"" + cap(jsTrim((String) x), 30) + "\"");
+            }
+            reasons.add(reason("doc_layout_odd", "Some text doesn't line up with the rest", (odd == 1 ? "1 word is a different size or sits higher or lower than the words around it" : odd + " words are a different size or sit higher or lower than the words around them") + (smp.isEmpty() ? "" : " (" + String.join(", ", smp) + ")") + ". Text pasted onto a document often looks like this. A tilted or curved photo can also cause it, so look closely at those words.", odd >= 2 ? 25 : 12));
+        }
+        Map<String, Object> ela = file.get("ela") instanceof Map ? mapOrEmpty(file.get("ela")) : null;
+        if (ela != null && truthy(ela.get("checked")) && !Boolean.TRUE.equals(file.get("screenshot"))) {
+            Object esO = ela.get("score");
+            double es = esO instanceof Number && !Double.isNaN(((Number) esO).doubleValue()) && !Double.isInfinite(((Number) esO).doubleValue()) ? ((Number) esO).doubleValue() : 0;
+            int hs = intOf(ela.get("hotspots"));
+            if (es >= 0.6 && hs >= 1) reasons.add(reason("doc_ela_regions", "Parts of the photo may have been edited", "When a JPEG photo is saved again, edited areas often compress differently from the rest. " + (hs == 1 ? "One area" : hs + " areas") + " of this photo stand" + (hs == 1 ? "s" : "") + " out. Filters, resaving or strong compression can also cause this, so treat it as a hint, not proof.", 20));
+        }
+        Map<String, Object> fonts = file.get("fonts") instanceof Map ? mapOrEmpty(file.get("fonts")) : null;
+        List<Map<String, Object>> rare = new ArrayList<>();
+        if (fonts != null && truthy(fonts.get("checked")) && fonts.get("rare") instanceof List) for (Object x : (List<?>) fonts.get("rare")) if (x instanceof Map) rare.add(mapOrEmpty(x));
+        if (!rare.isEmpty()) {
+            Object nm = rare.get(0).get("name");
+            String fname = cap((nm instanceof String ? (String) nm : "").replaceFirst("^[A-Z]{6}\\+", ""), 40);
+            if (fname.isEmpty()) fname = "unnamed";
+            int ch = intOf(rare.get(0).get("chars"));
+            reasons.add(reason("doc_font_rare", "A few numbers use a different font from the rest", "The font \"" + fname + "\" is used for only " + ch + (ch == 1 ? " character" : " characters") + ", mostly digits" + (rare.size() > 1 ? " (and " + (rare.size() - 1) + " more font" + (rare.size() > 2 ? "s" : "") + " like it)" : "") + ". Amounts or dates typed into an edited document often end up in a different font.", 35));
+        }
+        int wb = intOf(file.get("whiteBoxes"));
+        if (wb >= 1) reasons.add(reason("doc_white_boxes", "White boxes are drawn over parts of the page", "The PDF draws " + (wb == 1 ? "a white rectangle" : wb + " white rectangles") + " on top of text. That's a common way to hide the original numbers and type new ones over them.", 30));
+        if (Boolean.TRUE.equals(file.get("screenshot"))) reasons.add(reason("doc_screenshot", "This is a screenshot, not the original file", "A screenshot can't be checked for edits as well as the original. Ask for the original PDF, or a photo of the paper document.", 0));
+        if (!explicit && "unknown".equals(detKey)) reasons.add(reason("doc_type_unknown", "Couldn't tell what kind of document this is", "Only general checks were run. A clearer photo or the original PDF helps if it's an ID card, a statement or a notice.", 0));
 
         // ---- fake-letter tricks (same rules as messages)
         Map<String, Object> msg = analyzeMessage(cap(t, MAX_TEXT));
@@ -1401,11 +1498,31 @@ public final class Engine {
         out.put("level", level(score));
         out.put("reasons", new ArrayList<Object>(reasons));
         out.put("info", info);
-        out.put("advice", advice(kind, reasons, score));
+        out.put("advice", advice(kind, reasons, score, info));
         return out;
     }
 
-    private List<Object> advice(String kind, List<Map<String, Object>> reasons, int score) {
+    private static final Map<String, String> DOC_ADVICE = new HashMap<>();
+    static {
+        DOC_ADVICE.put("aadhaar", "Aadhaar: scan the QR code with UIDAI's official QR scanner app, or check the number at myaadhaar.uidai.gov.in (Verify Aadhaar).");
+        DOC_ADVICE.put("pan", "PAN: use \"Verify Your PAN\" on the Income Tax e-filing website (incometax.gov.in).");
+        DOC_ADVICE.put("passport", "Passport: ask to see the original passport and compare the photo page and code lines carefully. For anything else, use only the official Passport Seva website (passportindia.gov.in).");
+        DOC_ADVICE.put("voter_id", "Voter ID: search the EPIC number on the official Voters' Service Portal (voters.eci.gov.in).");
+        DOC_ADVICE.put("driving_licence", "Driving licence: check the DL number with \"DL status\" on the official Parivahan website (parivahan.gov.in).");
+        DOC_ADVICE.put("bank_statement", "Bank statement: ask for it to be downloaded from net banking in front of you, shared through the RBI Account Aggregator system, or confirmed by the bank.");
+        DOC_ADVICE.put("cheque", "Cheque: confirm with the bank that issued it, using the number on the bank's official website. Don't hand anything over until the money is in your account; a cheque can bounce days later.");
+        DOC_ADVICE.put("salary_slip", "Salary slip: confirm with the employer's HR department using contact details from the company's official website, and compare it with the salary credits in the bank statement.");
+        DOC_ADVICE.put("itr", "ITR: ask for the e-verified ITR-V, or have the person show the return after logging in to the Income Tax e-filing website (incometax.gov.in).");
+        DOC_ADVICE.put("gst_certificate", "GST: check the GSTIN with \"Search Taxpayer\" on the official GST portal (gst.gov.in). The name shown must match the document.");
+        DOC_ADVICE.put("invoice", "Invoice: check the seller's GSTIN with \"Search Taxpayer\" on the official GST portal (gst.gov.in) before you pay.");
+        DOC_ADVICE.put("utility_bill", "Bill: pay only through the provider's official website or app, or your UPI app's bill-payment section. Never pay a number from an SMS or call that threatens disconnection.");
+        DOC_ADVICE.put("offer_letter", "Job offer: confirm with the company's HR using contact details from its official website. Real employers never ask you to pay to join.");
+        DOC_ADVICE.put("legal_notice", "Government or police notice: look up the office's number on its official .gov.in website and call them. Agencies never ask for money to close cases.");
+        DOC_ADVICE.put("payment_screenshot", "Payment screenshot: use the Payment check instead, and look for the money in your own bank or UPI app. A screenshot is not proof.");
+        DOC_ADVICE.put("certificate", "Certificate: confirm it with the university or board that issued it, or ask for it through DigiLocker (digilocker.gov.in).");
+    }
+
+    private List<Object> advice(String kind, List<Map<String, Object>> reasons, int score, Map<String, Object> info) {
         Set<String> ids = new HashSet<>();
         for (Map<String, Object> r : reasons) ids.add((String) r.get("id"));
         List<Object> a = new ArrayList<>();
@@ -1447,9 +1564,13 @@ public final class Engine {
             String all = String.join(" ", idList);
             if (Pattern.compile("aadhaar|doc_qr").matcher(all).find() || ids.contains("doc_aadhaar_bad")) a.add("Aadhaar: scan the QR code with UIDAI's official QR scanner app, or check the number at myaadhaar.uidai.gov.in (Verify Aadhaar).");
             if (ids.contains("doc_pan_bad")) a.add("PAN: use \"Verify Your PAN\" on the Income Tax e-filing website (incometax.gov.in).");
-            if (Pattern.compile("doc_mrz|doc_expired").matcher(all).find()) a.add("Passport: ask to see the original passport and compare the photo page and code lines carefully.");
+            if (Pattern.compile("doc_mrz|doc_expired").matcher(all).find()) a.add(DOC_ADVICE.get("passport"));
             if (Pattern.compile("doc_balance|doc_summary|doc_statement|doc_dates_order|doc_created_before").matcher(all).find()) a.add("Bank statement: ask for it to be downloaded from net banking in front of you, shared through the RBI Account Aggregator system, or confirmed by the bank.");
             if (Pattern.compile("doc_official|doc_pay_to_close|doc_rbi|authority").matcher(all).find()) a.add("Government or police notice: look up the office's number on its official .gov.in website and call them. Agencies never ask for money to close cases.");
+            // The official way to confirm the kind of document that was detected.
+            Object d = info == null ? null : info.get("detected");
+            String tip = d instanceof Map ? DOC_ADVICE.get(String.valueOf(mapOrEmpty(d).get("key"))) : null;
+            if (tip != null && !a.contains(tip)) a.add(tip);
         }
         return a;
     }
