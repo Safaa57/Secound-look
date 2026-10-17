@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../community.dart';
 import '../i18n/i18n.dart';
 import '../native.dart';
+import 'document_check.dart';
 import 'payment_check.dart';
 import 'upi_check.dart';
 import '../widgets/common.dart';
@@ -66,25 +67,37 @@ class _CheckScreenState extends State<CheckScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(tr('Check something')), actions: const [LanguageButton()]),
       body: ListView(padding: const EdgeInsets.fromLTRB(18, 4, 18, 32), children: [
-        Row(children: [
-          Expanded(
-            child: _Tool(
-              icon: Icons.receipt_long_rounded,
-              title: tr('Payment screenshot'),
-              sub: tr('Spot fake "paid" proofs'),
-              onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PaymentCheckScreen())),
+        // Three tools side by side; equal heights, and the text wraps instead of overflowing on narrow phones.
+        IntrinsicHeight(
+          child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Expanded(
+              child: _Tool(
+                icon: Icons.receipt_long_rounded,
+                title: tr('Payment screenshot'),
+                sub: tr('Spot fake "paid" proofs'),
+                onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PaymentCheckScreen())),
+              ),
             ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: _Tool(
-              icon: Icons.qr_code_scanner_rounded,
-              title: tr('UPI ID or QR'),
-              sub: tr('Check before you pay'),
-              onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const UpiCheckScreen())),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _Tool(
+                icon: Icons.qr_code_scanner_rounded,
+                title: tr('UPI ID or QR'),
+                sub: tr('Check before you pay'),
+                onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const UpiCheckScreen())),
+              ),
             ),
-          ),
-        ]),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _Tool(
+                icon: Icons.badge_rounded,
+                title: tr('Document'),
+                sub: tr('IDs, statements, letters'),
+                onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const DocumentCheckScreen())),
+              ),
+            ),
+          ]),
+        ),
         const SizedBox(height: 18),
         Text(status['platform'] == 'web'
                 ? tr('Or paste a link, a whole message, a phone number or a UPI ID. The check runs in your browser.')
@@ -149,13 +162,13 @@ class _Tool extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Panel(
         onTap: onTap,
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Icon(icon, color: Theme.of(context).colorScheme.primary, size: 30),
-          const SizedBox(height: 10),
-          Text(title, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15.5)),
+          Icon(icon, color: Theme.of(context).colorScheme.primary, size: 26),
+          const SizedBox(height: 8),
+          Text(title, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14, height: 1.2)),
           const SizedBox(height: 2),
-          Text(sub, style: TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.onSurface.withAlpha(160))),
+          Text(sub, style: TextStyle(fontSize: 12, height: 1.25, color: Theme.of(context).colorScheme.onSurface.withAlpha(160))),
         ]),
       );
 }

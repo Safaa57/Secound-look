@@ -14,9 +14,10 @@ Effective {{EFFECTIVE}} · Version {{VERSION}}
 | Incoming caller's number | Only while Call Shield is ON | To show who's calling and warn about scam numbers |
 | Text, links, numbers, UPI IDs you check | When you tap Check | To give you a result |
 | Screenshots and QR photos you choose | When you pick one | Read on the device to find the payment details or QR code |
+| Documents you choose to check (PDF or photo of an ID, passport, bank statement or letter) | Only when you pick one in Document check | Read on the device to look for signs of editing or wrong numbers. Never uploaded or stored; the temporary copy is deleted when you leave the screen. Aadhaar numbers are shown masked |
 | Alerts history, numbers you marked, trusted person, settings | Saved by you | So the app can show them and use your block list |
 
-On a phone, alerts history and your trusted person are stored encrypted, and app data is excluded from cloud backups. On a laptop, this data stays in your browser's own storage on that computer. "Delete all my data" in Settings removes it. Second Look never reads your SMS inbox, call log or contacts.
+On a phone, alerts history and your trusted person are stored encrypted, and app data is excluded from cloud backups. On a laptop, this data stays in your browser's own storage on that computer. "Delete all my data" in Settings removes it. Second Look never reads your SMS inbox, call log or contacts. On the laptop web version inside Claude, a document photo you add there is read by AI on your own Claude account.
 
 ## 2. Data our server receives
 

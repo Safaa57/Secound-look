@@ -25,7 +25,7 @@ class ImageReader {
 
   static const maxBytes = 15 * 1024 * 1024;
 
-  static Future<PickedImage?> pick({bool camera = false}) async {
+  static Future<PickedImage?> pick({bool camera = false, bool layout = false}) async {
     // No resizing options: resizing would re-save the file and remove the editing-app info we look for.
     // requestFullMetadata is off so iPhone never asks for full photo-library access (Android ignores it).
     final f = await ImagePicker().pickImage(source: camera ? ImageSource.camera : ImageSource.gallery, requestFullMetadata: false);
@@ -34,17 +34,17 @@ class ImageReader {
     if (bytes.length > maxBytes) {
       return PickedImage(bytes: Uint8List(0), readError: 'This image is too large (over 15 MB).');
     }
-    return read(kIsWeb ? null : f.path, bytes);
+    return read(kIsWeb ? null : f.path, bytes, layout: layout);
   }
 
   /// Reads an image file at [path] (inside the app's own storage) or just its [bytes] (laptop).
-  static Future<PickedImage> read(String? path, Uint8List bytes) async {
+  static Future<PickedImage> read(String? path, Uint8List bytes, {bool layout = false}) async {
     final editor = ImageMeta.editorIn(bytes);
     if (path == null || kIsWeb) {
       return PickedImage(bytes: bytes, editor: editor, readError: 'Reading the words in a screenshot works in the phone app. Type the details below instead.');
     }
     try {
-      final r = await Native.instance.readImage(path);
+      final r = await Native.instance.readImage(path, layout: layout);
       return PickedImage(
         bytes: bytes,
         text: (r['text'] as String?) ?? '',

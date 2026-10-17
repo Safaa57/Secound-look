@@ -17,6 +17,12 @@ These terms are an agreement between you and {{OPERATOR}} ("we"), who runs Secon
 - Second Look is not affiliated with, endorsed by or sponsored by any bank, payment app, company, telecom operator or government body named in the app.
 - Names such as bank, app and courier names are used only to identify what a message pretends to be, or to open that service at your request. All trademarks belong to their owners.
 
+## 2A. Document check
+
+- Document check looks for warning signs (edited files, wrong check digits, totals that don't add up, wording used in fake letters). It cannot prove a document is genuine or fake.
+- A "no signs found" result is not a verification. Always confirm with the issuer through the official route the app shows (for example UIDAI, the Income Tax portal, the bank or the passport office).
+- Only check documents you are allowed to handle. Don't use it to make, alter or test forged documents.
+
 ## 3. Your responsibilities
 
 - Decisions you make after a check are your own.

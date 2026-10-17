@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart';
@@ -69,8 +70,57 @@ class Native {
       _json('analyzePayment', {'text': text, 'expectedAmount': expectedAmount, 'myUpi': myUpi, 'imageEditor': imageEditor});
 
   /// Reads the words and QR codes in an image, on the device (Android ML Kit / iPhone Vision). Not available on a laptop.
-  Future<Map<String, dynamic>> readImage(String path) => _json('readImage', {'path': path});
+  /// With [layout], the words are put back into rows as they appear on the page (for documents and statements).
+  Future<Map<String, dynamic>> readImage(String path, {bool layout = false}) =>
+      _json('readImage', {'path': path, if (layout) 'layout': true});
   Future<String?> consumeSharedImage() => _call<String>('consumeSharedImage');
+
+  // ---- documents (read on the device; never uploaded or kept) ----
+
+  /// Results may come back as a JSON string or as a map, depending on the platform.
+  static Map<String, dynamic>? _asMap(Object? v) {
+    if (v == null) return null;
+    if (v is String) {
+      if (v.isEmpty) return null;
+      final d = jsonDecode(v);
+      return d is Map ? d.cast<String, dynamic>() : null;
+    }
+    if (v is Map) return v.cast<String, dynamic>();
+    return null;
+  }
+
+  /// Lets the user choose a PDF or photo. Phones: {path, name, mime, size} (a copy in the app's cache).
+  /// Laptop: {name, mime, size, bytes (base64)}. Null if cancelled.
+  /// Throws PlatformException with code 'too_large' or 'unsupported'.
+  Future<Map<String, dynamic>?> pickDocument() async => _asMap(await _call<Object>('pickDocument'));
+
+  /// Text of a PDF: {text, pages, pagesRead}. Throws PlatformException 'locked', 'unreadable' or 'unsupported' (laptop).
+  Future<Map<String, dynamic>> readPdf(String path) async => _asMap(await _call<Object>('readPdf', {'path': path})) ?? <String, dynamic>{};
+
+  /// Checks an RSA/SHA-256 signature over [data] against any of the DER [certs].
+  /// Returns null when it couldn't be checked (for example in the browser).
+  Future<bool?> verifySignature(Uint8List data, Uint8List signature, List<Uint8List> certs) async {
+    try {
+      final v = await _call<Object>('verifySignature', {'data': data, 'signature': signature, 'certs': certs});
+      return v is bool ? v : null;
+    } on PlatformException {
+      return null;
+    } on MissingPluginException {
+      return null;
+    } on UnsupportedError {
+      return null;
+    }
+  }
+
+  Future<Map<String, dynamic>> analyzeDocument(Map<String, dynamic> input) async =>
+      _asMap(await _call<Object>('analyzeDocument', {'input': jsonEncode(input)})) ?? <String, dynamic>{};
+
+  /// Deletes any document copies the picker left in the app's cache.
+  Future<void> clearDocCache() async {
+    try {
+      await _call('clearDocCache');
+    } catch (_) {}
+  }
 
   /// Small preferences kept on the device: language, voice, community_off, community_sync.
   Future<Map<String, dynamic>> setPref(String key, String value) => _json('setPref', {'key': key, 'value': value});

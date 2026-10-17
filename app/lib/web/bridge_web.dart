@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:js_interop';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 
@@ -16,7 +18,50 @@ extension type _Engine._(JSObject _) implements JSObject {
   external JSString lookupNumber(JSString number);
   external JSString analyzeUpi(JSString text);
   external JSString analyzePayment(JSString inputJson);
+  external JSString analyzeDocument(JSString inputJson);
 }
+
+// ---- "Check a document": a hidden <input type=file>, read in this browser only ----
+@JS('document')
+external _Document get _document;
+
+extension type _Document._(JSObject _) implements JSObject {
+  external _FileInput createElement(JSString tag);
+  external _Body? get body;
+}
+
+extension type _Body._(JSObject _) implements JSObject {
+  external void appendChild(JSObject child);
+}
+
+extension type _FileInput._(JSObject _) implements JSObject {
+  external set type(JSString v);
+  external set accept(JSString v);
+  external _FileList? get files;
+  external void setAttribute(JSString name, JSString value);
+  external void click();
+  external void remove();
+  external void addEventListener(JSString type, JSFunction listener);
+  external void removeEventListener(JSString type, JSFunction listener);
+}
+
+extension type _FileList._(JSObject _) implements JSObject {
+  external JSNumber get length;
+  external _File? item(JSNumber index);
+}
+
+extension type _File._(JSObject _) implements JSObject {
+  external JSString get name;
+  external JSString get type;
+  external JSNumber get size;
+  external JSPromise<JSArrayBuffer> arrayBuffer();
+}
+
+// window.addEventListener / removeEventListener (for "the file dialog closed without a file").
+@JS('addEventListener')
+external void _windowAddEventListener(JSString type, JSFunction listener);
+@JS('removeEventListener')
+external void _windowRemoveEventListener(JSString type, JSFunction listener);
 
 @JS('localStorage')
 external _Storage get _storage;
@@ -178,6 +223,88 @@ class WebBridge {
     }
   }
 
+  static const _maxDocBytes = 25 * 1024 * 1024, _maxDocText = 50000, _maxDocInput = 1000000;
+
+  /// Opens the browser's file dialog (PDF or image) and returns {"name","mime","size","bytes": base64} as JSON,
+  /// or null if the user closed the dialog. The file is read in this browser only and never uploaded or saved.
+  /// Must be called straight from a tap (browsers only open file dialogs during a user gesture).
+  static Future<String?> _pickDocument() async {
+    final input = _document.createElement('input'.toJS)
+      ..type = 'file'.toJS
+      ..accept = 'application/pdf,image/*'.toJS;
+    input.setAttribute('style'.toJS, 'display:none'.toJS);
+    final picked = Completer<_File?>();
+    Timer? focusTimer;
+    void settle(_File? f) {
+      if (!picked.isCompleted) picked.complete(f);
+    }
+
+    _File? first() {
+      final files = input.files;
+      if (files == null || files.length.toDartInt == 0) return null;
+      return files.item(0.toJS);
+    }
+
+    final onChange = ((JSAny? _) => settle(first())).toJS;
+    final onCancel = ((JSAny? _) => settle(null)).toJS; // modern browsers fire "cancel" when the dialog is closed
+    // Fallback for browsers without "cancel": the page gets focus back when the dialog closes. "change" can arrive
+    // a little after that, so wait before treating it as a cancel.
+    final onFocus = ((JSAny? _) {
+      focusTimer?.cancel();
+      focusTimer = Timer(const Duration(milliseconds: 1000), () => settle(first()));
+    }).toJS;
+    input.addEventListener('change'.toJS, onChange);
+    input.addEventListener('cancel'.toJS, onCancel);
+    _document.body?.appendChild(input);
+    try {
+      input.click();
+      // Register after click() so the focus change caused by opening the dialog itself doesn't count.
+      _windowAddEventListener('focus'.toJS, onFocus);
+      final file = await picked.future;
+      if (file == null) return null;
+      var mime = file.type.toDart.toLowerCase();
+      if (mime.isEmpty && file.name.toDart.toLowerCase().endsWith('.pdf')) mime = 'application/pdf';
+      if (mime != 'application/pdf' && !mime.startsWith('image/')) {
+        throw PlatformException(code: 'unsupported', message: 'Choose a PDF or a photo of the document.');
+      }
+      final size = file.size.toDartDouble;
+      if (size > _maxDocBytes) {
+        throw PlatformException(code: 'too_large', message: 'This file is bigger than 25 MB. Choose a smaller file or a photo of the page.');
+      }
+      final Uint8List bytes = await file.arrayBuffer().toDart.then((b) => b.toDart.asUint8List(), onError: (Object _) => Uint8List(0));
+      if (bytes.isEmpty) throw PlatformException(code: 'unreadable', message: "Couldn't open this file. It may be damaged.");
+      if (bytes.length > _maxDocBytes) {
+        throw PlatformException(code: 'too_large', message: 'This file is bigger than 25 MB. Choose a smaller file or a photo of the page.');
+      }
+      var name = file.name.toDart.replaceAll(RegExp(r'[\x00-\x1f\x7f/\\\u200e\u200f\u202a-\u202e\u2066-\u2069]'), '').trim();
+      if (name.length > 120) name = name.substring(0, 120);
+      return jsonEncode({'name': name.isEmpty ? 'document' : name, 'mime': mime, 'size': bytes.length, 'bytes': base64Encode(bytes)});
+    } finally {
+      focusTimer?.cancel();
+      _windowRemoveEventListener('focus'.toJS, onFocus);
+      input.removeEventListener('change'.toJS, onChange);
+      input.removeEventListener('cancel'.toJS, onCancel);
+      input.remove();
+    }
+  }
+
+  /// Caps the text inside the Dart side's JSON before it reaches the engine.
+  static String _docInput(Object? raw) {
+    final s = (raw as String?) ?? '';
+    if (s.length > _maxDocInput) throw PlatformException(code: 'engine', message: 'Check failed');
+    Object? o;
+    try {
+      o = jsonDecode(s);
+    } catch (_) {
+      o = null;
+    }
+    if (o is! Map) throw PlatformException(code: 'engine', message: 'Check failed');
+    final m = o.cast<String, dynamic>();
+    final t = m['text'];
+    m['text'] = t is String ? _cap(t, _maxDocText) : '';
+    return jsonEncode(m);
+  }
+
   static void _open(String url) => _windowOpen(url.toJS, '_blank'.toJS, 'noopener,noreferrer'.toJS);
 
   static Future<Object?> call(String method, [Map<String, dynamic>? args]) async {
@@ -207,6 +334,18 @@ class WebBridge {
         throw PlatformException(code: 'unsupported', message: 'Reading screenshots works in the phone app. Type the details instead.');
       case 'consumeSharedImage':
         return null;
+
+      // "Check a document": read in this browser, never uploaded, never saved to history.
+      case 'pickDocument':
+        return _pickDocument();
+      case 'readPdf':
+        throw PlatformException(code: 'unsupported', message: 'Reading PDF text works in the phone app. Paste the text instead.');
+      case 'verifySignature':
+        return null; // not checked in the browser (QR codes are read only in the phone app)
+      case 'analyzeDocument':
+        return _sl.analyzeDocument(_docInput(a['input']).toJS).toDart; // deliberately not _remember()ed
+      case 'clearDocCache':
+        return null; // nothing is kept in the browser
       case 'setPref':
         const allowed = {'language', 'voice', 'community_off', 'community_sync'};
         if (!allowed.contains(a['key'])) throw PlatformException(code: 'blocked', message: 'Unknown setting');

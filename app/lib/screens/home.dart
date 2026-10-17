@@ -4,6 +4,7 @@ import '../i18n/i18n.dart';
 import '../native.dart';
 import '../theme.dart';
 import '../widgets/common.dart';
+import 'document_check.dart';
 import 'panic.dart';
 import 'payment_check.dart';
 import 'result.dart';
@@ -206,8 +207,10 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               childAspectRatio: 1.25,
               children: [
                 _Action(icon: Icons.manage_search_rounded, title: tr('Message, link or number'), sub: tr('Paste it to check'), onTap: widget.onCheck),
+                _Action(icon: Icons.phone_in_talk_rounded, title: tr('Phone number'), sub: tr('Who is calling you?'), onTap: widget.onCheck),
                 _Action(icon: Icons.receipt_long_rounded, title: tr('Payment screenshot'), sub: tr('Spot fake "paid" proofs'), onTap: () => _open(const PaymentCheckScreen())),
                 _Action(icon: Icons.qr_code_scanner_rounded, title: tr('UPI ID or QR'), sub: tr('Check before you pay'), onTap: () => _open(const UpiCheckScreen())),
+                _Action(icon: Icons.badge_rounded, title: tr('Document'), sub: tr('IDs, statements, letters'), onTap: () => _open(const DocumentCheckScreen())),
                 _Action(icon: Icons.sos_rounded, title: tr('Being scammed?'), sub: tr('Steps to take now'), danger: true, onTap: () => _open(const PanicScreen())),
               ],
             ),

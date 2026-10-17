@@ -3,7 +3,10 @@ import CallKit
 import Flutter
 import ImageIO
 import JavaScriptCore
+import PDFKit
+import Security
 import UIKit
+import UniformTypeIdentifiers
 import Vision
 
 /// Shared settings between the app and its extensions (Message Filter, Call Directory).
@@ -50,6 +53,8 @@ enum SLImageReader {
     static let maxText = 10000
     static let maxQr = 5
     static let maxQrLen = 2048
+    /// Layout (document) mode: Aadhaar's secure QR is a long decimal number, so allow much longer QR values.
+    static let maxQrLenDoc = 16384
     static let maxFileBytes = 30 * 1024 * 1024
     private static let queue = DispatchQueue(label: "secondlook.vision", qos: .userInitiated)
 
@@ -77,20 +82,21 @@ enum SLImageReader {
     }
 
     /// Calls done on the main thread with the JSON string, or a FlutterError.
-    static func read(path: String, done: @escaping (Any?) -> Void) {
+    /// layout: true rebuilds the text in reading rows (tables such as bank statements stay row by row).
+    static func read(path: String, layout: Bool = false, done: @escaping (Any?) -> Void) {
         queue.async {
             let out: Any? = autoreleasepool { () -> Any? in
                 guard let url = SLImageReader.allowedURL(path) else {
                     return FlutterError(code: "blocked", message: "This image can't be opened", details: nil)
                 }
-                if let json = SLImageReader.scan(url) { return json }
+                if let json = SLImageReader.scan(url, layout: layout) { return json }
                 return FlutterError(code: "image", message: "Couldn't read this image", details: nil)
             }
             DispatchQueue.main.async { done(out) }
         }
     }
 
-    private static func scan(_ url: URL) -> String? {
+    private static func scan(_ url: URL, layout: Bool) -> String? {
         guard let src = CGImageSourceCreateWithURL(url as CFURL, [kCGImageSourceShouldCache: false] as CFDictionary),
               CGImageSourceGetCount(src) > 0 else { return nil }
         let props = CGImageSourceCopyPropertiesAtIndex(src, 0, nil) as? [CFString: Any] ?? [:]
@@ -118,19 +124,404 @@ enum SLImageReader {
         let handler = VNImageRequestHandler(cgImage: cg, orientation: .up, options: [:])
         do { try handler.perform([textReq, qrReq]) } catch { return nil }
 
-        var text = (textReq.results ?? []).compactMap { $0.topCandidates(1).first?.string }.joined(separator: "\n")
+        var text: String
+        if layout {
+            text = SLTextRows.build(SLTextRows.lines(textReq.results ?? [], width: CGFloat(cg.width), height: CGFloat(cg.height)))
+        } else {
+            text = (textReq.results ?? []).compactMap { $0.topCandidates(1).first?.string }.joined(separator: "\n")
+        }
         if text.count > maxText { text = String(text.prefix(maxText)) }
+        let qrCap = layout ? maxQrLenDoc : maxQrLen
         var qr: [String] = []
         for o in qrReq.results ?? [] {
             if qr.count >= maxQr { break }
             guard var v = o.payloadStringValue, !v.isEmpty else { continue }
-            if v.count > maxQrLen { v = String(v.prefix(maxQrLen)) }
+            if v.count > qrCap { v = String(v.prefix(qrCap)) }
             if !qr.contains(v) { qr.append(v) }
         }
         let o: [String: Any] = ["text": text, "qr": qr, "width": w, "height": h]
         guard let data = try? JSONSerialization.data(withJSONObject: o), let s = String(data: data, encoding: .utf8) else { return nil }
         return s
     }
+}
+
+/// Rebuilds OCR text in reading rows. Plain OCR output often comes out column by column, which breaks tables such as
+/// bank statements. Every recognised line keeps its box; lines whose vertical centres are within 0.6 × the median line
+/// height form one row, each row is ordered left to right and joined with two spaces, and rows are joined with "\n".
+/// Same algorithm as Android's TextRows.java.
+enum SLTextRows {
+    /// One recognised line; rect is in image pixels with a TOP-left origin.
+    struct Line {
+        let text: String
+        let rect: CGRect
+    }
+
+    /// Vision observations → lines in top-left pixel coordinates (Vision boxes are normalised, bottom-left origin).
+    static func lines(_ observations: [VNRecognizedTextObservation], width: CGFloat, height: CGFloat) -> [Line] {
+        return observations.compactMap { o -> Line? in
+            guard let s = o.topCandidates(1).first?.string else { return nil }
+            let bb = o.boundingBox
+            return Line(text: s, rect: CGRect(x: bb.minX * width, y: (1 - bb.maxY) * height,
+                                              width: bb.width * width, height: bb.height * height))
+        }
+    }
+
+    static func build(_ input: [Line]) -> String {
+        let lines = input.compactMap { l -> Line? in
+            let t = l.text.replacingOccurrences(of: "\n", with: " ").trimmingCharacters(in: .whitespacesAndNewlines)
+            return t.isEmpty ? nil : Line(text: t, rect: l.rect.standardized)
+        }
+        guard !lines.isEmpty else { return "" }
+        let heights = lines.map { max(0, $0.rect.height) }.sorted()
+        var median = heights[heights.count / 2]
+        if median <= 0 { median = 1 }
+        let threshold = 0.6 * median
+        let sorted = lines.sorted { $0.rect.midY < $1.rect.midY }
+        var rows: [[Line]] = []
+        var centre: CGFloat = 0
+        for l in sorted {
+            let cy = l.rect.midY
+            if !rows.isEmpty, abs(cy - centre) <= threshold {
+                rows[rows.count - 1].append(l)
+                centre += (cy - centre) / CGFloat(rows[rows.count - 1].count) // running mean of the row's centres
+            } else {
+                rows.append([l])
+                centre = cy
+            }
+        }
+        return rows.map { row -> String in
+            row.sorted { a, b in a.rect.minX != b.rect.minX ? a.rect.minX < b.rect.minX : a.text < b.text }
+                .map { $0.text }
+                .joined(separator: "  ")
+        }.joined(separator: "\n")
+    }
+}
+
+/// "Check a document": the picked PDF or photo is copied into tmp/docs/, read on the iPhone (PDFKit, Vision) and
+/// deleted when the user leaves the screen. Nothing is uploaded, stored or logged.
+enum SLDocs {
+    static let maxBytes = 25 * 1024 * 1024
+    static let maxText = 50000
+    static let maxTextPages = 20
+    static let maxOcrPages = 6
+    static let pdfSide: CGFloat = 2000
+    static let maxInputBytes = 1_000_000
+    static let maxCerts = 8
+    static let maxCertBytes = 64 * 1024
+    static let maxSignedBytes = 1024 * 1024
+    static let maxSignatureBytes = 2048
+    private static let queue = DispatchQueue(label: "secondlook.docs", qos: .userInitiated)
+
+    static var dir: URL { URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true).appendingPathComponent("docs", isDirectory: true) }
+
+    static func fail(_ code: String) -> FlutterError {
+        let message: String
+        switch code {
+        case "too_large": message = "This file is bigger than 25 MB. Choose a smaller file or a photo of the page."
+        case "unsupported": message = "Choose a PDF or a photo of the document."
+        case "locked": message = "This PDF is protected with a password. Open it, save a copy without the password, and try again."
+        default: message = "Couldn't open this file. It may be damaged."
+        }
+        return FlutterError(code: code, message: message, details: nil)
+    }
+
+    /// Deletes every copied document.
+    static func clear() {
+        try? FileManager.default.removeItem(at: dir)
+    }
+
+    private static func json(_ o: [String: Any]) -> String? {
+        guard let data = try? JSONSerialization.data(withJSONObject: o), let s = String(data: data, encoding: .utf8) else { return nil }
+        return s
+    }
+
+    /// The file's name for display only: control and bidi-override characters and path separators removed.
+    static func cleanName(_ n: String) -> String {
+        var out = String.UnicodeScalarView()
+        for u in n.unicodeScalars {
+            let v = u.value
+            if v < 0x20 || v == 0x7f || u == "/" || u == "\\" { continue }
+            if (0x202a...0x202e).contains(v) || (0x2066...0x2069).contains(v) || v == 0x200e || v == 0x200f { continue }
+            out.append(u)
+        }
+        let t = String(String(out).trimmingCharacters(in: .whitespacesAndNewlines).prefix(120))
+        return t.isEmpty ? "document" : t
+    }
+
+    /// Removes the picker's own copy (it lives in our tmp folder) once we have ours.
+    private static func removePickerCopy(_ url: URL) {
+        var tmp = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true).standardizedFileURL.resolvingSymlinksInPath().path
+        if !tmp.hasSuffix("/") { tmp += "/" }
+        let p = url.standardizedFileURL.resolvingSymlinksInPath().path
+        if tmp.count > 1, p.hasPrefix(tmp) { try? FileManager.default.removeItem(atPath: p) }
+    }
+
+    /// Copies the picked document into tmp/docs/ and returns {"path","name","mime","size"} JSON, or a FlutterError.
+    /// Call off the main thread.
+    static func importPicked(_ src: URL) -> Any {
+        let fm = FileManager.default
+        let scoped = src.startAccessingSecurityScopedResource()
+        defer {
+            if scoped { src.stopAccessingSecurityScopedResource() }
+            removePickerCopy(src)
+        }
+        let values = try? src.resourceValues(forKeys: [.fileSizeKey, .contentTypeKey, .isRegularFileKey])
+        if values?.isRegularFile == false { return fail("unsupported") }
+        guard let type = values?.contentType ?? UTType(filenameExtension: src.pathExtension) else { return fail("unsupported") }
+        let isPdf = type.conforms(to: .pdf)
+        let isImage = !isPdf && type.conforms(to: .image)
+        guard isPdf || isImage else { return fail("unsupported") }
+        if let size = values?.fileSize, size > maxBytes { return fail("too_large") }
+
+        let mime = isPdf ? "application/pdf" : (type.preferredMIMEType ?? "image/jpeg")
+        var ext = isPdf ? "pdf" : type.conforms(to: .png) ? "png" : type.conforms(to: .jpeg) ? "jpg" : (type.preferredFilenameExtension ?? "img")
+        if ext.isEmpty || ext.count > 5 || !ext.allSatisfy({ $0.isASCII && ($0.isLetter || $0.isNumber) }) { ext = "img" }
+
+        clear() // keep only the latest document
+        do {
+            try fm.createDirectory(at: dir, withIntermediateDirectories: true)
+        } catch {
+            return fail("unreadable")
+        }
+        let dest = dir.appendingPathComponent("doc_\(Int(Date().timeIntervalSince1970 * 1000)).\(ext)")
+        do {
+            try fm.copyItem(at: src, to: dest)
+        } catch {
+            return fail("unreadable")
+        }
+        let size = ((try? fm.attributesOfItem(atPath: dest.path))?[.size] as? NSNumber)?.intValue ?? 0
+        guard size > 0 else { try? fm.removeItem(at: dest); return fail("unreadable") }
+        guard size <= maxBytes else { try? fm.removeItem(at: dest); return fail("too_large") }
+        // It must really be what it claims to be.
+        let genuine: Bool
+        if isPdf {
+            let head = (try? Data(contentsOf: dest, options: .mappedIfSafe))?.prefix(1024) ?? Data()
+            genuine = head.range(of: Data("%PDF-".utf8)) != nil
+        } else if let isrc = CGImageSourceCreateWithURL(dest as CFURL, [kCGImageSourceShouldCache: false] as CFDictionary) {
+            genuine = CGImageSourceGetCount(isrc) > 0 && CGImageSourceGetType(isrc) != nil
+        } else {
+            genuine = false
+        }
+        guard genuine else { try? fm.removeItem(at: dest); return fail("unsupported") }
+        let o: [String: Any] = ["path": dest.path, "name": cleanName(src.lastPathComponent), "mime": mime, "size": size]
+        guard let s = json(o) else { try? fm.removeItem(at: dest); return fail("unreadable") }
+        return s
+    }
+
+    // MARK: Reading a PDF
+
+    /// Calls done on the main thread with {"text","pages","pagesRead","ocr"} JSON, or a FlutterError.
+    static func readPdf(path: String, done: @escaping (Any?) -> Void) {
+        queue.async {
+            let out: Any? = autoreleasepool { () -> Any? in
+                guard let url = SLImageReader.allowedURL(path) else {
+                    return FlutterError(code: "blocked", message: "This file can't be opened", details: nil)
+                }
+                return SLDocs.pdfText(url)
+            }
+            DispatchQueue.main.async { done(out) }
+        }
+    }
+
+    private static func nonSpaceCount(_ s: String) -> Int {
+        s.unicodeScalars.reduce(0) { $0 + (CharacterSet.whitespacesAndNewlines.contains($1) ? 0 : 1) }
+    }
+
+    private static func pdfText(_ url: URL) -> Any {
+        guard let doc = PDFDocument(url: url) else { return fail("unreadable") }
+        if doc.isLocked { return fail("locked") }
+        let pages = doc.pageCount
+        guard pages > 0 else { return fail("unreadable") }
+
+        // 1. The PDF's own text (made by a computer): up to 20 pages, rebuilt in rows where possible.
+        var parts: [String] = []
+        var total = 0
+        var read = 0
+        for i in 0..<min(pages, maxTextPages) where total < maxText {
+            let t: String = autoreleasepool { () -> String in
+                guard let page = doc.page(at: i) else { return "" }
+                return pageTextRows(page)
+            }
+            read += 1
+            if !t.isEmpty { parts.append(t); total += t.count }
+        }
+        var text = parts.joined(separator: "\n\n")
+        var ocr = false
+
+        // 2. A scanned PDF has (almost) no text: render up to 6 pages and read them with Vision.
+        if nonSpaceCount(text) < 50 {
+            var scanned: [String] = []
+            var scannedTotal = 0
+            var scannedRead = 0
+            for i in 0..<min(pages, maxOcrPages) where scannedTotal < maxText {
+                let t: String? = autoreleasepool { () -> String? in
+                    guard let page = doc.page(at: i), let cg = render(page) else { return nil }
+                    return ocrRows(cg)
+                }
+                guard let pageText = t else { break } // keep what earlier pages gave
+                scannedRead += 1
+                if !pageText.isEmpty { scanned.append(pageText); scannedTotal += pageText.count }
+            }
+            let scannedText = scanned.joined(separator: "\n\n")
+            if scannedRead > 0 && nonSpaceCount(scannedText) >= nonSpaceCount(text) {
+                text = scannedText
+                read = scannedRead
+                ocr = true
+            } else if scannedRead == 0 && nonSpaceCount(text) == 0 {
+                return fail("unreadable")
+            }
+        }
+        if text.count > maxText { text = String(text.prefix(maxText)) }
+        guard let s = json(["text": text, "pages": pages, "pagesRead": read, "ocr": ocr]) else { return fail("unreadable") }
+        return s
+    }
+
+    /// A page's text in reading rows (from the text's positions); falls back to PDFKit's own order.
+    private static func pageTextRows(_ page: PDFPage) -> String {
+        let rotation = ((page.rotation % 360) + 360) % 360
+        let box = page.bounds(for: .cropBox)
+        if rotation == 0, box.width > 0, box.height > 0, let sel = page.selection(for: box) {
+            let lines = sel.selectionsByLine().compactMap { s -> SLTextRows.Line? in
+                guard let t = s.string else { return nil }
+                let b = s.bounds(for: page)
+                // PDF space has its origin at the bottom: flip so rows read top to bottom.
+                return SLTextRows.Line(text: t, rect: CGRect(x: b.minX, y: box.maxY - b.maxY, width: b.width, height: b.height))
+            }
+            let rows = SLTextRows.build(lines)
+            if !rows.isEmpty { return rows }
+        }
+        return page.string ?? ""
+    }
+
+    /// Renders a page upright on white, longest side about 2000 px.
+    private static func render(_ page: PDFPage) -> CGImage? {
+        guard let ref = page.pageRef else { return nil }
+        let box = ref.getBoxRect(.cropBox)
+        let rotation = ((Int(ref.rotationAngle) % 360) + 360) % 360
+        var w = box.width, h = box.height
+        if rotation == 90 || rotation == 270 { swap(&w, &h) }
+        guard w > 0, h > 0 else { return nil }
+        let k = pdfSide / max(w, h)
+        let size = CGSize(width: max(1, (w * k).rounded()), height: max(1, (h * k).rounded()))
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 1
+        format.opaque = true
+        let image = UIGraphicsImageRenderer(size: size, format: format).image { ctx in
+            UIColor.white.setFill()
+            ctx.fill(CGRect(origin: .zero, size: size))
+            let cg = ctx.cgContext
+            cg.saveGState()
+            cg.translateBy(x: 0, y: size.height) // UIKit is top-down, PDF is bottom-up
+            cg.scaleBy(x: k, y: -k)
+            // Maps the page box (with its rotation) onto a same-size rect; the scale above does the enlarging,
+            // because getDrawingTransform never scales up.
+            cg.concatenate(ref.getDrawingTransform(.cropBox, rect: CGRect(x: 0, y: 0, width: w, height: h), rotate: 0, preserveAspectRatio: true))
+            cg.drawPDFPage(ref)
+            cg.restoreGState()
+        }
+        return image.cgImage
+    }
+
+    /// Vision OCR of one rendered page, rebuilt in reading rows. nil if Vision failed.
+    private static func ocrRows(_ cg: CGImage) -> String? {
+        let req = VNRecognizeTextRequest()
+        req.recognitionLevel = .accurate
+        req.usesLanguageCorrection = false
+        req.recognitionLanguages = ["en-US"]
+        let handler = VNImageRequestHandler(cgImage: cg, orientation: .up, options: [:])
+        do { try handler.perform([req]) } catch { return nil }
+        return SLTextRows.build(SLTextRows.lines(req.results ?? [], width: CGFloat(cg.width), height: CGFloat(cg.height)))
+    }
+
+    // MARK: analyzeDocument input
+
+    /// Caps the text inside the Dart side's JSON (50,000 characters). nil for malformed input.
+    static func capInput(_ s: String) -> String? {
+        guard s.utf8.count <= maxInputBytes, let d = s.data(using: .utf8),
+              var o = (try? JSONSerialization.jsonObject(with: d)) as? [String: Any] else { return nil }
+        let t = o["text"] as? String ?? ""
+        o["text"] = t.count > maxText ? String(t.prefix(maxText)) : t
+        return json(o)
+    }
+
+    // MARK: Signatures (Aadhaar secure QR)
+
+    /// True if signature is a valid SHA256withRSA (PKCS#1 v1.5) signature of data under ANY of the DER X.509
+    /// certificates' public keys. Bad input is simply false. Certificate dates are not checked.
+    /// true = valid, false = checked against a usable key and failed, nil = no usable key (shown as "not checked").
+    static func verifySignature(data: Data?, signature: Data?, certs: [Data]) -> Bool? {
+        guard let data = data, let sig = signature, !data.isEmpty, data.count <= maxSignedBytes,
+              !sig.isEmpty, sig.count <= maxSignatureBytes else { return false }
+        var usable = false
+        let alg = SecKeyAlgorithm.rsaSignatureMessagePKCS1v15SHA256
+        for der in certs.prefix(maxCerts) where !der.isEmpty && der.count <= maxCertBytes {
+            guard let cert = SecCertificateCreateWithData(nil, der as CFData),
+                  let key = SecCertificateCopyKey(cert),
+                  SecKeyIsAlgorithmSupported(key, .verify, alg) else { continue }
+            usable = true
+            if SecKeyVerifySignature(key, alg, data as CFData, sig as CFData, nil) { return true }
+        }
+        return usable ? false : nil
+    }
+}
+
+/// The system document picker (Files, iCloud Drive, Downloads): PDFs and images only. No permission prompt needed.
+final class SLDocPicker: NSObject, UIDocumentPickerDelegate {
+    private static var current: SLDocPicker? // keeps the delegate alive while the picker is open
+    private var done: ((Any?) -> Void)?
+    private weak var controller: UIViewController?
+    private var importing = false
+
+    static func present(_ done: @escaping (Any?) -> Void) {
+        if let c = current {
+            // A picker that vanished without telling us (should not happen) must not block the feature for good.
+            if c.importing || c.controller?.presentingViewController != nil {
+                done(FlutterError(code: "busy", message: "A file is already being chosen", details: nil))
+                return
+            }
+            c.finish(nil)
+        }
+        guard let top = topViewController() else {
+            done(FlutterError(code: "unsupported", message: "Couldn't open the file picker", details: nil))
+            return
+        }
+        let p = SLDocPicker()
+        p.done = done
+        let vc = UIDocumentPickerViewController(forOpeningContentTypes: [.pdf, .image], asCopy: true)
+        vc.allowsMultipleSelection = false
+        vc.delegate = p
+        p.controller = vc
+        current = p
+        top.present(vc, animated: true)
+    }
+
+    static func topViewController() -> UIViewController? {
+        let windows = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.flatMap { $0.windows }
+        var top = (windows.first(where: { $0.isKeyWindow }) ?? windows.first)?.rootViewController
+        while let p = top?.presentedViewController, !p.isBeingDismissed { top = p }
+        return top
+    }
+
+    private func finish(_ r: Any?) {
+        if SLDocPicker.current === self { SLDocPicker.current = nil }
+        guard let d = done else { return }
+        done = nil
+        d(r)
+    }
+
+    func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+        guard let url = urls.first else { finish(nil); return }
+        importing = true
+        DispatchQueue.global(qos: .userInitiated).async {
+            let r = SLDocs.importPicked(url)
+            DispatchQueue.main.async {
+                self.importing = false
+                self.finish(r)
+            }
+        }
+    }
+
+    func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) { finish(nil) }
 }
 
 public class SecondLookPlugin: NSObject, FlutterPlugin {
@@ -144,6 +535,8 @@ public class SecondLookPlugin: NSObject, FlutterPlugin {
         instance.speech.delegate = instance
         registrar.addMethodCallDelegate(instance, channel: ch)
         SLPrivacyCover.shared.start()
+        // Documents are never kept: remove any copy left behind if the app was closed mid-check.
+        DispatchQueue.global(qos: .utility).async { SLDocs.clear() }
         // Warn the user the moment their screen starts being recorded or shared (a common scam step).
         NotificationCenter.default.addObserver(forName: UIScreen.capturedDidChangeNotification, object: nil, queue: .main) { _ in
             ch.invokeMethod("onScreenCaptured", arguments: UIScreen.main.isCaptured)
@@ -264,7 +657,32 @@ public class SecondLookPlugin: NSObject, FlutterPlugin {
             ]
             SLEngine.shared.call("analyzePayment", [json(input)]) { r in self.remember(r, kind: "payment", title: "Payment screenshot"); self.reply(r, result) }
         case "readImage":
-            SLImageReader.read(path: str("path")) { result($0) }
+            SLImageReader.read(path: str("path"), layout: a["layout"] as? Bool ?? false) { result($0) }
+
+        // "Check a document" (IDs, passports, statements, letters). Read on the iPhone; results are never saved to
+        // history or alerts, and nothing about the document is logged.
+        case "pickDocument":
+            SLDocPicker.present { result($0) }
+        case "readPdf":
+            SLDocs.readPdf(path: str("path")) { result($0) }
+        case "verifySignature":
+            let data = (a["data"] as? FlutterStandardTypedData)?.data
+            let sig = (a["signature"] as? FlutterStandardTypedData)?.data
+            let certs = (a["certs"] as? [Any] ?? []).compactMap { ($0 as? FlutterStandardTypedData)?.data }
+            DispatchQueue.global(qos: .userInitiated).async {
+                let ok = SLDocs.verifySignature(data: data, signature: sig, certs: certs)
+                DispatchQueue.main.async { result(ok.map { NSNumber(value: $0) } ?? NSNull()) }
+            }
+        case "analyzeDocument":
+            guard let input = SLDocs.capInput(str("input")) else {
+                result(FlutterError(code: "engine", message: "Check failed", details: nil)); return
+            }
+            SLEngine.shared.call("analyzeDocument", [input]) { r in self.reply(r, result) } // never remembered
+        case "clearDocCache":
+            DispatchQueue.global(qos: .utility).async {
+                SLDocs.clear()
+                DispatchQueue.main.async { result(nil) }
+            }
         case "status":
             status { result($0) }
         case "setSmsShield":
@@ -331,6 +749,7 @@ public class SecondLookPlugin: NSObject, FlutterPlugin {
             result(nil)
         case "deleteAllData":
             for k in ["history", "reports", "sms_on", "call_on", "trusted_name", "trusted_number", "app_lock"] { d.removeObject(forKey: k) }
+            SLDocs.clear()
             SLSecurity.wipeKey()
             reloadCallDirectory()
             result(nil)

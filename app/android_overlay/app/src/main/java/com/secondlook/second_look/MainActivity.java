@@ -1,6 +1,7 @@
 package com.secondlook.second_look;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.KeyguardManager;
 import android.app.role.RoleManager;
 import android.hardware.biometrics.BiometricManager;
@@ -8,7 +9,9 @@ import android.hardware.biometrics.BiometricPrompt;
 import android.os.CancellationSignal;
 import android.view.MotionEvent;
 import android.view.WindowManager;
+import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -41,12 +44,14 @@ public class MainActivity extends FlutterActivity {
     private static final int REQ_SMS = 41;
     private static final int REQ_ROLE = 42;
     private static final int REQ_NOTIFY = 43;
+    private static final int REQ_DOC = 44;
 
     private final ExecutorService worker = Executors.newSingleThreadExecutor();
     private TextToSpeech tts;
     private boolean ttsReady;
     private MethodChannel channel;
     private MethodChannel.Result pending;
+    private MethodChannel.Result docPending;   // "Check a document": waiting for the system file picker
     private String sharedText;
     private String pendingImagePath;   // a screenshot shared to us, copied into cache/shared/
     private boolean imageAsked;        // Dart already polled consumeSharedImage (cold start)
@@ -56,6 +61,11 @@ public class MainActivity extends FlutterActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         applyScreenProtection();
+        // Documents are never kept: remove any copy left behind if the app was closed mid-check.
+        if (savedInstanceState == null) {
+            Context app = getApplicationContext();
+            worker.execute(() -> DocScan.clearCache(app));
+        }
         readIntent(getIntent(), false);
     }
 
@@ -162,17 +172,62 @@ public class MainActivity extends FlutterActivity {
                 return;
             }
             // On-device OCR + QR decoding of a screenshot. Only files inside our own cache/files folders.
+            // layout: true rebuilds the text in reading rows (tables such as bank statements stay row by row).
             case "readImage": {
                 String path = call.argument("path");
+                boolean layout = Boolean.TRUE.equals(call.argument("layout"));
                 worker.execute(() -> {
                     File f = ImageScan.allowedFile(this, path);
                     if (f == null) { runOnUiThread(() -> result.error("blocked", "This image can't be opened", null)); return; }
                     try {
-                        String out = ImageScan.read(f);
+                        String out = ImageScan.read(f, layout);
                         runOnUiThread(() -> result.success(out));
                     } catch (Exception | OutOfMemoryError e) {
                         runOnUiThread(() -> result.error("image", "Couldn't read this image", null));
                     }
+                });
+                return;
+            }
+
+            // ---- "Check a document" (IDs, passports, statements, letters). Read on the phone; results are never
+            //      saved to history or alerts, and nothing about the document is logged. ----
+            case "pickDocument": pickDocument(result); return;
+            case "readPdf": {
+                String path = call.argument("path");
+                worker.execute(() -> {
+                    File f = ImageScan.allowedFile(this, path);
+                    if (f == null) { runOnUiThread(() -> result.error("blocked", "This file can't be opened", null)); return; }
+                    try {
+                        String out = DocScan.readPdf(f);
+                        runOnUiThread(() -> result.success(out));
+                    } catch (DocScan.DocError e) {
+                        runOnUiThread(() -> result.error(e.code, e.getMessage(), null));
+                    } catch (RuntimeException | OutOfMemoryError e) {
+                        runOnUiThread(() -> result.error("unreadable", "Couldn't open this file. It may be damaged.", null));
+                    }
+                });
+                return;
+            }
+            case "verifySignature": {
+                Object data = call.argument("data"), sig = call.argument("signature"), certs = call.argument("certs");
+                worker.execute(() -> {
+                    Boolean ok;
+                    try { ok = DocScan.verifySignature(data, sig, certs); } catch (RuntimeException e) { ok = null; }
+                    Boolean answer = ok;
+                    runOnUiThread(() -> result.success(answer));
+                });
+                return;
+            }
+            case "analyzeDocument": {
+                String input = call.argument("input");
+                bg(result, () -> EngineHolder.get(this).analyzeDocument(DocScan.documentInput(input)));
+                return;
+            }
+            case "clearDocCache": {
+                Context app = getApplicationContext();
+                worker.execute(() -> {
+                    DocScan.clearCache(app);
+                    runOnUiThread(() -> result.success(null));
                 });
                 return;
             }
@@ -227,6 +282,7 @@ public class MainActivity extends FlutterActivity {
             }
             case "deleteAllData":
                 Store.wipe(this);
+                DocScan.clearCache(this);
                 Security.wipeKey();
                 enableSmsReceiver(false);
                 result.success(null);
@@ -320,6 +376,41 @@ public class MainActivity extends FlutterActivity {
     }
 
     private interface Job { Map<String, Object> run(); }
+
+    /** System file picker (no storage permission): PDFs and images only. One request at a time. */
+    private void pickDocument(MethodChannel.Result result) {
+        if (docPending != null) { result.error("busy", "A file is already being chosen", null); return; }
+        Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT)
+                .addCategory(Intent.CATEGORY_OPENABLE)
+                .setType("*/*")
+                .putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"application/pdf", "image/*"});
+        docPending = result;
+        try {
+            startActivityForResult(i, REQ_DOC);
+        } catch (ActivityNotFoundException | SecurityException e) {
+            docPending = null;
+            result.error("unsupported", "This phone has no file picker", null);
+        }
+    }
+
+    private void onDocumentPicked(int resultCode, Intent data) {
+        MethodChannel.Result r = docPending;
+        docPending = null;
+        if (r == null) return;
+        Uri uri = resultCode == Activity.RESULT_OK && data != null ? data.getData() : null;
+        if (uri == null) { r.success(null); return; } // the user backed out
+        Context app = getApplicationContext();
+        worker.execute(() -> {
+            try {
+                String out = Json.stringify(DocScan.copyPicked(app, uri));
+                runOnUiThread(() -> r.success(out));
+            } catch (DocScan.DocError e) {
+                runOnUiThread(() -> r.error(e.code, e.getMessage(), null));
+            } catch (RuntimeException | OutOfMemoryError e) {
+                runOnUiThread(() -> r.error("unreadable", "Couldn't open this file. It may be damaged.", null));
+            }
+        });
+    }
 
     private interface AuthDone { void done(boolean ok); }
 
@@ -418,6 +509,10 @@ public class MainActivity extends FlutterActivity {
     @Override
     protected void onDestroy() {
         if (tts != null) { tts.shutdown(); tts = null; ttsReady = false; }
+        if (isFinishing()) {
+            Context app = getApplicationContext();
+            worker.execute(() -> DocScan.clearCache(app)); // never leave a document copy behind
+        }
         super.onDestroy();
     }
 
@@ -502,6 +597,7 @@ public class MainActivity extends FlutterActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQ_DOC) { onDocumentPicked(resultCode, data); return; }
         if (requestCode == REQ_ROLE) {
             if (!roleHeld()) Store.put(this, "call_on", false);
             else if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {

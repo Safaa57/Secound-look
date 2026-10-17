@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Rect;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.provider.OpenableColumns;
@@ -39,6 +40,8 @@ final class ImageScan {
     static final int MAX_TEXT = 10000;
     static final int MAX_QR = 5;
     static final int MAX_QR_LEN = 2048;
+    /** Layout (document) mode: Aadhaar's secure QR is a long decimal number, so allow much longer QR values. */
+    static final int MAX_QR_LEN_DOC = 16384;
     static final long MAX_FILE_BYTES = 30L * 1024 * 1024; // refuse to even open bigger "images"
     static final long MAX_SHARED_BYTES = 15L * 1024 * 1024;
     private static final long TIMEOUT_S = 30;
@@ -71,7 +74,13 @@ final class ImageScan {
 
     // ------------------------------------------------------------------ OCR + QR
     /** Returns {"text": String, "qr": [String], "width": int, "height": int} as JSON. Throws on any failure. */
-    static String read(File f) throws Exception {
+    static String read(File f) throws Exception { return read(f, false); }
+
+    /**
+     * Same as {@link #read(File)}; with layout = true the text is rebuilt in reading rows (see {@link TextRows}),
+     * which keeps table rows such as bank statement lines together, and longer QR values are kept.
+     */
+    static String read(File f, boolean layout) throws Exception {
         BitmapFactory.Options bounds = new BitmapFactory.Options();
         bounds.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(f.getPath(), bounds);
@@ -103,7 +112,7 @@ final class ImageScan {
             Text text = Tasks.await(tr.process(img), TIMEOUT_S, TimeUnit.SECONDS);
             List<Barcode> codes = Tasks.await(bs.process(img), TIMEOUT_S, TimeUnit.SECONDS);
 
-            String t = text == null ? "" : text.getText();
+            String t = text == null ? "" : layout ? TextRows.build(lines(text)) : text.getText();
             if (t == null) t = "";
             if (t.length() > MAX_TEXT) t = t.substring(0, MAX_TEXT);
             List<Object> qr = new ArrayList<>();
@@ -112,7 +121,8 @@ final class ImageScan {
                     if (qr.size() >= MAX_QR) break;
                     String v = b.getRawValue();
                     if (v == null || v.isEmpty()) continue;
-                    if (v.length() > MAX_QR_LEN) v = v.substring(0, MAX_QR_LEN);
+                    int maxQr = layout ? MAX_QR_LEN_DOC : MAX_QR_LEN;
+                    if (v.length() > maxQr) v = v.substring(0, maxQr);
                     if (!qr.contains(v)) qr.add(v);
                 }
             }
@@ -123,6 +133,21 @@ final class ImageScan {
             bs.close();
             bmp.recycle();
         }
+    }
+
+    /** Every recognised line with its box (in the upright image's pixels), for {@link TextRows}. */
+    static List<TextRows.Line> lines(Text text) {
+        List<TextRows.Line> out = new ArrayList<>();
+        if (text == null) return out;
+        for (Text.TextBlock b : text.getTextBlocks()) {
+            for (Text.Line l : b.getLines()) {
+                String s = l.getText();
+                if (s == null || s.trim().isEmpty()) continue;
+                Rect r = l.getBoundingBox();
+                out.add(r == null ? new TextRows.Line(s) : new TextRows.Line(s, r.left, r.top, r.right, r.bottom));
+            }
+        }
+        return out;
     }
 
     private static int rotationOf(File f) {
@@ -189,11 +214,11 @@ final class ImageScan {
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    private static void deleteQuietly(File f) {
+    static void deleteQuietly(File f) {
         try { f.delete(); } catch (SecurityException ignored) { /* nothing more we can do */ }
     }
 
-    private static long declaredSize(ContentResolver cr, Uri uri) {
+    static long declaredSize(ContentResolver cr, Uri uri) {
         try (Cursor q = cr.query(uri, new String[]{OpenableColumns.SIZE}, null, null, null)) {
             if (q != null && q.moveToFirst() && !q.isNull(0)) return q.getLong(0);
         } catch (RuntimeException ignored) {

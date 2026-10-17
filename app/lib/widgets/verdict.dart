@@ -148,10 +148,15 @@ class VerdictView extends StatelessWidget {
   }
 
   static String _kindTitle(String k) =>
-      tr({'sms': 'SMS', 'message': 'Message', 'link': 'Link', 'number': 'Phone number', 'call': 'Call', 'upi': 'UPI ID', 'payment': 'Payment screenshot'}[k] ?? k);
+      tr({'sms': 'SMS', 'message': 'Message', 'link': 'Link', 'number': 'Phone number', 'call': 'Call', 'upi': 'UPI ID', 'payment': 'Payment screenshot', 'document': 'Document'}[k] ?? k);
 
   /// One plain sentence under the verdict: what it means for the person right now.
   static String _oneLiner(String level, String? kind) {
+    if (kind == 'document') {
+      return level == 'safe'
+          ? tr('No signs of forgery found, but only the issuer can confirm a document is genuine.')
+          : tr('Don\'t pay, sign or share anything because of this document until the issuer confirms it.');
+    }
     if (kind == 'payment') {
       return level == 'safe'
           ? tr('A screenshot can\'t prove a payment. Check the money in your own bank app.')

@@ -71,6 +71,7 @@ String trAdvice(String en) => adviceText(L10n.lang.value, en) ?? en;
 String trLevel(Map level, {String? kind}) {
   final key = '${level['key']}';
   if (kind == 'payment' && key == 'safe') return tr('No red flags found. Confirm in your bank app');
+  if (kind == 'document' && key == 'safe') return tr('No signs of forgery found. Confirm with the issuer');
   switch (key) {
     case 'danger':
       return tr('Likely scam');
