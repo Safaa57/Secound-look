@@ -9,18 +9,50 @@ import 'native.dart';
 class Voice {
   Voice._();
 
-  /// Read results aloud automatically when they appear. Switched in Settings.
-  static bool auto = true;
+  /// Read results aloud automatically when they appear. OFF unless the user switched it on in Settings.
+  static bool auto = false;
+
+  /// Voice id chosen in Settings ('' = the phone's default voice). Ids come from [voices].
+  static String voiceName = '';
+
+  static const normalRate = 0.92;
+  static const slowRate = 0.75;
+
+  /// Speaking speed (1.0 = the engine's normal speed).
+  static double rate = normalRate;
+  static bool get slow => rate < normalRate;
 
   static void init(Map<String, dynamic>? status) {
-    auto = '${(status?['prefs'] as Map?)?['voice'] ?? ''}' != 'off';
+    final prefs = status?['prefs'] as Map?;
+    // Off by default: a missing or empty pref means off.
+    auto = '${prefs?['voice'] ?? ''}' == 'on';
+    voiceName = '${prefs?['voice_name'] ?? ''}';
+    rate = '${prefs?['voice_rate'] ?? ''}' == 'slow' ? slowRate : normalRate;
   }
 
   static Future<void> setAuto(bool on) async {
     auto = on;
-    try {
-      await Native.instance.setPref('voice', on ? 'on' : 'off');
-    } catch (_) {}
+    await Native.instance.trySetPref('voice', on ? 'on' : 'off');
+  }
+
+  static Future<void> setVoiceName(String id) async {
+    voiceName = id;
+    await Native.instance.trySetPref('voice_name', id);
+  }
+
+  static Future<void> setSlow(bool on) async {
+    rate = on ? slowRate : normalRate;
+    await Native.instance.trySetPref('voice_rate', on ? 'slow' : 'normal');
+  }
+
+  static final _voices = <String, List<Map<String, dynamic>>>{};
+
+  /// Voices installed for [lang] (best first), cached for this session.
+  static Future<List<Map<String, dynamic>>> voices(String lang, {bool reload = false}) async {
+    if (!reload && _voices.containsKey(lang)) return _voices[lang]!;
+    final v = await Native.instance.listVoices(lang);
+    _voices[lang] = v;
+    return v;
   }
 
   static const _en = {
@@ -43,9 +75,17 @@ class Voice {
     return parts.map((s) => s.trim().endsWith('.') || s.trim().endsWith('।') ? s.trim() : '${s.trim()}.').join(' ');
   }
 
-  static Future<bool> speak(String text) async {
+  /// Speaks [text] in the current language. [voice] overrides the saved voice (used for previews in Settings).
+  static Future<bool> speak(String text, {String? voice}) async {
+    final lang = L10n.lang.value;
     try {
-      return await Native.instance.speak(text, L10n.lang.value);
+      var v = voice;
+      if (v == null && voiceName.isNotEmpty) {
+        // The saved voice may belong to another language: only use it when it's one of this language's voices.
+        final list = await voices(lang);
+        if (list.any((e) => '${e['id']}' == voiceName)) v = voiceName;
+      }
+      return await Native.instance.speak(text, lang, voice: v, rate: rate);
     } catch (_) {
       return false;
     }
@@ -58,7 +98,7 @@ class Voice {
   }
 }
 
-/// "Listen" button for a result; also reads it out once automatically if that's switched on.
+/// "Listen" button for a result. Reads it out automatically only if the user switched that on in Settings (off by default).
 class ListenButton extends StatefulWidget {
   const ListenButton({super.key, required this.result, this.autoPlay = true, this.color});
   final Map<String, dynamic> result;

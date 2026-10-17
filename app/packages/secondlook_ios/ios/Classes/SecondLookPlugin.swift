@@ -139,7 +139,9 @@ enum SLImageReader {
             if v.count > qrCap { v = String(v.prefix(qrCap)) }
             if !qr.contains(v) { qr.append(v) }
         }
-        let o: [String: Any] = ["text": text, "qr": qr, "width": w, "height": h]
+        var geometry = SLLayout.Acc()
+        geometry.add(textReq.results ?? [], width: CGFloat(cg.width), height: CGFloat(cg.height))
+        let o: [String: Any] = ["text": text, "qr": qr, "width": w, "height": h, "layout": geometry.json(checked: true)]
         guard let data = try? JSONSerialization.data(withJSONObject: o), let s = String(data: data, encoding: .utf8) else { return nil }
         return s
     }
@@ -194,6 +196,76 @@ enum SLTextRows {
                 .map { $0.text }
                 .joined(separator: "  ")
         }.joined(separator: "\n")
+    }
+}
+
+/// Text-geometry check from OCR word boxes (same rule as Android): in lines with at least 3 words, a word (2+
+/// characters, containing a letter or digit) is "odd" when its box height differs by more than 30% from the line's
+/// median word height, or its bottom edge is off the line's median bottom by more than 35% of that height. Pasted-in
+/// digits or names often sit slightly off the line they were edited into.
+enum SLLayout {
+    static let maxSamples = 5
+
+    struct Acc {
+        var lines = 0
+        var odd = 0
+        var samples: [String] = []
+
+        /// Adds every recognised line of one image (Vision boxes are normalised with a bottom-left origin).
+        mutating func add(_ observations: [VNRecognizedTextObservation], width: CGFloat, height: CGFloat) {
+            for o in observations {
+                guard let cand = o.topCandidates(1).first else { continue }
+                let s = cand.string
+                // Each word's box: (text, height, bottom edge) in top-left pixel coordinates.
+                var words: [(String, CGFloat, CGFloat)] = []
+                var i = s.startIndex
+                while i < s.endIndex {
+                    if s[i].isWhitespace { i = s.index(after: i); continue }
+                    var j = i
+                    while j < s.endIndex && !s[j].isWhitespace { j = s.index(after: j) }
+                    if let box = try? cand.boundingBox(for: i..<j) {
+                        let bb = box.boundingBox
+                        words.append((String(s[i..<j]), bb.height * height, (1 - bb.minY) * height))
+                    }
+                    i = j
+                }
+                guard words.count >= 3 else { continue }
+                lines += 1
+                let hs = words.map { $0.1 }.sorted()
+                let bs = words.map { $0.2 }.sorted()
+                let medH = hs[hs.count / 2]
+                let medB = bs[bs.count / 2]
+                guard medH > 0 else { continue }
+                for (w, h, b) in words {
+                    guard w.count >= 2, w.contains(where: { $0.isLetter || $0.isNumber }) else { continue }
+                    if abs(h - medH) > 0.30 * medH || abs(b - medB) > 0.35 * medH {
+                        odd += 1
+                        if samples.count < SLLayout.maxSamples { samples.append(SLLayout.mask(String(w.prefix(40)))) }
+                    }
+                }
+            }
+        }
+
+        func json(checked: Bool) -> [String: Any] {
+            ["checked": checked && lines > 0, "lines": lines, "odd": odd, "samples": samples]
+        }
+    }
+
+    static let notChecked: [String: Any] = ["checked": false, "lines": 0, "odd": 0, "samples": [String]()]
+
+    /// In any run of 8+ digits, every digit except the last 4 becomes "X".
+    static func mask(_ w: String) -> String {
+        var out = ""
+        var run = ""
+        func flush() {
+            if run.count >= 8 { out += String(repeating: "X", count: run.count - 4) + run.suffix(4) } else { out += run }
+            run = ""
+        }
+        for ch in w {
+            if ch.isASCII && ch.isNumber { run.append(ch) } else { flush(); out.append(ch) }
+        }
+        flush()
+        return out
     }
 }
 
@@ -347,16 +419,18 @@ enum SLDocs {
         }
         var text = parts.joined(separator: "\n\n")
         var ocr = false
+        var layout = SLLayout.notChecked // only OCR'd pages have word boxes to compare
 
         // 2. A scanned PDF has (almost) no text: render up to 6 pages and read them with Vision.
         if nonSpaceCount(text) < 50 {
             var scanned: [String] = []
             var scannedTotal = 0
             var scannedRead = 0
+            var geometry = SLLayout.Acc()
             for i in 0..<min(pages, maxOcrPages) where scannedTotal < maxText {
                 let t: String? = autoreleasepool { () -> String? in
                     guard let page = doc.page(at: i), let cg = render(page) else { return nil }
-                    return ocrRows(cg)
+                    return ocrRows(cg, geometry: &geometry)
                 }
                 guard let pageText = t else { break } // keep what earlier pages gave
                 scannedRead += 1
@@ -367,12 +441,13 @@ enum SLDocs {
                 text = scannedText
                 read = scannedRead
                 ocr = true
+                layout = geometry.json(checked: true)
             } else if scannedRead == 0 && nonSpaceCount(text) == 0 {
                 return fail("unreadable")
             }
         }
         if text.count > maxText { text = String(text.prefix(maxText)) }
-        guard let s = json(["text": text, "pages": pages, "pagesRead": read, "ocr": ocr]) else { return fail("unreadable") }
+        guard let s = json(["text": text, "pages": pages, "pagesRead": read, "ocr": ocr, "layout": layout]) else { return fail("unreadable") }
         return s
     }
 
@@ -423,13 +498,15 @@ enum SLDocs {
     }
 
     /// Vision OCR of one rendered page, rebuilt in reading rows. nil if Vision failed.
-    private static func ocrRows(_ cg: CGImage) -> String? {
+    /// Also adds the page's word boxes to the layout check.
+    private static func ocrRows(_ cg: CGImage, geometry: inout SLLayout.Acc) -> String? {
         let req = VNRecognizeTextRequest()
         req.recognitionLevel = .accurate
         req.usesLanguageCorrection = false
         req.recognitionLanguages = ["en-US"]
         let handler = VNImageRequestHandler(cgImage: cg, orientation: .up, options: [:])
         do { try handler.perform([req]) } catch { return nil }
+        geometry.add(req.results ?? [], width: CGFloat(cg.width), height: CGFloat(cg.height))
         return SLTextRows.build(SLTextRows.lines(req.results ?? [], width: CGFloat(cg.width), height: CGFloat(cg.height)))
     }
 
@@ -550,10 +627,15 @@ public class SecondLookPlugin: NSObject, FlutterPlugin {
         return s
     }
 
-    /// "history" is encrypted; "reports" stays readable by the Call Directory extension (it holds only numbers you marked).
+    /// "history" and "number_actions" are encrypted; "reports" stays readable by the Call Directory extension
+    /// (it holds only numbers you marked).
+    private static let encryptedLists: Set<String> = ["history", "number_actions"]
+    private static let maxHistory = 300
+    private static let maxActions = 500
+
     private func list(_ key: String) -> [[String: Any]] {
         let raw = d.string(forKey: key)
-        let text = key == "history" ? SLSecurity.decrypt(raw) : raw
+        let text = Self.encryptedLists.contains(key) ? SLSecurity.decrypt(raw) : raw
         guard let s = text, let data = s.data(using: .utf8),
               let a = try? JSONSerialization.jsonObject(with: data) as? [[String: Any]] else { return [] }
         return a
@@ -561,7 +643,7 @@ public class SecondLookPlugin: NSObject, FlutterPlugin {
 
     private func saveList(_ key: String, _ a: [[String: Any]]) {
         let text = json(a)
-        if key == "history" {
+        if Self.encryptedLists.contains(key) {
             guard let enc = SLSecurity.encrypt(text) else { return } // never store history unencrypted
             d.set(enc, forKey: key)
         } else {
@@ -572,17 +654,62 @@ public class SecondLookPlugin: NSObject, FlutterPlugin {
     private func secret(_ key: String) -> String { SLSecurity.decrypt(d.string(forKey: key)) ?? "" }
     private func setSecret(_ key: String, _ v: String) { d.set(SLSecurity.encrypt(v), forKey: key) }
 
-    // Keep flagged results from checks the user runs, so Home and Alerts can show them.
-    private func remember(_ resultJson: String?, kind: String, title: String) {
-        guard let s = resultJson, let data = s.data(using: .utf8),
-              let r = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let level = (r["level"] as? [String: Any])?["key"] as? String, level != "safe" else { return }
+    private static func now() -> Int { Int(Date().timeIntervalSince1970 * 1000) }
+
+    private static func parse(_ s: String?) -> [String: Any]? {
+        guard let s = s, let data = s.data(using: .utf8) else { return nil }
+        return (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
+    }
+
+    /// Saves an alert to history and returns its id (nil if the result is malformed). extra adds the v1.3 fields
+    /// (number, senderType, firstTime, preview, test).
+    @discardableResult
+    private func addHistory(kind: String, title: String, result r: [String: Any], extra: [String: Any] = [:]) -> String? {
+        guard let level = (r["level"] as? [String: Any])?["key"] as? String else { return nil }
         let reasons = (r["reasons"] as? [[String: Any]]) ?? []
         let summary = reasons.first(where: { (($0["weight"] as? NSNumber)?.intValue ?? 0) > 0 })?["title"] as? String ?? ""
+        let id = UUID().uuidString
+        var e: [String: Any] = ["id": id, "at": Self.now(), "kind": kind, "title": title,
+                                "summary": summary, "level": level, "score": r["score"] ?? 0, "result": r]
+        for (k, v) in extra { e[k] = v }
         var h = list("history")
-        h.insert(["id": UUID().uuidString, "at": Int(Date().timeIntervalSince1970 * 1000), "kind": kind, "title": title,
-                  "summary": summary, "level": level, "score": r["score"] ?? 0, "result": r], at: 0)
-        saveList("history", Array(h.prefix(100)))
+        h.insert(e, at: 0)
+        saveList("history", Array(h.prefix(Self.maxHistory)))
+        return id
+    }
+
+    // Keep flagged results from checks the user runs, so Home and Alerts can show them.
+    private func remember(_ resultJson: String?, kind: String, title: String, extra: [String: Any] = [:]) {
+        guard let r = Self.parse(resultJson),
+              let level = (r["level"] as? [String: Any])?["key"] as? String, level != "safe" else { return }
+        addHistory(kind: kind, title: title, result: r, extra: extra)
+    }
+
+    /// The sender fields of a history entry: phone numbers vs. SMS headers such as "VK-HDFCBK".
+    private static func senderFields(_ sender: String) -> [String: Any] {
+        let s = String(sender.prefix(64))
+        let isNumber = !s.contains(where: { $0.isLetter }) && s.filter({ $0.isNumber }).count >= 3
+        return ["number": s, "senderType": isNumber ? "number" : "header"]
+    }
+
+    /// E.164 for phone numbers (via the engine); otherwise the digits, or a cleaned SMS header. Calls done on main.
+    private func normalize(_ raw: String, _ done: @escaping (String) -> Void) {
+        let input = String(raw.prefix(64))
+        SLEngine.shared.call("lookupNumber", [input]) { r in
+            if let e = Self.parse(r)?["e164"] as? String, !e.isEmpty { done(e); return }
+            let digits = SLSecurity.cleanNumber(input)
+            if digits.filter({ $0.isNumber }).count >= 3 { done(digits); return }
+            done(String(input.uppercased().filter { $0.isASCII && ($0.isLetter || $0.isNumber || $0 == "-") }.prefix(20)))
+        }
+    }
+
+    /// Saves (or replaces) the user's own mark for a number. Blocked numbers are blocked by the Call Directory.
+    private func upsertReport(_ number: String, type: String, label: String, kind: String, blocked: Bool) {
+        var reps = list("reports").filter { ($0["number"] as? String) != number }
+        var e: [String: Any] = ["number": number, "type": type, "label": label, "kind": kind, "at": Self.now()]
+        if blocked { e["blocked"] = true }
+        reps.insert(e, at: 0)
+        saveList("reports", Array(reps.prefix(500)))
     }
 
     private func status(_ done: @escaping (String) -> Void) {
@@ -592,10 +719,15 @@ public class SecondLookPlugin: NSObject, FlutterPlugin {
             "termsVersion": d.string(forKey: "terms_version") ?? "",
             "prefs": [
                 "language": d.string(forKey: "pref_language") ?? "",
-                "voice": d.string(forKey: "pref_voice") ?? "",
+                "voice": d.string(forKey: "pref_voice") ?? "", // missing / "" means off (read-out only on Listen)
+                "voice_name": d.string(forKey: "pref_voice_name") ?? "",
+                "voice_rate": d.string(forKey: "pref_voice_rate") ?? "",
+                "log_all": d.string(forKey: "pref_log_all") ?? "",
+                "call_popup": d.string(forKey: "pref_call_popup") ?? "",
                 "community_off": d.string(forKey: "pref_community_off") ?? "",
                 "community_sync": d.string(forKey: "pref_community_sync") ?? "",
             ],
+            "overlayAllowed": false, // iOS never lets an app draw over a call
             "smsShield": d.bool(forKey: "sms_on"),
             "smsNeedsPermission": false,
             "autoSilence": false,
@@ -631,6 +763,50 @@ public class SecondLookPlugin: NSObject, FlutterPlugin {
         UIApplication.shared.open(u)
     }
 
+    // MARK: v1.3 helpers
+
+    /// Up to 6 installed voices for the language, best first: premium, then enhanced, then default quality;
+    /// Indian voices before others of the same quality. Novelty and Personal Voice voices are left out.
+    static func voices(_ lang: String) -> [AVSpeechSynthesisVoice] {
+        let code = ["hi", "kn"].contains(lang) ? lang : "en"
+        var seen = Set<String>()
+        let list = AVSpeechSynthesisVoice.speechVoices().filter { v in
+            let l = v.language.lowercased()
+            guard l == code || l.hasPrefix(code + "-"), !seen.contains(v.identifier) else { return false }
+            if #available(iOS 17.0, *) {
+                if v.voiceTraits.contains(.isNoveltyVoice) || v.voiceTraits.contains(.isPersonalVoice) { return false }
+            }
+            seen.insert(v.identifier)
+            return true
+        }
+        let sorted = list.sorted { x, y in
+            let qx = quality(x), qy = quality(y)
+            if qx != qy { return qx > qy }
+            let ix = x.language.uppercased().hasSuffix("-IN"), iy = y.language.uppercased().hasSuffix("-IN")
+            if ix != iy { return ix }
+            return x.identifier < y.identifier
+        }
+        return Array(sorted.prefix(6))
+    }
+
+    /// 1 default, 2 enhanced, 3 premium.
+    static func quality(_ v: AVSpeechSynthesisVoice) -> Int { min(3, max(1, v.quality.rawValue)) }
+
+    /// A user's comment: links removed, control characters removed, at most 200 characters.
+    static func cleanComment(_ s: String) -> String {
+        var t = String(s.prefix(1000))
+        t = t.replacingOccurrences(of: "(?i)\\b(?:https?://|www\\.)\\S*", with: "", options: .regularExpression)
+        t = t.replacingOccurrences(of: "(?i)\\b[a-z0-9-]+(?:\\.[a-z0-9-]+)*\\.(?:com|in|net|org|info|top|xyz|io|co|me|ly|link|site|online|app|live|club|shop|biz|cc|tk|ml|ga|cf|gq|buzz|icu|vip|work)\\b(?:/\\S*)?", with: "", options: .regularExpression)
+        t = String(t.unicodeScalars.filter { $0.value >= 0x20 && $0.value != 0x7f && !(0x202a...0x202e).contains($0.value) && !(0x2066...0x2069).contains($0.value) }.map { Character($0) })
+        t = t.replacingOccurrences(of: "\\s{2,}", with: " ", options: .regularExpression).trimmingCharacters(in: .whitespacesAndNewlines)
+        return String(t.prefix(200))
+    }
+
+    /// SMS preview for history: first 160 characters, one-time codes (4–8 digits on their own) hidden.
+    static func preview(_ body: String) -> String {
+        String(body.prefix(160)).replacingOccurrences(of: "(?<![0-9])[0-9]{4,8}(?![0-9])", with: "••••", options: .regularExpression)
+    }
+
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let a = call.arguments as? [String: Any] ?? [:]
         let str = { (k: String) -> String in a[k] as? String ?? "" }
@@ -638,9 +814,15 @@ public class SecondLookPlugin: NSObject, FlutterPlugin {
         case "analyze":
             SLEngine.shared.call("analyzeAuto", [str("text")]) { r in self.remember(r, kind: "check", title: "Checked text"); self.reply(r, result) }
         case "analyzeSms":
-            SLEngine.shared.call("analyzeSms", [str("sender"), str("body")]) { r in self.remember(r, kind: "sms", title: "SMS from \(str("sender"))"); self.reply(r, result) }
+            SLEngine.shared.call("analyzeSms", [str("sender"), str("body")]) { r in
+                self.remember(r, kind: "sms", title: "SMS from \(str("sender"))", extra: Self.senderFields(str("sender")))
+                self.reply(r, result)
+            }
         case "analyzeNumber":
-            SLEngine.shared.call("analyzeNumber", [str("number"), json(list("reports"))]) { r in self.remember(r, kind: "call", title: "Number \(str("number"))"); self.reply(r, result) }
+            SLEngine.shared.call("analyzeNumber", [str("number"), json(list("reports"))]) { r in
+                self.remember(r, kind: "call", title: "Number \(str("number"))", extra: Self.senderFields(str("number")))
+                self.reply(r, result)
+            }
         case "analyzeUpi":
             let upi = String(str("text").prefix(2048))
             SLEngine.shared.call("analyzeUpi", [upi]) { r in self.remember(r, kind: "upi", title: "UPI ID \(upi.prefix(64))"); self.reply(r, result) }
@@ -748,7 +930,7 @@ public class SecondLookPlugin: NSObject, FlutterPlugin {
             reloadCallDirectory()
             result(nil)
         case "deleteAllData":
-            for k in ["history", "reports", "sms_on", "call_on", "trusted_name", "trusted_number", "app_lock"] { d.removeObject(forKey: k) }
+            for k in ["history", "reports", "number_actions", "sms_on", "call_on", "trusted_name", "trusted_number", "app_lock"] { d.removeObject(forKey: k) }
             SLDocs.clear()
             SLSecurity.wipeKey()
             reloadCallDirectory()
@@ -770,26 +952,36 @@ public class SecondLookPlugin: NSObject, FlutterPlugin {
             result(nil)
         case "setPref":
             let key = str("key")
-            guard ["language", "voice", "community_off", "community_sync"].contains(key) else {
+            guard ["language", "voice", "voice_name", "log_all", "call_popup", "voice_rate", "community_off", "community_sync"].contains(key) else {
                 result(FlutterError(code: "blocked", message: "Unknown setting", details: nil)); return
             }
-            d.set(String(str("value").prefix(40)), forKey: "pref_" + key)
+            // Voice ids (e.g. "com.apple.voice.enhanced.en-IN.Rishi") are longer than the other values.
+            d.set(String(str("value").prefix(key == "voice_name" ? 200 : 40)), forKey: "pref_" + key)
             if key == "community_off" { reloadCallDirectory() }
             status { result($0) }
+        case "listVoices":
+            result(json(Self.voices(str("lang")).enumerated().map { i, v -> [String: Any] in
+                ["id": v.identifier, "label": "Voice \(i + 1)", "quality": Self.quality(v), "network": false]
+            }))
         case "speak":
             // On-device text-to-speech. Returns false when that language's voice isn't installed.
             let code = ["hi", "kn"].contains(str("lang")) ? str("lang") : "en"
             let text = String(str("text").prefix(800))
-            guard !text.isEmpty, let voice = AVSpeechSynthesisVoice(language: code + "-IN") ?? (code == "en" ? AVSpeechSynthesisVoice(language: "en-US") : nil) else {
+            // The voice the user picked (passed in, or saved in Settings), if it is still installed and fits the language.
+            let wantedId = (a["voice"] as? String).flatMap { $0.isEmpty ? nil : $0 } ?? d.string(forKey: "pref_voice_name") ?? ""
+            let picked = wantedId.isEmpty ? nil : AVSpeechSynthesisVoice(identifier: wantedId).flatMap { $0.language.lowercased().hasPrefix(code) ? $0 : nil }
+            guard !text.isEmpty, let voice = picked ?? AVSpeechSynthesisVoice(language: code + "-IN") ?? (code == "en" ? AVSpeechSynthesisVoice(language: "en-US") : nil) else {
                 result(false); return
             }
+            // Slightly slower than normal by default (0.92), kept within a sensible range.
+            let rate = min(1.5, max(0.5, (a["rate"] as? NSNumber)?.doubleValue ?? 0.92))
             if speech.isSpeaking { speech.stopSpeaking(at: .immediate) }
             // Speak even when the ring/silent switch is on, and lower other audio meanwhile.
             try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio, options: [.duckOthers])
             try? AVAudioSession.sharedInstance().setActive(true)
             let u = AVSpeechUtterance(string: text)
             u.voice = voice
-            u.rate = AVSpeechUtteranceDefaultSpeechRate * 0.95
+            u.rate = min(AVSpeechUtteranceMaximumSpeechRate, max(AVSpeechUtteranceMinimumSpeechRate, AVSpeechUtteranceDefaultSpeechRate * Float(rate)))
             speech.speak(u)
             result(true)
         case "stopSpeaking":
@@ -819,6 +1011,107 @@ public class SecondLookPlugin: NSObject, FlutterPlugin {
                     result(ok)
                 }
             }
+
+        // ---- v1.3: shield setup, test alert, marking numbers, chat, voices ----
+        case "shieldHealth":
+            // iOS has no SMS permission, caller-ID role, overlay or battery settings to check.
+            result(json(["platform": "ios"]))
+        case "openSettings":
+            if str("target") == "app", let u = URL(string: UIApplication.openSettingsURLString) {
+                UIApplication.shared.open(u, options: [:]) { ok in result(ok) }
+            } else {
+                result(false)
+            }
+        case "testAlert":
+            // A built-in sample scam, saved to history like a real alert (marked as a test).
+            if str("kind") == "call" {
+                let n = "+919000000000"
+                SLEngine.shared.call("analyzeNumber", [n, json(list("reports"))]) { r in
+                    guard let o = Self.parse(r),
+                          let id = self.addHistory(kind: "call", title: "Call from \(n)", result: o,
+                                                   extra: ["number": n, "senderType": "number", "firstTime": false, "test": true]) else {
+                        self.reply(nil, result); return
+                    }
+                    result(id)
+                }
+            } else {
+                let sender = "VK-ALERTS"
+                let body = "Dear customer your bank account will be blocked today. Update KYC now at http://kyc-verify-update.top/login"
+                SLEngine.shared.call("analyzeSms", [sender, body]) { r in
+                    guard let o = Self.parse(r),
+                          let id = self.addHistory(kind: "sms", title: "SMS from \(sender)", result: o,
+                                                   extra: ["number": sender, "senderType": "header", "firstTime": false,
+                                                           "preview": Self.preview(body), "test": true]) else {
+                        self.reply(nil, result); return
+                    }
+                    result(id)
+                }
+            }
+        case "markNumber":
+            let action = str("action")
+            guard ["block", "spam", "fraud", "safe", "comment", "unblock"].contains(action) else {
+                result(FlutterError(code: "blocked", message: "Unknown action", details: nil)); return
+            }
+            let comment = Self.cleanComment(str("comment"))
+            let historyId = String(str("historyId").prefix(64))
+            if action == "comment" && comment.isEmpty { result(json(["ok": false])); return }
+            let raw = str("number")
+            normalize(raw) { number in
+                guard !number.isEmpty else { result(self.json(["ok": false])); return }
+                switch action {
+                case "block": self.upsertReport(number, type: "blocked", label: "Blocked", kind: "scam", blocked: true)
+                case "spam": self.upsertReport(number, type: "spam", label: "Spam", kind: "spam", blocked: false)
+                case "fraud": self.upsertReport(number, type: "fraud", label: "Fraud", kind: "scam", blocked: false)
+                case "safe": self.upsertReport(number, type: "safe", label: "Safe", kind: "safe", blocked: false)
+                case "unblock":
+                    self.saveList("reports", self.list("reports").filter {
+                        let n = $0["number"] as? String
+                        return n != number && n != raw
+                    })
+                default: break // comment: only logged
+                }
+                if action != "comment" { self.reloadCallDirectory() }
+                let at = Self.now()
+                var log = self.list("number_actions")
+                log.insert(["number": number, "action": action, "comment": comment, "at": at,
+                            "historyId": historyId.isEmpty ? NSNull() as Any : historyId as Any], at: 0)
+                self.saveList("number_actions", Array(log.prefix(Self.maxActions)))
+                if !historyId.isEmpty {
+                    var h = self.list("history")
+                    if let i = h.firstIndex(where: { ($0["id"] as? String) == historyId }) {
+                        h[i]["userAction"] = ["action": action, "comment": comment, "at": at]
+                        self.saveList("history", h)
+                    }
+                }
+                result(self.json(["ok": true]))
+            }
+        case "numberActions":
+            let all = list("number_actions") // newest first
+            let raw = str("number")
+            if raw.isEmpty { result(json(all)); return }
+            normalize(raw) { number in
+                result(self.json(all.filter {
+                    let n = $0["number"] as? String
+                    return n == number || n == raw
+                }))
+            }
+        case "isAppInstalled":
+            // Needs "whatsapp" in LSApplicationQueriesSchemes (tool/setup.sh adds it).
+            if str("app") == "whatsapp", let u = URL(string: "whatsapp://") {
+                result(UIApplication.shared.canOpenURL(u))
+            } else {
+                result(false)
+            }
+        case "openChat":
+            // The only place that may open wa.me. Needs the full number with country code.
+            normalize(str("number")) { number in
+                let digits = number.filter { $0.isASCII && $0.isNumber }
+                guard number.hasPrefix("+"), (8...15).contains(digits.count), let u = URL(string: "https://wa.me/\(digits)") else {
+                    result(false); return
+                }
+                UIApplication.shared.open(u, options: [:]) { ok in result(ok) }
+            }
+
         case "installId":
             // Random id for this install, used only for the deep-check quota and Plus. Not linked to the person.
             var id = secret("install_id")

@@ -1,6 +1,28 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart' show compute;
+
+import 'image_forensics.dart';
+
+/// Photo forensics for the document check, run off the UI thread (inline in the browser). Never throws.
+///
+///     Future<Map<String, dynamic>> imageForensics(Uint8List bytes, {String? name})
+///
+/// Returns `{'ela': {'checked': bool, 'score': double 0..1, 'hotspots': int}, 'screenshot': bool, 'camera': bool,
+///           'width': int?, 'height': int?}` — pass them as the same-named file.* fields to analyzeDocument.
+/// ELA runs only for JPEG photos (not screenshots); very large images (over 4000×4000) are skipped and ones
+/// over 2400 px are scaled to 1600 px first. [name] is accepted for future use (the type comes from the bytes).
+Future<Map<String, dynamic>> imageForensics(Uint8List bytes, {String? name}) async {
+  Map<String, dynamic> r;
+  try {
+    r = await compute(ImageForensics.analyze, bytes);
+  } catch (_) {
+    r = ImageForensics.analyze(bytes);
+  }
+  return r;
+}
+
 /// Looks inside an image file for the name of a photo-editing app.
 ///
 /// Editors such as Photoshop, PicsArt or Snapseed usually write their name into the file

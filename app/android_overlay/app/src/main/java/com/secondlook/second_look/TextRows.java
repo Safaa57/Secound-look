@@ -2,7 +2,11 @@ package com.secondlook.second_look;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Rebuilds OCR text in reading rows. Plain OCR output often comes out column by column, which breaks tables such as
@@ -87,6 +91,102 @@ final class TextRows {
             if (out.length() > 0) out.append('\n');
             out.append(l.text);
         }
+        return out.toString();
+    }
+
+    // ------------------------------------------------------------------ text-geometry check ("layout")
+    /** One OCR word and the top / bottom of its box in image pixels. */
+    static final class Word {
+        final String text;
+        final float top, bottom;
+
+        Word(String text, float top, float bottom) {
+            this.text = text == null ? "" : text.trim();
+            this.top = Math.min(top, bottom);
+            this.bottom = Math.max(top, bottom);
+        }
+
+        float height() { return bottom - top; }
+    }
+
+    /**
+     * Looks for words that don't sit like their neighbours, typical of digits or names pasted into a document:
+     * in lines with at least 3 words, a word (2+ characters, with a letter or digit) whose box height differs by more
+     * than 30% from the line's median word height, or whose bottom edge is off the line's median bottom by more than
+     * 35% of the median height. Accumulates over lines (and pages).
+     */
+    static final class LayoutCheck {
+        static final float HEIGHT_DIFF = 0.30f;
+        static final float BASELINE_DIFF = 0.35f;
+        static final int MAX_SAMPLES = 5;
+
+        boolean checked;
+        int lines;
+        int odd;
+        final List<String> samples = new ArrayList<>();
+
+        void addLine(List<Word> words) {
+            checked = true;
+            if (words == null || words.size() < 3) return;
+            List<Float> heights = new ArrayList<>();
+            List<Float> bottoms = new ArrayList<>();
+            for (Word w : words) {
+                if (w == null || w.text.isEmpty() || Float.isNaN(w.top) || Float.isNaN(w.bottom)) continue;
+                heights.add(w.height());
+                bottoms.add(w.bottom);
+            }
+            if (heights.size() < 3) return;
+            Collections.sort(heights);
+            Collections.sort(bottoms);
+            float medH = heights.get(heights.size() / 2);
+            float medB = bottoms.get(bottoms.size() / 2);
+            if (medH <= 0f) return;
+            lines++;
+            for (Word w : words) {
+                if (w == null || w.text.length() < 2 || !hasLetterOrDigit(w.text)) continue;
+                if (Float.isNaN(w.top) || Float.isNaN(w.bottom)) continue;
+                boolean badHeight = Math.abs(w.height() - medH) / medH > HEIGHT_DIFF;
+                boolean badBase = Math.abs(w.bottom - medB) > BASELINE_DIFF * medH;
+                if (badHeight || badBase) {
+                    odd++;
+                    if (samples.size() < MAX_SAMPLES) samples.add(maskLongDigits(w.text));
+                }
+            }
+        }
+
+        /** {checked, lines, odd, samples} for the engine's file.layout input. */
+        Map<String, Object> toMap() {
+            Map<String, Object> m = new LinkedHashMap<>();
+            m.put("checked", checked);
+            m.put("lines", lines);
+            m.put("odd", odd);
+            m.put("samples", new ArrayList<Object>(samples));
+            return m;
+        }
+
+        static Map<String, Object> notChecked() { return new LayoutCheck().toMap(); }
+    }
+
+    private static boolean hasLetterOrDigit(String s) {
+        for (int i = 0; i < s.length(); i++) if (Character.isLetterOrDigit(s.charAt(i))) return true;
+        return false;
+    }
+
+    private static final Pattern LONG_DIGITS = Pattern.compile("\\d{8,}");
+
+    /** In any run of 8+ digits, every digit except the last 4 becomes X (account and ID numbers stay hidden). */
+    static String maskLongDigits(String s) {
+        if (s == null) return "";
+        Matcher m = LONG_DIGITS.matcher(s);
+        StringBuffer out = new StringBuffer();
+        while (m.find()) {
+            String run = m.group();
+            StringBuilder r = new StringBuilder();
+            for (int i = 0; i < run.length() - 4; i++) r.append('X');
+            r.append(run.substring(run.length() - 4));
+            m.appendReplacement(out, r.toString());
+        }
+        m.appendTail(out);
         return out.toString();
     }
 }

@@ -73,7 +73,10 @@ final class ImageScan {
     }
 
     // ------------------------------------------------------------------ OCR + QR
-    /** Returns {"text": String, "qr": [String], "width": int, "height": int} as JSON. Throws on any failure. */
+    /**
+     * Returns {"text": String, "qr": [String], "width": int, "height": int, "layout": {checked, lines, odd, samples}}
+     * as JSON. Throws on any failure.
+     */
     static String read(File f) throws Exception { return read(f, false); }
 
     /**
@@ -126,8 +129,10 @@ final class ImageScan {
                     if (!qr.contains(v)) qr.add(v);
                 }
             }
+            TextRows.LayoutCheck lc = new TextRows.LayoutCheck();
+            layout(text, lc);
             boolean swap = rotation == 90 || rotation == 270;
-            return Json.stringify(Json.map("text", t, "qr", qr, "width", swap ? h : w, "height", swap ? w : h));
+            return Json.stringify(Json.map("text", t, "qr", qr, "width", swap ? h : w, "height", swap ? w : h, "layout", lc.toMap()));
         } finally {
             tr.close();
             bs.close();
@@ -148,6 +153,23 @@ final class ImageScan {
             }
         }
         return out;
+    }
+
+    /** Text-geometry check from the OCR word boxes (see {@link TextRows.LayoutCheck}). */
+    static void layout(Text text, TextRows.LayoutCheck lc) {
+        if (text == null) return;
+        lc.checked = true;
+        for (Text.TextBlock b : text.getTextBlocks()) {
+            for (Text.Line l : b.getLines()) {
+                List<TextRows.Word> words = new ArrayList<>();
+                for (Text.Element e : l.getElements()) {
+                    Rect r = e.getBoundingBox();
+                    if (r == null) continue;
+                    words.add(new TextRows.Word(e.getText(), r.top, r.bottom));
+                }
+                lc.addLine(words);
+            }
+        }
     }
 
     private static int rotationOf(File f) {

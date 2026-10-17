@@ -112,6 +112,30 @@ final class EngineHolder {
         return d == null ? null : (String) d.get("e164");
     }
 
+    /** True when an SMS sender / caller looks like a phone number (not a business header such as VK-HDFCBK). */
+    static boolean isPhoneSender(String raw) {
+        return raw != null && raw.trim().matches("^[+\\d][\\d\\s()-]{6,}$");
+    }
+
+    /**
+     * The key Second Look files a sender under: E.164 for phone numbers (digits only if it can't be parsed),
+     * the cleaned upper-case header for business senders. Null when there is nothing usable.
+     */
+    static String senderKey(Context c, String raw) {
+        if (raw == null) return null;
+        String s = raw.trim();
+        if (s.isEmpty() || s.length() > 64) return null;
+        if (isPhoneSender(s)) {
+            String e = null;
+            try { e = e164(c, s); } catch (RuntimeException ignored) { /* fall back to the digits */ }
+            if (e == null || e.isEmpty()) e = Security.cleanNumber(s);
+            return e.isEmpty() ? null : e;
+        }
+        String h = s.toUpperCase(java.util.Locale.ROOT).replaceAll("[^A-Z0-9-]", "");
+        if (h.length() > 20) h = h.substring(0, 20);
+        return h.isEmpty() ? null : h;
+    }
+
     /** Number check plus the user's own reports (kept on the phone). */
     @SuppressWarnings("unchecked")
     static Map<String, Object> analyzeNumber(Context c, String number) {

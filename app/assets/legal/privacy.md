@@ -15,9 +15,14 @@ Effective {{EFFECTIVE}} · Version {{VERSION}}
 | Text, links, numbers, UPI IDs you check | When you tap Check | To give you a result |
 | Screenshots and QR photos you choose | When you pick one | Read on the device to find the payment details or QR code |
 | Documents you choose to check (PDF or photo of an ID, passport, bank statement or letter) | Only when you pick one in Document check | Read on the device to look for signs of editing or wrong numbers. Never uploaded or stored; the temporary copy is deleted when you leave the screen. Aadhaar numbers are shown masked |
-| Alerts history, numbers you marked, trusted person, settings | Saved by you | So the app can show them and use your block list |
+| Alerts list: every SMS and call the shields check, including ones that look normal (sender or number, time, result and, for SMS, a short preview with any OTP-style codes hidden) | While a shield is ON. You can switch "List every checked SMS and call" off to keep only suspicious ones | So you can see what was checked and act on it. Kept on the phone (up to 300 entries) until you clear it |
+| A list of senders seen before, stored only as one-way scrambled (salted hash) codes, not as numbers | While a shield is ON | To show a "New sender" badge. The numbers can't be read back from it |
+| Numbers you marked (Block, Spam, Fraud, Safe) and your comments on them | When you mark a number | To block or label that number and show your history of marks. Not shared unless you separately report a number to warn others |
+| Trusted person, settings | Saved by you | So the app can use them |
 
-On a phone, alerts history and your trusted person are stored encrypted, and app data is excluded from cloud backups. On a laptop, this data stays in your browser's own storage on that computer. "Delete all my data" in Settings removes it. Second Look never reads your SMS inbox, call log or contacts. On the laptop web version inside Claude, a document photo you add there is read by AI on your own Claude account.
+The optional call popup uses Android's "Display over other apps" permission, which you grant yourself, only to show who may be calling while an unknown number rings. The "Chat on WhatsApp" button only opens that app with the number; Second Look sends nothing to WhatsApp and can't know in advance whether the number uses it.
+
+On a phone, alerts history, marked numbers and your trusted person are stored encrypted, and app data is excluded from cloud backups. On a laptop, this data stays in your browser's own storage on that computer. "Delete all my data" in Settings removes it. Second Look never reads your SMS inbox, call log or contacts. On the laptop web version inside Claude, a document photo you add there is read by AI on your own Claude account.
 
 ## 2. Data our server receives
 

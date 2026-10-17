@@ -13,10 +13,11 @@ import com.secondlook.engine.Json;
 import java.util.List;
 import java.util.Map;
 
-/** Heads-up notifications for SMS and call verdicts. */
+/** Heads-up notifications for SMS and call verdicts, and a quiet one for new senders that look normal. */
 final class Notifier {
     static final String CH_ALERTS = "sl_alerts";
     static final String CH_CALLER = "sl_caller";
+    static final String CH_QUIET = "sl_new_sender";
 
     private Notifier() { }
 
@@ -27,8 +28,52 @@ final class Notifier {
         a.setDescription(I18n.t(c, "Warnings about suspicious SMS and calls"));
         NotificationChannel b = new NotificationChannel(CH_CALLER, I18n.t(c, "Who's calling"), NotificationManager.IMPORTANCE_HIGH);
         b.setDescription(I18n.t(c, "Shows what kind of caller is ringing (person, business, telemarketer, bot or scam)"));
+        NotificationChannel q = new NotificationChannel(CH_QUIET, I18n.t(c, "New sender checks"), NotificationManager.IMPORTANCE_LOW);
+        q.setDescription(I18n.t(c, "A quiet note when a message from a new number looks normal"));
+        q.setShowBadge(false);
         nm.createNotificationChannel(a);
         nm.createNotificationChannel(b);
+        nm.createNotificationChannel(q);
+    }
+
+    /** True if the app may post notifications at all (Android 13+: the user granted it; any version: not switched off). */
+    static boolean allowed(Context c) {
+        try {
+            NotificationManager nm = c.getSystemService(NotificationManager.class);
+            return nm != null && nm.areNotificationsEnabled();
+        } catch (RuntimeException e) {
+            return false;
+        }
+    }
+
+    /** True if the "Scam alerts" channel is switched on (the user can turn single channels off in Settings). */
+    static boolean alertChannelOn(Context c) {
+        try {
+            NotificationManager nm = c.getSystemService(NotificationManager.class);
+            if (nm == null) return false;
+            ensureChannels(c);
+            NotificationChannel ch = nm.getNotificationChannel(CH_ALERTS);
+            return ch != null && ch.getImportance() != NotificationManager.IMPORTANCE_NONE;
+        } catch (RuntimeException e) {
+            return false;
+        }
+    }
+
+    private static String testPrefix(Context c, boolean test) { return test ? I18n.t(c, "Test alert") + " · " : ""; }
+
+    /** Quiet, low-importance note: a message from a phone number seen for the first time was checked and looks normal. */
+    static void newSender(Context c, String sender, String alertId) {
+        ensureChannels(c);
+        Notification.Builder b = new Notification.Builder(c, CH_QUIET)
+                .setSmallIcon(R.drawable.ic_stat_shield)
+                .setContentTitle(I18n.t(c, "New sender checked: looks normal"))
+                .setContentText(sender)
+                .setColor(0xFF2346E0)
+                .setCategory(Notification.CATEGORY_STATUS)
+                .setOnlyAlertOnce(true)
+                .setContentIntent(openApp(c, alertId))
+                .setAutoCancel(true);
+        c.getSystemService(NotificationManager.class).notify(alertId.hashCode(), b.build());
     }
 
     @SuppressWarnings("unchecked")
@@ -51,7 +96,39 @@ final class Notifier {
         return id == null ? en : I18n.reason(c, String.valueOf(id), en);
     }
 
-    private static PendingIntent openApp(Context c, String alertId) {
+    /** Titles of up to max warning signs (weight > 0), in the chosen language. */
+    @SuppressWarnings("unchecked")
+    static List<String> reasonTitles(Context c, Map<String, Object> result, int max) {
+        List<String> out = new java.util.ArrayList<>();
+        Object list = result.get("reasons");
+        if (!(list instanceof List)) return out;
+        for (Object o : (List<Object>) list) {
+            if (out.size() >= max) break;
+            if (!(o instanceof Map)) continue;
+            Map<String, Object> r = Json.obj(o);
+            if (!(r.get("weight") instanceof Number) || Json.num(r.get("weight")) <= 0) continue;
+            Object id = r.get("id"), title = r.get("title");
+            String en = title == null ? "" : String.valueOf(title);
+            String t = id == null ? en : I18n.reason(c, String.valueOf(id), en);
+            if (t != null && !t.isEmpty()) out.add(t);
+        }
+        return out;
+    }
+
+    /** The caller's kind ("Personal mobile number", "Telemarketer"...), in the chosen language. */
+    @SuppressWarnings("unchecked")
+    static String callerLabel(Context c, Map<String, Object> result) {
+        Object infoO = result.get("info");
+        Map<String, Object> info = infoO instanceof Map ? (Map<String, Object>) infoO : null;
+        Object callerO = info == null ? null : info.get("caller");
+        Map<String, Object> caller = callerO instanceof Map ? (Map<String, Object>) callerO : null;
+        if (caller == null) return I18n.t(c, "Unknown caller");
+        Object enLabel = caller.get("label");
+        String en = enLabel == null ? "" : String.valueOf(enLabel);
+        return caller.get("kind") != null ? I18n.caller(c, String.valueOf(caller.get("kind")), en) : en;
+    }
+
+    static PendingIntent openApp(Context c, String alertId) {
         Intent i = new Intent(c, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP).putExtra("alertId", alertId);
         return PendingIntent.getActivity(c, alertId.hashCode(), i, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
     }
@@ -67,15 +144,17 @@ final class Notifier {
         return new Notification.Action.Builder(null, I18n.t(c, "Ask {name}", "name", name.isEmpty() ? I18n.t(c, "trusted person") : name), pi).build();
     }
 
+    static void sms(Context c, String sender, Map<String, Object> result, String alertId) { sms(c, sender, result, alertId, false); }
+
     @SuppressWarnings("unchecked")
-    static void sms(Context c, String sender, Map<String, Object> result, String alertId) {
+    static void sms(Context c, String sender, Map<String, Object> result, String alertId, boolean test) {
         ensureChannels(c);
         Map<String, Object> level = (Map<String, Object>) result.get("level");
         String key = (String) level.get("key");
         String reason = firstReasonTitle(c, result);
         Notification.Builder b = new Notification.Builder(c, CH_ALERTS)
                 .setSmallIcon(R.drawable.ic_stat_shield)
-                .setContentTitle(I18n.t(c, "danger".equals(key) ? "Likely scam SMS" : "Suspicious SMS") + " " + I18n.t(c, "from") + " " + sender)
+                .setContentTitle(testPrefix(c, test) + I18n.t(c, "danger".equals(key) ? "Likely scam SMS" : "Suspicious SMS") + " " + I18n.t(c, "from") + " " + sender)
                 .setContentText(reason != null ? reason : I18n.t(c, "Tap to see why"))
                 .setStyle(new Notification.BigTextStyle().bigText((reason != null ? reason + "\n" : "") + I18n.t(c, "Don't tap links or share OTPs. Tap to see why.")))
                 .setColor("danger".equals(key) ? 0xFFC0262D : 0xFF9A5B00)
@@ -83,16 +162,18 @@ final class Notifier {
                 .setContentIntent(openApp(c, alertId))
                 .setAutoCancel(true);
         Notification.Action tell = tellTrusted(c, I18n.t(c, "an SMS from {who}", "who", sender));
-        if (tell != null && "danger".equals(key)) b.addAction(tell);
+        if (tell != null && "danger".equals(key) && !test) b.addAction(tell);
         c.getSystemService(NotificationManager.class).notify(alertId.hashCode(), b.build());
     }
 
+    static void call(Context c, String number, Map<String, Object> result, String alertId) { call(c, number, result, alertId, false); }
+
     @SuppressWarnings("unchecked")
-    static void call(Context c, String number, Map<String, Object> result, String alertId) {
+    static void call(Context c, String number, Map<String, Object> result, String alertId, boolean test) {
         ensureChannels(c);
         Map<String, Object> info = (Map<String, Object>) result.get("info");
-        Map<String, Object> caller = (Map<String, Object>) info.get("caller");
-        Map<String, Object> d = (Map<String, Object>) info.get("numberDetails");
+        Map<String, Object> caller = info == null ? null : (Map<String, Object>) info.get("caller");
+        Map<String, Object> d = info == null ? null : (Map<String, Object>) info.get("numberDetails");
         String key = (String) ((Map<String, Object>) result.get("level")).get("key");
         StringBuilder facts = new StringBuilder();
         if (d != null) {
@@ -107,7 +188,7 @@ final class Notifier {
         String label = caller != null && caller.get("kind") != null
                 ? I18n.caller(c, String.valueOf(caller.get("kind")), enLabel == null ? "" : String.valueOf(enLabel))
                 : (enLabel == null ? "" : String.valueOf(enLabel));
-        String title = (verdict != null ? verdict + " · " : "") + label;
+        String title = testPrefix(c, test) + (verdict != null ? verdict + " · " : "") + label;
         String reason = firstReasonTitle(c, result);
         Notification.Builder b = new Notification.Builder(c, "safe".equals(key) ? CH_CALLER : CH_ALERTS)
                 .setSmallIcon(R.drawable.ic_stat_shield)

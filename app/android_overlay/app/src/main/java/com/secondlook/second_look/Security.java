@@ -225,8 +225,32 @@ final class Security {
     }
 
     static boolean isAlertId(String id) {
-        return id != null && id.matches("^(call-\\d{1,20}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$");
+        return id != null && id.matches("^((call|sms)-\\d{1,20}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$");
     }
 
     static String capText(String s, int max) { return s == null ? null : (s.length() > max ? s.substring(0, max) : s); }
+
+    private static final Pattern LINKS = Pattern.compile(
+            "(?i)(\\b(?:https?|ftp)://\\S*|\\bwww\\.\\S*|\\b[a-z0-9-]+(?:\\.[a-z0-9-]+)*\\.(?:com|in|net|org|info|top|xyz|online|site|live|club|shop|app|link|ly|me|co|io|biz|cc|tk|ml|ga|cf|gq|icu|vip|buzz|cn|ru|store|website|space|fun|click|page)\\b(?:/\\S*)?)");
+
+    /** A note the user writes on an alert: links removed, control characters dropped, at most 200 characters. */
+    static String cleanComment(String s) {
+        if (s == null) return "";
+        String t = LINKS.matcher(capText(s, 2000)).replaceAll("");
+        StringBuilder b = new StringBuilder();
+        for (int i = 0; i < t.length(); i++) {
+            char ch = t.charAt(i);
+            if (ch == '\n' || ch == '\r' || ch == '\t') ch = ' ';
+            if (ch < 0x20 || ch == 0x7f) continue;
+            if ((ch >= 0x202a && ch <= 0x202e) || (ch >= 0x2066 && ch <= 0x2069)) continue; // bidi overrides
+            b.append(ch);
+        }
+        String out = b.toString().replaceAll(" {2,}", " ").trim();
+        if (out.length() > 200) {
+            int end = 200;
+            if (Character.isHighSurrogate(out.charAt(end - 1))) end--;
+            out = out.substring(0, end).trim();
+        }
+        return out;
+    }
 }

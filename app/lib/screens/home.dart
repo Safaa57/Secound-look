@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 import '../i18n/i18n.dart';
 import '../native.dart';
 import '../theme.dart';
+import '../widgets/alert_card.dart';
 import '../widgets/common.dart';
 import 'document_check.dart';
 import 'panic.dart';
 import 'payment_check.dart';
-import 'result.dart';
+import 'shield_health.dart';
 import 'upi_check.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -20,6 +21,7 @@ class HomeScreen extends StatefulWidget {
 class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   Map<String, dynamic> s = {};
   Map<String, dynamic> sec = {};
+  Map<String, dynamic>? health;
   bool captured = false;
   List<Map<String, dynamic>> alerts = [];
   bool busy = false;
@@ -29,11 +31,13 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     Native.instance.onScreenCaptured = (c) => mounted ? setState(() => captured = c) : null;
+    alertsVersion.addListener(refresh);
     refresh();
   }
 
   @override
   void dispose() {
+    alertsVersion.removeListener(refresh);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -48,10 +52,12 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final st = await Native.instance.status();
     final h = await Native.instance.history();
     final sc = await Native.instance.securityStatus();
+    final hh = await Native.instance.shieldHealth();
     if (!mounted) return;
     setState(() {
       s = st;
       sec = sc;
+      health = hh;
       captured = st['screenCaptured'] == true;
       alerts = h;
     });
@@ -68,6 +74,8 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       s = st;
       busy = false;
     });
+    final hh = await Native.instance.shieldHealth();
+    if (mounted) setState(() => health = hh);
   }
 
   /// Prominent disclosure (Google Play policy): explain exactly what is read and why, before the system permission prompt.
@@ -81,7 +89,7 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           content: Text(sms
               ? (ios
                   ? tr('Second Look will check text messages from unknown senders and move likely scams to Junk. Checks happen on this iPhone. Messages are not uploaded, stored on a server or shared.')
-                  : tr('Second Look will receive each new SMS (sender and text) while SMS Shield is on, to check it for scams and warn you. Checks happen on this phone. SMS are not uploaded, stored on a server or shared. Only SMS that look like scams are kept in Alerts on this phone. Your phone will ask you to allow SMS access next. You can turn this off at any time.'))
+                  : tr('Second Look will receive each new SMS (sender and text) while SMS Shield is on, to check it for scams and warn you. Checks happen on this phone. SMS are not uploaded, stored on a server or shared. Each checked SMS is listed in Alerts on this phone with a short preview (codes hidden). Your phone will ask you to allow SMS access next. You can turn this off at any time.'))
               : (ios
                   ? tr('Second Look will give iPhone a list of numbers that you or many Second Look users reported, so it can label or block them. The list stays on this iPhone.')
                   : tr('Second Look will see the number of each incoming call from someone not in your contacts, to tell you who may be calling and warn about scams. It never records calls or reads your contacts or call log, and numbers are not uploaded. Your phone will ask you to choose Second Look as your caller ID & spam app next. You can turn this off at any time.'))),
@@ -98,12 +106,18 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   void _open(Widget page) => Navigator.of(context).push(MaterialPageRoute(builder: (_) => page));
 
+  Future<void> _openHealth() async {
+    await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ShieldHealthScreen()));
+    if (mounted) refresh();
+  }
+
   @override
   Widget build(BuildContext context) {
     final sms = s['smsShield'] == true, call = s['callShield'] == true;
     final active = (sms ? 1 : 0) + (call ? 1 : 0);
     final cs = Theme.of(context).colorScheme;
     final caught = alerts.where((a) => a['level'] != 'safe').length;
+    final broken = shieldBroken(health);
     final headline = active == 2 ? tr('Both shields are on') : active == 1 ? tr('One shield is on') : tr('Shields are off');
 
     return Scaffold(
@@ -159,6 +173,10 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 title: ios ? tr('This iPhone is jailbroken') : tr('This phone is rooted'),
                 text: tr('Apps on it can bypass normal security. Be extra careful with banking and OTPs.'),
               ),
+            ],
+            if (!web && broken != null) ...[
+              const SizedBox(height: 14),
+              _BrokenBanner(which: broken, restricted: health?['restrictedSettingsLikely'] == true, onTap: _openHealth),
             ],
             const SizedBox(height: 16),
             // ---- hero
@@ -244,7 +262,11 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           ])
                         : null),
               ),
-              if (s['smsNeedsPermission'] == true || s['callNeedsRole'] == true) ...[
+              if (!ios) ...[
+                const SizedBox(height: 12),
+                _HealthRow(issues: healthIssues(health), onTap: _openHealth),
+              ],
+              if (broken == null && (s['smsNeedsPermission'] == true || s['callNeedsRole'] == true)) ...[
                 const SizedBox(height: 12),
                 Panel(
                   color: SL.bg(context, 'warning'),
@@ -267,7 +289,7 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 child: Text(
                   ios || web
                       ? tr('Checks you run from the Check tab show up here.')
-                      : tr('Nothing suspicious yet. When SMS or Call Shield catches something, it shows up here and as a notification.'),
+                      : tr('Nothing checked yet. When SMS or Call Shield checks a new SMS or call, it shows up here.'),
                   style: TextStyle(color: cs.onSurface.withAlpha(170)),
                 ),
               )
@@ -406,39 +428,73 @@ class _Action extends StatelessWidget {
   }
 }
 
-/// One alert in a list.
-class AlertTile extends StatelessWidget {
-  const AlertTile({super.key, required this.a});
-  final Map<String, dynamic> a;
+/// "Protection check" row in the shields section, with a warning dot when something needs attention.
+class _HealthRow extends StatelessWidget {
+  const _HealthRow({required this.issues, required this.onTap});
+  final int issues;
+  final VoidCallback onTap;
   @override
   Widget build(BuildContext context) {
-    final level = a['level'] as String? ?? 'safe';
+    final cs = Theme.of(context).colorScheme;
     return Panel(
-      padding: const EdgeInsets.all(14),
-      onTap: () {
-        final r = (a['result'] as Map?)?.cast<String, dynamic>();
-        if (r != null) Navigator.of(context).push(MaterialPageRoute(builder: (_) => ResultScreen(result: r, title: a['title'] as String? ?? 'Alert')));
-      },
+      onTap: onTap,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       child: Row(children: [
-        Container(
-          width: 42,
-          height: 42,
-          decoration: BoxDecoration(color: SL.bg(context, level), borderRadius: BorderRadius.circular(12)),
-          child: Icon(a['kind'] == 'call' ? Icons.call_rounded : Icons.sms_rounded, color: SL.fg(context, level)),
+        Stack(clipBehavior: Clip.none, children: [
+          Icon(Icons.health_and_safety_rounded, color: cs.primary, size: 28),
+          if (issues > 0)
+            Positioned(
+              right: -2,
+              top: -2,
+              child: Container(
+                width: 11,
+                height: 11,
+                decoration: BoxDecoration(color: SL.fg(context, 'danger'), shape: BoxShape.circle, border: Border.all(color: cs.surface, width: 1.5)),
+              ),
+            ),
+        ]),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(tr('Protection check'), style: Theme.of(context).textTheme.titleMedium),
+            Text(
+              issues > 0 ? tr('Something may stop your shields. Tap to fix.') : tr('See if anything stops your shields, and send a test alert'),
+              style: TextStyle(fontSize: 13.5, color: issues > 0 ? SL.fg(context, 'warning') : cs.onSurface.withAlpha(160)),
+            ),
+          ]),
         ),
+        Icon(Icons.chevron_right_rounded, color: cs.onSurface.withAlpha(120)),
+      ]),
+    );
+  }
+}
+
+/// Shown when a shield is switched on but can't work (missing permission, role or notifications).
+class _BrokenBanner extends StatelessWidget {
+  const _BrokenBanner({required this.which, required this.restricted, required this.onTap});
+  final String which;
+  final bool restricted;
+  final VoidCallback onTap;
+  @override
+  Widget build(BuildContext context) {
+    final level = restricted || which == 'sms' ? 'danger' : 'warning';
+    final fg = SL.fg(context, level);
+    return Panel(
+      onTap: onTap,
+      color: SL.bg(context, level),
+      borderColor: fg.withAlpha(110),
+      child: Row(children: [
+        Icon(Icons.gpp_maybe_rounded, color: fg, size: 30),
         const SizedBox(width: 12),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('${a['title']}', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w700)),
-            Text('${a['summary'] ?? ''}', maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13.5, color: Theme.of(context).colorScheme.onSurface.withAlpha(160))),
+            Text(which == 'sms' ? tr('SMS Shield is on but isn\'t working yet') : tr('Call Shield is on but isn\'t working yet'),
+                style: TextStyle(fontWeight: FontWeight.w800, color: fg)),
+            const SizedBox(height: 3),
+            Text(tr('New SMS or calls may not be checked. Tap to open Protection check and fix it.'), style: const TextStyle(fontSize: 14, height: 1.4)),
           ]),
         ),
-        const SizedBox(width: 8),
-        Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-          Pill(level == 'danger' ? tr('Scam') : level == 'warning' ? tr('Suspicious') : tr('OK'), fg: SL.fg(context, level), bg: SL.bg(context, level)),
-          const SizedBox(height: 4),
-          Text(timeAgo((a['at'] as num).toInt()), style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withAlpha(130))),
-        ]),
+        Icon(Icons.chevron_right_rounded, color: fg),
       ]),
     );
   }

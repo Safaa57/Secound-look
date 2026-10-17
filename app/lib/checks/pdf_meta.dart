@@ -1,6 +1,25 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart' show compute;
+
+import 'pdf_forensics.dart';
+
+/// PDF content forensics, run off the UI thread (in the browser it runs inline; compressed pages can't be
+/// read there, so fonts.checked is false). Never throws.
+///
+///     Future<Map<String, dynamic>> pdfForensics(Uint8List bytes)
+///
+/// Returns `{'fonts': {'checked': bool, 'count': int, 'rare': [{'name': String, 'chars': int, 'digitShare': double}]},
+///           'whiteBoxes': int}` — pass both as file.fonts / file.whiteBoxes to analyzeDocument.
+Future<Map<String, dynamic>> pdfForensics(Uint8List bytes) async {
+  try {
+    return await compute(PdfForensics.analyze, bytes);
+  } catch (_) {
+    return PdfForensics.analyze(bytes);
+  }
+}
+
 /// Reads the details a PDF records about itself: which program made it, when it was created and changed,
 /// and how many times it was saved. Pure Dart, so it also works in the browser. Nothing is uploaded.
 ///

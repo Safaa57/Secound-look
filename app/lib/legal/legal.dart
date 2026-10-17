@@ -6,7 +6,7 @@ import '../i18n/i18n.dart';
 
 /// Version of the Terms and Privacy Policy. Change it when either document changes in a meaningful way:
 /// everyone is then asked to accept the new version.
-const kLegalVersion = '2026-10-17';
+const kLegalVersion = '2026-10-18';
 
 /// Who runs this copy of Second Look. Set these at build time (see docs/legal/LEGAL_CHECKLIST.md), e.g.
 /// --dart-define=SL_OPERATOR="Ayesha Khan (Second Look)" --dart-define=SL_GRIEVANCE_EMAIL=grievance@example.in

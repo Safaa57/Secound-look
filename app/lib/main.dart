@@ -16,8 +16,10 @@ import 'screens/onboarding.dart';
 import 'screens/payment_check.dart';
 import 'screens/result.dart';
 import 'screens/settings.dart';
+import 'screens/splash.dart';
 import 'theme.dart';
 import 'voice.dart';
+import 'widgets/alert_card.dart';
 
 final navKey = GlobalKey<NavigatorState>();
 
@@ -90,6 +92,7 @@ class _RootState extends State<Root> with WidgetsBindingObserver {
   bool unlocked = false;
   bool _agreedNow = false;
   bool _langReady = false;
+  bool _splashDone = false;
   DateTime? leftAt;
 
   @override
@@ -210,8 +213,27 @@ class _RootState extends State<Root> with WidgetsBindingObserver {
     navKey.currentState?.push(MaterialPageRoute(builder: (_) => ResultScreen(result: r, title: item.first['title'] as String? ?? 'Alert')));
   }
 
+  /// The short intro on every launch, then a fade into the app (onboarding, lock screen or the app itself).
   @override
   Widget build(BuildContext context) {
+    final noMotion = MediaQuery.of(context).disableAnimations;
+    return AnimatedSwitcher(
+      duration: Duration(milliseconds: noMotion ? 0 : 420),
+      switchInCurve: Curves.easeOut,
+      switchOutCurve: Curves.easeIn,
+      child: _splashDone
+          ? KeyedSubtree(key: const ValueKey('app'), child: _content(context))
+          : SplashScreen(
+              key: const ValueKey('splash'),
+              status: status,
+              onDone: () {
+                if (mounted) setState(() => _splashDone = true);
+              },
+            ),
+    );
+  }
+
+  Widget _content(BuildContext context) {
     final s = status;
     if (s == null) return const Scaffold(body: Center(child: CircularProgressIndicator()));
     if (s['onboarded'] != true) {
@@ -263,6 +285,7 @@ class _ShellState extends State<Shell> {
         onDestinationSelected: (i) {
           setState(() => tab = i);
           if (i == 0) _homeKey.currentState?.refresh();
+          if (i == 2) notifyAlertsChanged(); // new SMS/calls may have been checked while the app was open
         },
         destinations: [
           NavigationDestination(icon: const Icon(Icons.shield_outlined), selectedIcon: const Icon(Icons.shield_rounded), label: tr('Protection')),

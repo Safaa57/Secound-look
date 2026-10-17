@@ -588,6 +588,34 @@
    "doc_loan_fee": [
     "लोन मंज़ूरी, जिसके लिए पहले फ़ीस भरनी है",
     "असली लोन देने वाले अपनी फ़ीस लोन की रकम से ही काटते हैं। लोन मिलने से पहले प्रोसेसिंग, इंश्योरेंस, स्टांप ड्यूटी या GST के पैसे माँगना नकली लोन लेटर की पुरानी चाल है।"
+   ],
+   "doc_layout_odd": [
+    "कुछ शब्द बाकी लाइन से मेल नहीं खाते",
+    "कुछ शब्दों का आकार अलग है या वे आस-पास के शब्दों से ऊपर-नीचे हैं। दस्तावेज़ पर चिपकाया गया टेक्स्ट अक्सर ऐसा दिखता है। टेढ़ी या मुड़ी फ़ोटो से भी ऐसा हो सकता है, इसलिए उन शब्दों को ध्यान से देखें।"
+   ],
+   "doc_ela_regions": [
+    "फ़ोटो के कुछ हिस्से बदले गए हो सकते हैं",
+    "JPEG फ़ोटो दोबारा सेव करने पर बदले गए हिस्से अक्सर बाकी फ़ोटो से अलग दिखते हैं। इस फ़ोटो में कुछ हिस्से अलग दिखते हैं। फ़िल्टर, दोबारा सेव करना या ज़्यादा कंप्रेशन भी इसका कारण हो सकता है, इसलिए इसे सिर्फ़ संकेत मानें, सबूत नहीं।"
+   ],
+   "doc_font_rare": [
+    "कुछ अंक बाकी दस्तावेज़ से अलग फ़ॉन्ट में हैं",
+    "एक फ़ॉन्ट सिर्फ़ कुछ अक्षरों के लिए इस्तेमाल हुआ है, और वे ज़्यादातर अंक हैं। बदले गए दस्तावेज़ में नई रकम या तारीख अक्सर अलग फ़ॉन्ट में टाइप होती है।"
+   ],
+   "doc_white_boxes": [
+    "पेज के कुछ हिस्सों पर सफ़ेद डिब्बे बने हैं",
+    "PDF में टेक्स्ट के ऊपर सफ़ेद आयत बनाए गए हैं। असली अंक छिपाकर उनके ऊपर नए अंक लिखने का यह आम तरीका है।"
+   ],
+   "doc_screenshot": [
+    "यह स्क्रीनशॉट है, असली फ़ाइल नहीं",
+    "स्क्रीनशॉट में बदलाव उतनी अच्छी तरह नहीं जाँचे जा सकते जितने असली फ़ाइल में। असली PDF या कागज़ वाले दस्तावेज़ की फ़ोटो माँगें।"
+   ],
+   "doc_type_unknown": [
+    "पता नहीं चल पाया कि यह किस तरह का दस्तावेज़ है",
+    "सिर्फ़ सामान्य जाँच की गई। अगर यह पहचान पत्र, स्टेटमेंट या नोटिस है, तो साफ़ फ़ोटो या असली PDF से मदद मिलेगी।"
+   ],
+   "test_alert": [
+    "यह Second Look का टेस्ट अलर्ट है",
+    "यह जाँचने के लिए भेजा गया है कि अलर्ट ठीक से दिखते हैं। कुछ करने की ज़रूरत नहीं।"
    ]
   },
   "kn": {
@@ -1178,6 +1206,34 @@
    "doc_loan_fee": [
     "ಮೊದಲು ಶುಲ್ಕ ಕಟ್ಟಬೇಕಾದ ಸಾಲ ಮಂಜೂರಾತಿ",
     "ನಿಜವಾದ ಸಾಲದಾತರು ತಮ್ಮ ಶುಲ್ಕವನ್ನು ಸಾಲದ ಮೊತ್ತದಿಂದಲೇ ಕಡಿತ ಮಾಡುತ್ತಾರೆ. ಸಾಲ ಕೊಡುವ ಮೊದಲು ಪ್ರೊಸೆಸಿಂಗ್, ವಿಮೆ, ಸ್ಟ್ಯಾಂಪ್ ಡ್ಯೂಟಿ ಅಥವಾ GST ಹಣ ಕೇಳುವುದು ನಕಲಿ ಸಾಲ ಪತ್ರದ ಹಳೆಯ ತಂತ್ರ."
+   ],
+   "doc_layout_odd": [
+    "ಕೆಲವು ಪದಗಳು ಉಳಿದ ಸಾಲಿಗೆ ಹೊಂದುತ್ತಿಲ್ಲ",
+    "ಕೆಲವು ಪದಗಳ ಗಾತ್ರ ಬೇರೆ ಇದೆ ಅಥವಾ ಅಕ್ಕಪಕ್ಕದ ಪದಗಳಿಗಿಂತ ಮೇಲೆ-ಕೆಳಗೆ ಇವೆ. ದಾಖಲೆಯ ಮೇಲೆ ಅಂಟಿಸಿದ ಪಠ್ಯ ಹೀಗೆಯೇ ಕಾಣುತ್ತದೆ. ಓರೆಯಾದ ಅಥವಾ ಬಾಗಿದ ಫೋಟೋದಿಂದಲೂ ಹೀಗಾಗಬಹುದು, ಆದ್ದರಿಂದ ಆ ಪದಗಳನ್ನು ಗಮನವಿಟ್ಟು ನೋಡಿ."
+   ],
+   "doc_ela_regions": [
+    "ಫೋಟೋದ ಕೆಲವು ಭಾಗಗಳನ್ನು ಬದಲಿಸಿರಬಹುದು",
+    "JPEG ಫೋಟೋವನ್ನು ಮತ್ತೆ ಸೇವ್ ಮಾಡಿದಾಗ ಬದಲಿಸಿದ ಭಾಗಗಳು ಉಳಿದ ಫೋಟೋಗಿಂತ ಬೇರೆಯಾಗಿ ಕಾಣುತ್ತವೆ. ಈ ಫೋಟೋದಲ್ಲಿ ಕೆಲವು ಭಾಗಗಳು ಬೇರೆಯಾಗಿ ಕಾಣುತ್ತವೆ. ಫಿಲ್ಟರ್, ಮತ್ತೆ ಸೇವ್ ಮಾಡುವುದು ಅಥವಾ ಹೆಚ್ಚು ಕಂಪ್ರೆಷನ್‌ನಿಂದಲೂ ಹೀಗಾಗಬಹುದು, ಆದ್ದರಿಂದ ಇದನ್ನು ಸುಳಿವು ಎಂದು ಮಾತ್ರ ಪರಿಗಣಿಸಿ, ಪುರಾವೆ ಅಲ್ಲ."
+   ],
+   "doc_font_rare": [
+    "ಕೆಲವು ಸಂಖ್ಯೆಗಳು ಉಳಿದ ದಾಖಲೆಗಿಂತ ಬೇರೆ ಫಾಂಟ್‌ನಲ್ಲಿವೆ",
+    "ಒಂದು ಫಾಂಟ್ ಕೆಲವೇ ಅಕ್ಷರಗಳಿಗೆ ಬಳಸಲಾಗಿದೆ, ಅವು ಹೆಚ್ಚಾಗಿ ಸಂಖ್ಯೆಗಳು. ಬದಲಿಸಿದ ದಾಖಲೆಯಲ್ಲಿ ಹೊಸ ಮೊತ್ತ ಅಥವಾ ದಿನಾಂಕ ಹೆಚ್ಚಾಗಿ ಬೇರೆ ಫಾಂಟ್‌ನಲ್ಲಿ ಟೈಪ್ ಆಗುತ್ತದೆ."
+   ],
+   "doc_white_boxes": [
+    "ಪುಟದ ಕೆಲವು ಭಾಗಗಳ ಮೇಲೆ ಬಿಳಿ ಚೌಕಗಳನ್ನು ಎಳೆಯಲಾಗಿದೆ",
+    "PDF ಪಠ್ಯದ ಮೇಲೆ ಬಿಳಿ ಆಯತಗಳನ್ನು ಎಳೆಯುತ್ತದೆ. ನಿಜವಾದ ಸಂಖ್ಯೆಗಳನ್ನು ಮುಚ್ಚಿ ಅವುಗಳ ಮೇಲೆ ಹೊಸ ಸಂಖ್ಯೆಗಳನ್ನು ಬರೆಯುವ ಸಾಮಾನ್ಯ ವಿಧಾನ ಇದು."
+   ],
+   "doc_screenshot": [
+    "ಇದು ಸ್ಕ್ರೀನ್‌ಶಾಟ್, ಮೂಲ ಫೈಲ್ ಅಲ್ಲ",
+    "ಸ್ಕ್ರೀನ್‌ಶಾಟ್‌ನಲ್ಲಿ ಬದಲಾವಣೆಗಳನ್ನು ಮೂಲ ಫೈಲ್‌ನಷ್ಟು ಚೆನ್ನಾಗಿ ಪರಿಶೀಲಿಸಲು ಆಗುವುದಿಲ್ಲ. ಮೂಲ PDF ಅಥವಾ ಕಾಗದದ ದಾಖಲೆಯ ಫೋಟೋ ಕೇಳಿ."
+   ],
+   "doc_type_unknown": [
+    "ಇದು ಯಾವ ರೀತಿಯ ದಾಖಲೆ ಎಂದು ತಿಳಿಯಲಿಲ್ಲ",
+    "ಸಾಮಾನ್ಯ ಪರಿಶೀಲನೆ ಮಾತ್ರ ಮಾಡಲಾಗಿದೆ. ಇದು ಗುರುತಿನ ಚೀಟಿ, ಸ್ಟೇಟ್‌ಮೆಂಟ್ ಅಥವಾ ನೋಟಿಸ್ ಆಗಿದ್ದರೆ, ಸ್ಪಷ್ಟ ಫೋಟೋ ಅಥವಾ ಮೂಲ PDF ಸಹಾಯ ಮಾಡುತ್ತದೆ."
+   ],
+   "test_alert": [
+    "ಇದು Second Look ನಿಂದ ಪರೀಕ್ಷಾ ಎಚ್ಚರಿಕೆ",
+    "ಎಚ್ಚರಿಕೆಗಳು ಸರಿಯಾಗಿ ಕಾಣುತ್ತವೆಯೇ ಎಂದು ನೋಡಲು ಇದನ್ನು ಕಳುಹಿಸಲಾಗಿದೆ. ಏನನ್ನೂ ಮಾಡಬೇಕಿಲ್ಲ."
    ]
   }
  },
@@ -1215,7 +1271,19 @@
    "PAN: use \"Verify Your PAN\" on the Income Tax e-filing website (incometax.gov.in).": "PAN: इनकम टैक्स ई-फ़ाइलिंग वेबसाइट (incometax.gov.in) पर \"Verify Your PAN\" इस्तेमाल करें।",
    "Passport: ask to see the original passport and compare the photo page and code lines carefully.": "पासपोर्ट: असली पासपोर्ट दिखाने को कहें, और फ़ोटो वाले पेज व कोड वाली लाइनों को ध्यान से मिलाएँ।",
    "Bank statement: ask for it to be downloaded from net banking in front of you, shared through the RBI Account Aggregator system, or confirmed by the bank.": "बैंक स्टेटमेंट: कहें कि इसे आपके सामने नेट बैंकिंग से डाउनलोड करें, RBI के Account Aggregator सिस्टम से भेजें, या बैंक से इसकी पुष्टि करवाएँ।",
-   "Government or police notice: look up the office's number on its official .gov.in website and call them. Agencies never ask for money to close cases.": "सरकारी या पुलिस नोटिस: उस दफ़्तर का नंबर उसकी आधिकारिक .gov.in वेबसाइट पर ढूँढें और खुद कॉल करें। एजेंसियाँ केस बंद करने के लिए कभी पैसे नहीं माँगतीं।"
+   "Government or police notice: look up the office's number on its official .gov.in website and call them. Agencies never ask for money to close cases.": "सरकारी या पुलिस नोटिस: उस दफ़्तर का नंबर उसकी आधिकारिक .gov.in वेबसाइट पर ढूँढें और खुद कॉल करें। एजेंसियाँ केस बंद करने के लिए कभी पैसे नहीं माँगतीं।",
+   "Passport: ask to see the original passport and compare the photo page and code lines carefully. For anything else, use only the official Passport Seva website (passportindia.gov.in).": "Passport: असली पासपोर्ट दिखाने को कहें और फ़ोटो वाला पेज और कोड लाइनें ध्यान से मिलाएँ। बाकी किसी भी काम के लिए सिर्फ़ आधिकारिक Passport Seva वेबसाइट (passportindia.gov.in) इस्तेमाल करें।",
+   "Voter ID: search the EPIC number on the official Voters' Service Portal (voters.eci.gov.in).": "Voter ID: आधिकारिक Voters' Service Portal (voters.eci.gov.in) पर EPIC नंबर खोजें।",
+   "Driving licence: check the DL number with \"DL status\" on the official Parivahan website (parivahan.gov.in).": "Driving licence: आधिकारिक Parivahan वेबसाइट (parivahan.gov.in) पर \"DL status\" से DL नंबर जाँचें।",
+   "Cheque: confirm with the bank that issued it, using the number on the bank's official website. Don't hand anything over until the money is in your account; a cheque can bounce days later.": "Cheque: जिस बैंक का चेक है, उसकी आधिकारिक वेबसाइट पर दिए नंबर से पुष्टि करें। पैसा आपके खाते में आने तक कुछ न दें; चेक कुछ दिन बाद भी बाउंस हो सकता है।",
+   "Salary slip: confirm with the employer's HR department using contact details from the company's official website, and compare it with the salary credits in the bank statement.": "Salary slip: कंपनी की आधिकारिक वेबसाइट पर दिए संपर्क से HR विभाग से पुष्टि करें, और बैंक स्टेटमेंट में आई सैलरी से मिलाएँ।",
+   "ITR: ask for the e-verified ITR-V, or have the person show the return after logging in to the Income Tax e-filing website (incometax.gov.in).": "ITR: e-verified ITR-V माँगें, या व्यक्ति से Income Tax ई-फ़ाइलिंग वेबसाइट (incometax.gov.in) पर लॉग-इन करके रिटर्न दिखाने को कहें।",
+   "GST: check the GSTIN with \"Search Taxpayer\" on the official GST portal (gst.gov.in). The name shown must match the document.": "GST: आधिकारिक GST पोर्टल (gst.gov.in) पर \"Search Taxpayer\" से GSTIN जाँचें। वहाँ दिखा नाम दस्तावेज़ से मेल खाना चाहिए।",
+   "Invoice: check the seller's GSTIN with \"Search Taxpayer\" on the official GST portal (gst.gov.in) before you pay.": "Invoice: पैसे देने से पहले आधिकारिक GST पोर्टल (gst.gov.in) पर \"Search Taxpayer\" से विक्रेता का GSTIN जाँचें।",
+   "Bill: pay only through the provider's official website or app, or your UPI app's bill-payment section. Never pay a number from an SMS or call that threatens disconnection.": "Bill: सिर्फ़ कंपनी की आधिकारिक वेबसाइट या app से, या अपने UPI app के बिल-पेमेंट सेक्शन से भुगतान करें। कनेक्शन काटने की धमकी देने वाले SMS या कॉल में दिए नंबर पर कभी पैसे न भेजें।",
+   "Job offer: confirm with the company's HR using contact details from its official website. Real employers never ask you to pay to join.": "Job offer: कंपनी की आधिकारिक वेबसाइट पर दिए संपर्क से HR से पुष्टि करें। असली कंपनियाँ नौकरी देने के लिए कभी पैसे नहीं माँगतीं।",
+   "Payment screenshot: use the Payment check instead, and look for the money in your own bank or UPI app. A screenshot is not proof.": "Payment screenshot: इसके लिए Payment जाँच इस्तेमाल करें, और अपने बैंक या UPI app में पैसा आया है या नहीं देखें। स्क्रीनशॉट सबूत नहीं है।",
+   "Certificate: confirm it with the university or board that issued it, or ask for it through DigiLocker (digilocker.gov.in).": "Certificate: जारी करने वाली यूनिवर्सिटी या बोर्ड से पुष्टि करें, या इसे DigiLocker (digilocker.gov.in) से माँगें।"
   },
   "kn": {
    "Don't open the link, and don't enter any details if you already did.": "ಲಿಂಕ್ ತೆರೆಯಬೇಡಿ. ಈಗಾಗಲೇ ತೆರೆದಿದ್ದರೆ, ಅದರಲ್ಲಿ ಯಾವುದೇ ವಿವರ ಹಾಕಬೇಡಿ.",
@@ -1250,7 +1318,19 @@
    "PAN: use \"Verify Your PAN\" on the Income Tax e-filing website (incometax.gov.in).": "PAN: ಆದಾಯ ತೆರಿಗೆ ಇ-ಫೈಲಿಂಗ್ ವೆಬ್‌ಸೈಟ್‌ನಲ್ಲಿ (incometax.gov.in) \"Verify Your PAN\" ಬಳಸಿ.",
    "Passport: ask to see the original passport and compare the photo page and code lines carefully.": "ಪಾಸ್‌ಪೋರ್ಟ್: ಮೂಲ ಪಾಸ್‌ಪೋರ್ಟ್ ತೋರಿಸಲು ಕೇಳಿ, ಮತ್ತು ಫೋಟೋ ಪುಟ ಹಾಗೂ ಕೋಡ್ ಸಾಲುಗಳನ್ನು ಎಚ್ಚರಿಕೆಯಿಂದ ಹೋಲಿಸಿ.",
    "Bank statement: ask for it to be downloaded from net banking in front of you, shared through the RBI Account Aggregator system, or confirmed by the bank.": "ಬ್ಯಾಂಕ್ ಸ್ಟೇಟ್‌ಮೆಂಟ್: ಅದನ್ನು ನಿಮ್ಮ ಎದುರೇ ನೆಟ್ ಬ್ಯಾಂಕಿಂಗ್‌ನಿಂದ ಡೌನ್‌ಲೋಡ್ ಮಾಡಲು, RBI ನ Account Aggregator ವ್ಯವಸ್ಥೆಯ ಮೂಲಕ ಹಂಚಿಕೊಳ್ಳಲು, ಅಥವಾ ಬ್ಯಾಂಕ್‌ನಿಂದ ಖಚಿತಪಡಿಸಲು ಕೇಳಿ.",
-   "Government or police notice: look up the office's number on its official .gov.in website and call them. Agencies never ask for money to close cases.": "ಸರ್ಕಾರಿ ಅಥವಾ ಪೊಲೀಸ್ ನೋಟಿಸ್: ಆ ಕಚೇರಿಯ ಸಂಖ್ಯೆಯನ್ನು ಅದರ ಅಧಿಕೃತ .gov.in ವೆಬ್‌ಸೈಟ್‌ನಲ್ಲಿ ಹುಡುಕಿ ನೀವೇ ಕರೆ ಮಾಡಿ. ಏಜೆನ್ಸಿಗಳು ಕೇಸ್ ಮುಚ್ಚಲು ಎಂದಿಗೂ ಹಣ ಕೇಳುವುದಿಲ್ಲ."
+   "Government or police notice: look up the office's number on its official .gov.in website and call them. Agencies never ask for money to close cases.": "ಸರ್ಕಾರಿ ಅಥವಾ ಪೊಲೀಸ್ ನೋಟಿಸ್: ಆ ಕಚೇರಿಯ ಸಂಖ್ಯೆಯನ್ನು ಅದರ ಅಧಿಕೃತ .gov.in ವೆಬ್‌ಸೈಟ್‌ನಲ್ಲಿ ಹುಡುಕಿ ನೀವೇ ಕರೆ ಮಾಡಿ. ಏಜೆನ್ಸಿಗಳು ಕೇಸ್ ಮುಚ್ಚಲು ಎಂದಿಗೂ ಹಣ ಕೇಳುವುದಿಲ್ಲ.",
+   "Passport: ask to see the original passport and compare the photo page and code lines carefully. For anything else, use only the official Passport Seva website (passportindia.gov.in).": "Passport: ಮೂಲ ಪಾಸ್‌ಪೋರ್ಟ್ ತೋರಿಸಲು ಕೇಳಿ, ಫೋಟೋ ಪುಟ ಮತ್ತು ಕೋಡ್ ಸಾಲುಗಳನ್ನು ಗಮನವಿಟ್ಟು ಹೋಲಿಸಿ. ಬೇರೆ ಯಾವುದಕ್ಕೂ ಅಧಿಕೃತ Passport Seva ವೆಬ್‌ಸೈಟ್ (passportindia.gov.in) ಮಾತ್ರ ಬಳಸಿ.",
+   "Voter ID: search the EPIC number on the official Voters' Service Portal (voters.eci.gov.in).": "Voter ID: ಅಧಿಕೃತ Voters' Service Portal (voters.eci.gov.in) ನಲ್ಲಿ EPIC ಸಂಖ್ಯೆಯನ್ನು ಹುಡುಕಿ.",
+   "Driving licence: check the DL number with \"DL status\" on the official Parivahan website (parivahan.gov.in).": "Driving licence: ಅಧಿಕೃತ Parivahan ವೆಬ್‌ಸೈಟ್‌ನಲ್ಲಿ (parivahan.gov.in) \"DL status\" ಮೂಲಕ DL ಸಂಖ್ಯೆಯನ್ನು ಪರಿಶೀಲಿಸಿ.",
+   "Cheque: confirm with the bank that issued it, using the number on the bank's official website. Don't hand anything over until the money is in your account; a cheque can bounce days later.": "Cheque: ಚೆಕ್ ನೀಡಿದ ಬ್ಯಾಂಕ್‌ನ ಅಧಿಕೃತ ವೆಬ್‌ಸೈಟ್‌ನಲ್ಲಿರುವ ಸಂಖ್ಯೆಯಿಂದ ಖಚಿತಪಡಿಸಿ. ಹಣ ನಿಮ್ಮ ಖಾತೆಗೆ ಬರುವವರೆಗೆ ಏನನ್ನೂ ಕೊಡಬೇಡಿ; ಚೆಕ್ ಕೆಲವು ದಿನಗಳ ನಂತರವೂ ಬೌನ್ಸ್ ಆಗಬಹುದು.",
+   "Salary slip: confirm with the employer's HR department using contact details from the company's official website, and compare it with the salary credits in the bank statement.": "Salary slip: ಕಂಪನಿಯ ಅಧಿಕೃತ ವೆಬ್‌ಸೈಟ್‌ನಲ್ಲಿರುವ ಸಂಪರ್ಕದ ಮೂಲಕ HR ವಿಭಾಗದಿಂದ ಖಚಿತಪಡಿಸಿ, ಮತ್ತು ಬ್ಯಾಂಕ್ ಸ್ಟೇಟ್‌ಮೆಂಟ್‌ನಲ್ಲಿ ಬಂದ ಸಂಬಳದೊಂದಿಗೆ ಹೋಲಿಸಿ.",
+   "ITR: ask for the e-verified ITR-V, or have the person show the return after logging in to the Income Tax e-filing website (incometax.gov.in).": "ITR: e-verified ITR-V ಕೇಳಿ, ಅಥವಾ ಆ ವ್ಯಕ್ತಿ Income Tax ಇ-ಫೈಲಿಂಗ್ ವೆಬ್‌ಸೈಟ್‌ಗೆ (incometax.gov.in) ಲಾಗಿನ್ ಆಗಿ ರಿಟರ್ನ್ ತೋರಿಸಲಿ.",
+   "GST: check the GSTIN with \"Search Taxpayer\" on the official GST portal (gst.gov.in). The name shown must match the document.": "GST: ಅಧಿಕೃತ GST ಪೋರ್ಟಲ್‌ನಲ್ಲಿ (gst.gov.in) \"Search Taxpayer\" ಮೂಲಕ GSTIN ಪರಿಶೀಲಿಸಿ. ಅಲ್ಲಿ ಕಾಣುವ ಹೆಸರು ದಾಖಲೆಗೆ ಹೊಂದಿಕೆಯಾಗಬೇಕು.",
+   "Invoice: check the seller's GSTIN with \"Search Taxpayer\" on the official GST portal (gst.gov.in) before you pay.": "Invoice: ಹಣ ಕೊಡುವ ಮೊದಲು ಅಧಿಕೃತ GST ಪೋರ್ಟಲ್‌ನಲ್ಲಿ (gst.gov.in) \"Search Taxpayer\" ಮೂಲಕ ಮಾರಾಟಗಾರರ GSTIN ಪರಿಶೀಲಿಸಿ.",
+   "Bill: pay only through the provider's official website or app, or your UPI app's bill-payment section. Never pay a number from an SMS or call that threatens disconnection.": "Bill: ಸೇವಾ ಸಂಸ್ಥೆಯ ಅಧಿಕೃತ ವೆಬ್‌ಸೈಟ್ ಅಥವಾ app ಮೂಲಕ, ಅಥವಾ ನಿಮ್ಮ UPI app ನ ಬಿಲ್-ಪಾವತಿ ವಿಭಾಗದಿಂದ ಮಾತ್ರ ಪಾವತಿಸಿ. ಸಂಪರ್ಕ ಕಡಿತದ ಬೆದರಿಕೆ ಹಾಕುವ SMS ಅಥವಾ ಕರೆಯಲ್ಲಿನ ಸಂಖ್ಯೆಗೆ ಎಂದಿಗೂ ಹಣ ಕಳುಹಿಸಬೇಡಿ.",
+   "Job offer: confirm with the company's HR using contact details from its official website. Real employers never ask you to pay to join.": "Job offer: ಕಂಪನಿಯ ಅಧಿಕೃತ ವೆಬ್‌ಸೈಟ್‌ನಲ್ಲಿರುವ ಸಂಪರ್ಕದ ಮೂಲಕ HR ನಿಂದ ಖಚಿತಪಡಿಸಿ. ನಿಜವಾದ ಕಂಪನಿಗಳು ಸೇರಲು ಎಂದಿಗೂ ಹಣ ಕೇಳುವುದಿಲ್ಲ.",
+   "Payment screenshot: use the Payment check instead, and look for the money in your own bank or UPI app. A screenshot is not proof.": "Payment screenshot: ಇದಕ್ಕೆ Payment ಪರಿಶೀಲನೆ ಬಳಸಿ, ಮತ್ತು ನಿಮ್ಮ ಬ್ಯಾಂಕ್ ಅಥವಾ UPI app ನಲ್ಲಿ ಹಣ ಬಂದಿದೆಯೇ ನೋಡಿ. ಸ್ಕ್ರೀನ್‌ಶಾಟ್ ಪುರಾವೆ ಅಲ್ಲ.",
+   "Certificate: confirm it with the university or board that issued it, or ask for it through DigiLocker (digilocker.gov.in).": "Certificate: ನೀಡಿದ ವಿಶ್ವವಿದ್ಯಾಲಯ ಅಥವಾ ಬೋರ್ಡ್‌ನಿಂದ ಖಚಿತಪಡಿಸಿ, ಅಥವಾ DigiLocker (digilocker.gov.in) ಮೂಲಕ ಕೇಳಿ."
   }
  },
  "callers": {
@@ -1394,7 +1474,14 @@
    "Scam alerts": "धोखाधड़ी अलर्ट",
    "Warnings about suspicious SMS and calls": "संदिग्ध SMS और कॉल के बारे में चेतावनी",
    "Who's calling": "कौन कॉल कर रहा है",
-   "Shows what kind of caller is ringing (person, business, telemarketer, bot or scam)": "बताता है कि किस तरह का कॉलर कॉल कर रहा है (व्यक्ति, कारोबार, टेलीमार्केटर, बॉट या ठग)"
+   "Shows what kind of caller is ringing (person, business, telemarketer, bot or scam)": "बताता है कि किस तरह का कॉलर कॉल कर रहा है (व्यक्ति, कारोबार, टेलीमार्केटर, बॉट या ठग)",
+   "Test alert": "टेस्ट अलर्ट",
+   "New sender checks": "नए भेजने वालों की जाँच",
+   "A quiet note when a message from a new number looks normal": "नए नंबर से आया संदेश सामान्य लगे तो एक शांत सूचना",
+   "New sender checked: looks normal": "नए भेजने वाले की जाँच हुई: सामान्य लगता है",
+   "Unknown caller": "अज्ञात कॉलर",
+   "Looks normal — unknown number": "सामान्य लगता है — अनजान नंबर",
+   "Close": "बंद करें"
   },
   "kn": {
    "Likely scam SMS": "ವಂಚನೆ SMS ಇರಬಹುದು",
@@ -1412,7 +1499,76 @@
    "Scam alerts": "ವಂಚನೆ ಅಲರ್ಟ್‌ಗಳು",
    "Warnings about suspicious SMS and calls": "ಅನುಮಾನಾಸ್ಪದ SMS ಮತ್ತು ಕರೆಗಳ ಬಗ್ಗೆ ಎಚ್ಚರಿಕೆಗಳು",
    "Who's calling": "ಯಾರು ಕರೆ ಮಾಡುತ್ತಿದ್ದಾರೆ",
-   "Shows what kind of caller is ringing (person, business, telemarketer, bot or scam)": "ಯಾವ ರೀತಿಯ ಕರೆದಾರರು ಕರೆ ಮಾಡುತ್ತಿದ್ದಾರೆ ಎಂದು ತೋರಿಸುತ್ತದೆ (ವ್ಯಕ್ತಿ, ವ್ಯಾಪಾರ, ಟೆಲಿಮಾರ್ಕೆಟರ್, ಬಾಟ್ ಅಥವಾ ವಂಚಕ)"
+   "Shows what kind of caller is ringing (person, business, telemarketer, bot or scam)": "ಯಾವ ರೀತಿಯ ಕರೆದಾರರು ಕರೆ ಮಾಡುತ್ತಿದ್ದಾರೆ ಎಂದು ತೋರಿಸುತ್ತದೆ (ವ್ಯಕ್ತಿ, ವ್ಯಾಪಾರ, ಟೆಲಿಮಾರ್ಕೆಟರ್, ಬಾಟ್ ಅಥವಾ ವಂಚಕ)",
+   "Test alert": "ಪರೀಕ್ಷಾ ಎಚ್ಚರಿಕೆ",
+   "New sender checks": "ಹೊಸ ಕಳುಹಿಸುವವರ ಪರಿಶೀಲನೆ",
+   "A quiet note when a message from a new number looks normal": "ಹೊಸ ಸಂಖ್ಯೆಯಿಂದ ಬಂದ ಸಂದೇಶ ಸಾಮಾನ್ಯವಾಗಿ ಕಂಡರೆ ಶಬ್ದವಿಲ್ಲದ ಸೂಚನೆ",
+   "New sender checked: looks normal": "ಹೊಸ ಕಳುಹಿಸುವವರನ್ನು ಪರಿಶೀಲಿಸಲಾಗಿದೆ: ಸಾಮಾನ್ಯವಾಗಿ ಕಾಣುತ್ತದೆ",
+   "Unknown caller": "ಅಪರಿಚಿತ ಕರೆದಾರ",
+   "Looks normal — unknown number": "ಸಾಮಾನ್ಯವಾಗಿ ಕಾಣುತ್ತದೆ — ಅಪರಿಚಿತ ಸಂಖ್ಯೆ",
+   "Close": "ಮುಚ್ಚಿ"
+  }
+ },
+ "docTypes": {
+  "en": {
+   "aadhaar": "Aadhaar",
+   "pan": "PAN card",
+   "passport": "Passport",
+   "voter_id": "Voter ID",
+   "driving_licence": "Driving licence",
+   "bank_statement": "Bank statement",
+   "cheque": "Cheque",
+   "salary_slip": "Salary slip",
+   "itr": "Income tax return (ITR)",
+   "gst_certificate": "GST certificate",
+   "utility_bill": "Utility bill",
+   "invoice": "Invoice",
+   "offer_letter": "Job offer letter",
+   "legal_notice": "Legal or police notice",
+   "payment_screenshot": "Payment screenshot",
+   "certificate": "Certificate or marksheet",
+   "letter": "Letter",
+   "unknown": "Unknown document"
+  },
+  "hi": {
+   "aadhaar": "आधार",
+   "pan": "पैन कार्ड",
+   "passport": "पासपोर्ट",
+   "voter_id": "वोटर ID",
+   "driving_licence": "ड्राइविंग लाइसेंस",
+   "bank_statement": "बैंक स्टेटमेंट",
+   "cheque": "चेक",
+   "salary_slip": "सैलरी स्लिप",
+   "itr": "इनकम टैक्स रिटर्न (ITR)",
+   "gst_certificate": "GST सर्टिफ़िकेट",
+   "utility_bill": "बिजली/पानी/फ़ोन बिल",
+   "invoice": "इनवॉइस",
+   "offer_letter": "नौकरी का ऑफ़र लेटर",
+   "legal_notice": "कानूनी या पुलिस नोटिस",
+   "payment_screenshot": "पेमेंट स्क्रीनशॉट",
+   "certificate": "सर्टिफ़िकेट या मार्कशीट",
+   "letter": "पत्र",
+   "unknown": "अज्ञात दस्तावेज़"
+  },
+  "kn": {
+   "aadhaar": "ಆಧಾರ್",
+   "pan": "ಪ್ಯಾನ್ ಕಾರ್ಡ್",
+   "passport": "ಪಾಸ್‌ಪೋರ್ಟ್",
+   "voter_id": "ಮತದಾರರ ಗುರುತಿನ ಚೀಟಿ",
+   "driving_licence": "ಚಾಲನಾ ಪರವಾನಗಿ",
+   "bank_statement": "ಬ್ಯಾಂಕ್ ಸ್ಟೇಟ್‌ಮೆಂಟ್",
+   "cheque": "ಚೆಕ್",
+   "salary_slip": "ಸಂಬಳದ ಚೀಟಿ",
+   "itr": "ಆದಾಯ ತೆರಿಗೆ ರಿಟರ್ನ್ (ITR)",
+   "gst_certificate": "GST ಪ್ರಮಾಣಪತ್ರ",
+   "utility_bill": "ವಿದ್ಯುತ್/ನೀರು/ಫೋನ್ ಬಿಲ್",
+   "invoice": "ಇನ್‌ವಾಯ್ಸ್",
+   "offer_letter": "ಉದ್ಯೋಗದ ಆಫರ್ ಪತ್ರ",
+   "legal_notice": "ಕಾನೂನು ಅಥವಾ ಪೊಲೀಸ್ ನೋಟಿಸ್",
+   "payment_screenshot": "ಪಾವತಿ ಸ್ಕ್ರೀನ್‌ಶಾಟ್",
+   "certificate": "ಪ್ರಮಾಣಪತ್ರ ಅಥವಾ ಅಂಕಪಟ್ಟಿ",
+   "letter": "ಪತ್ರ",
+   "unknown": "ಗುರುತಿಸಲಾಗದ ದಾಖಲೆ"
   }
  }
 }

@@ -9,7 +9,7 @@ environment:
 
 # Everything sensitive (SMS, calls, storage) is handled by our own native code on the device.
 # The only packages are official ones from the Dart and Flutter teams and Google, used for the
-# optional online deep check (http), the optional rewarded ad (google_mobile_ads), Plus (in_app_purchase) and choosing a screenshot (image_picker).
+# optional online deep check (http), the optional rewarded ad (google_mobile_ads), Plus (in_app_purchase), choosing a screenshot (image_picker) and on-device photo forensics (image).
 dependencies:
   flutter:
     sdk: flutter
@@ -19,6 +19,7 @@ dependencies:
   google_mobile_ads: ">=7.0.0 <10.0.0"
   in_app_purchase: ^3.2.0
   image_picker: ^1.1.0
+  image: ^4.2.0
   secondlook_ios:
     path: packages/secondlook_ios
 

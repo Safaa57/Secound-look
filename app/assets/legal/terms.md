@@ -23,6 +23,13 @@ These terms are an agreement between you and {{OPERATOR}} ("we"), who runs Secon
 - A "no signs found" result is not a verification. Always confirm with the issuer through the official route the app shows (for example UIDAI, the Income Tax portal, the bank or the passport office).
 - Only check documents you are allowed to handle. Don't use it to make, alter or test forged documents.
 
+## 2B. Alerts, marks and the call popup
+
+- When a shield is on, Alerts lists every SMS and call it checked, on your phone only. You can mark a number as Block, Spam, Fraud or Safe, or add a comment. Marks are your own notes; they are not shared unless you separately report a number to warn others.
+- Blocking only works while Call Shield is on, and may not stop every call or SMS on every phone.
+- The optional call popup appears over other apps while an unknown number rings. You can switch it off in Protection check.
+- The "Chat on WhatsApp" button only opens that app. WhatsApp is a separate service with its own terms; Second Look is not connected with it.
+
 ## 3. Your responsibilities
 
 - Decisions you make after a check are your own.

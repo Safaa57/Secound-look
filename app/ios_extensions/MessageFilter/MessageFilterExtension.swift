@@ -13,6 +13,28 @@ final class MessageFilterExtension: ILMessageFilterExtension {
         return ctx
     }()
 
+    /// True if the user's own marks ("reports" in the shared app group, written by the app) block this sender:
+    /// Block, Fraud or Spam. Phone numbers match on their last 10 digits; SMS headers match exactly.
+    fileprivate static func userMarked(_ sender: String, _ shared: UserDefaults?) -> Bool {
+        guard !sender.isEmpty, let s = shared?.string(forKey: "reports"), let data = s.data(using: .utf8),
+              let reports = try? JSONSerialization.jsonObject(with: data) as? [[String: Any]] else { return false }
+        let digits = sender.filter { $0.isASCII && $0.isNumber }
+        let isPhone = !sender.contains(where: { $0.isLetter }) && digits.count >= 6
+        let header = sender.uppercased()
+        for r in reports {
+            guard let n = r["number"] as? String else { continue }
+            let kind = r["kind"] as? String ?? ""
+            guard (r["blocked"] as? Bool ?? false) || kind == "scam" || kind == "spam" else { continue }
+            if isPhone {
+                let nd = n.filter { $0.isASCII && $0.isNumber }
+                if nd.count >= 6 && nd.suffix(10) == digits.suffix(10) { return true }
+            } else if n.uppercased() == header {
+                return true
+            }
+        }
+        return false
+    }
+
     fileprivate func verdict(sender: String, body: String) -> [String: Any]? {
         guard let s = Self.context?.objectForKeyedSubscript("SL")?.invokeMethod("analyzeSms", withArguments: [sender, body])?.toString(),
               let data = s.data(using: .utf8) else { return nil }
@@ -35,6 +57,13 @@ extension MessageFilterExtension: ILMessageFilterQueryHandling {
 
         let sender = queryRequest.sender ?? ""
         let body = queryRequest.messageBody ?? ""
+
+        // Senders the user blocked or marked as fraud/spam in the app go straight to Junk.
+        if Self.userMarked(sender, shared) {
+            response.action = .junk
+            completion(response)
+            return
+        }
         guard let r = verdict(sender: sender, body: body),
               let level = (r["level"] as? [String: Any])?["key"] as? String else {
             completion(response)

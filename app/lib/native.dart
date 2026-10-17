@@ -50,6 +50,17 @@ class Native {
     });
   }
 
+  /// A list result that may come back as a JSON string or as a list, depending on the platform.
+  static List<Map<String, dynamic>> _asList(Object? v) {
+    Object? d = v;
+    if (d is String) {
+      if (d.isEmpty) return [];
+      d = jsonDecode(d);
+    }
+    if (d is List) return d.whereType<Map>().map((e) => e.cast<String, dynamic>()).toList();
+    return [];
+  }
+
   Future<Map<String, dynamic>> _json(String method, [Map<String, dynamic>? args]) async {
     final s = await _call<String>(method, args);
     return s == null ? <String, dynamic>{} : (jsonDecode(s) as Map).cast<String, dynamic>();
@@ -122,11 +133,38 @@ class Native {
     } catch (_) {}
   }
 
-  /// Small preferences kept on the device: language, voice, community_off, community_sync.
+  /// Small preferences kept on the device: language, voice ('on'|'off', missing = off), voice_name, community_off,
+  /// community_sync, log_all ('on'|'off', default on), call_popup ('on'|'off', default on).
   Future<Map<String, dynamic>> setPref(String key, String value) => _json('setPref', {'key': key, 'value': value});
 
+  /// Like [setPref], but never throws (for example when an older build doesn't know the key). Null if not saved.
+  Future<Map<String, dynamic>?> trySetPref(String key, String value) async {
+    try {
+      return await setPref(key, value);
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Reads text aloud with the device's own text-to-speech. Returns false if that language's voice isn't available.
-  Future<bool> speak(String text, String lang) async => (await _call<bool>('speak', {'text': text, 'lang': lang})) ?? false;
+  /// [voice] is an id from [listVoices] (null = the saved voice or the phone's default); [rate] 1.0 = normal speed.
+  Future<bool> speak(String text, String lang, {String? voice, double? rate}) async =>
+      (await _call<bool>('speak', {
+        'text': text,
+        'lang': lang,
+        if (voice != null && voice.isNotEmpty) 'voice': voice,
+        if (rate != null) 'rate': rate,
+      })) ??
+      false;
+
+  /// Voices for 'en' | 'hi' | 'kn', best first: [{id, label, quality, network}]. Empty if none or unsupported.
+  Future<List<Map<String, dynamic>>> listVoices(String lang) async {
+    try {
+      return _asList(await _call<Object>('listVoices', {'lang': lang}));
+    } catch (_) {
+      return [];
+    }
+  }
   Future<void> stopSpeaking() => _call('stopSpeaking');
 
   /// Saves the downloaded community scam list on the device, for Call Shield to match offline.
@@ -142,6 +180,36 @@ class Native {
   Future<void> setOnboarded(String termsVersion) => _call('setOnboarded', {'terms': termsVersion});
   Future<void> openSystemSettings(String which) => _call('openSystemSettings', {'which': which});
 
+  /// Android: what could stop the shields from working (permissions, notifications, caller-ID role, battery,
+  /// "Display over other apps", sideloading restrictions, autostart). iPhone: {platform:'ios'}. Null if unavailable.
+  Future<Map<String, dynamic>?> shieldHealth() async {
+    try {
+      return _asMap(await _call<Object>('shieldHealth'));
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Opens a system screen: 'app' | 'notifications' | 'overlay' | 'battery' | 'callRole' | 'autostart' | 'sms'.
+  /// True if a screen opened.
+  Future<bool> openSettings(String target) async {
+    try {
+      return (await _call<Object>('openSettings', {'target': target})) == true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Runs a built-in sample scam ('sms' | 'call') through the shield pipeline. Returns the new alert's id, or null.
+  Future<String?> testAlert(String kind) async {
+    try {
+      final v = await _call<Object>('testAlert', {'kind': kind});
+      return v == null ? null : '$v';
+    } catch (_) {
+      return null;
+    }
+  }
+
   // ---- history & personal block list (stored only on this phone) ----
   Future<List<Map<String, dynamic>>> history() => _list('history');
   Future<void> clearHistory() => _call('clearHistory');
@@ -150,6 +218,31 @@ class Native {
       _call('report', {'number': number, 'type': type, 'label': label, 'kind': kind});
   Future<void> removeReport(String number) => _call('removeReport', {'number': number});
   Future<void> deleteAllData() => _call('deleteAllData');
+
+  /// Marks a number or sender: 'block' | 'spam' | 'fraud' | 'safe' | 'comment' | 'unblock' (unblock also removes a mark).
+  /// [historyId] links the mark to that alert. Returns true when saved.
+  Future<bool> markNumber(String number, String action, {String? comment, String? historyId}) async {
+    try {
+      final m = _asMap(await _call<Object>('markNumber', {
+        'number': number,
+        'action': action,
+        if (comment != null) 'comment': comment,
+        if (historyId != null) 'historyId': historyId,
+      }));
+      return m?['ok'] == true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// What the user marked (newest first): [{number, action, comment, at, historyId}]. Only for [number] when given.
+  Future<List<Map<String, dynamic>>> numberActions({String? number}) async {
+    try {
+      return _asList(await _call<Object>('numberActions', {if (number != null) 'number': number}));
+    } catch (_) {
+      return [];
+    }
+  }
 
   // ---- security ----
   Future<Map<String, dynamic>> securityStatus() => _json('securityStatus');
@@ -174,6 +267,24 @@ class Native {
   Future<void> openUrl(String url) => _call('openUrl', {'url': url});
   Future<void> dial(String number) => _call('dial', {'number': number});
   Future<void> smsTo(String number, String body) => _call('smsTo', {'number': number, 'body': body});
+
+  /// Whether a chat app is installed. Only 'whatsapp' is supported.
+  Future<bool> isAppInstalled(String app) async {
+    try {
+      return (await _call<Object>('isAppInstalled', {'app': app})) == true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Opens a chat with [number] in WhatsApp (the app itself says if the number isn't on WhatsApp). True if it opened.
+  Future<bool> openChat(String number) async {
+    try {
+      return (await _call<Object>('openChat', {'number': number})) == true;
+    } catch (_) {
+      return false;
+    }
+  }
   Future<String?> consumeSharedText() => _call<String>('consumeSharedText');
   Future<String?> consumeAlertId() => _call<String>('consumeAlertId');
 }

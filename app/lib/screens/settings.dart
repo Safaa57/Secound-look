@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import '../cloud.dart';
 import '../community.dart';
 import '../i18n/i18n.dart';
+import '../i18n/reasons.dart';
 import '../native.dart';
 import '../legal/legal.dart';
 import 'plus.dart';
+import 'shield_health.dart';
 import '../theme.dart';
 import '../voice.dart';
 import '../widgets/common.dart';
@@ -20,8 +22,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Map<String, dynamic> s = {};
   Map<String, dynamic> sec = {};
   List<Map<String, dynamic>> reports = [];
+  Map<String, dynamic>? health;
   final name = TextEditingController();
   final number = TextEditingController();
+
+  // Voices for the current language (loaded again when the language changes).
+  List<Map<String, dynamic>> voices = [];
+  String? voicesLang;
+  bool voicesLoading = false;
+  String? previewing;
 
   @override
   void initState() {
@@ -29,18 +38,107 @@ class _SettingsScreenState extends State<SettingsScreen> {
     load();
   }
 
+  @override
+  void dispose() {
+    name.dispose();
+    number.dispose();
+    if (previewing != null) Voice.stop();
+    super.dispose();
+  }
+
+  Future<void> _loadVoices() async {
+    final lang = L10n.lang.value;
+    voicesLang = lang;
+    voicesLoading = true;
+    final v = await Voice.voices(lang);
+    if (!mounted) return;
+    if (L10n.lang.value != lang) {
+      // The language changed while loading: load again on the next build.
+      setState(() {
+        voicesLoading = false;
+        voicesLang = null;
+      });
+      return;
+    }
+    setState(() {
+      voices = v;
+      voicesLoading = false;
+    });
+  }
+
+  Future<void> _preview(String id) async {
+    setState(() => previewing = id);
+    final ok = await Voice.speak(tr('This is how Second Look will read your results.'), voice: id);
+    if (!mounted) return;
+    if (!ok) {
+      setState(() => previewing = null);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(tr('The voice for {lang} isn\'t installed on this device. Add it in your phone\'s text-to-speech settings.',
+            {'lang': L10n.names[L10n.lang.value]})),
+      ));
+      return;
+    }
+    Future.delayed(const Duration(seconds: 4), () {
+      if (mounted && previewing == id) setState(() => previewing = null);
+    });
+  }
+
   Future<void> load() async {
     final st = await Native.instance.status();
     final r = await Native.instance.reports();
     final sc = await Native.instance.securityStatus();
+    final hh = await Native.instance.shieldHealth();
     if (!mounted) return;
     setState(() {
       s = st;
       sec = sc;
+      health = hh;
       reports = r;
       name.text = (st['trustedName'] as String?) ?? '';
       number.text = (st['trustedNumber'] as String?) ?? '';
     });
+  }
+
+  /// One voice choice: radio, label, optional note, and a ▶ preview button.
+  Widget _voiceRow(String id, String label, String? note) {
+    final selected = Voice.voiceName == id;
+    final playing = previewing == id;
+    return InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: () async {
+        await Voice.setVoiceName(id);
+        if (mounted) setState(() {});
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 2),
+        child: Row(children: [
+          Icon(selected ? Icons.radio_button_checked_rounded : Icons.radio_button_unchecked_rounded,
+              color: selected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface.withAlpha(120)),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(label, style: TextStyle(fontWeight: selected ? FontWeight.w700 : FontWeight.w500)),
+              if (note != null) Text(note, style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withAlpha(140))),
+            ]),
+          ),
+          if (id.isEmpty)
+            const SizedBox(width: 48)
+          else
+            IconButton(
+              tooltip: tr('Play a sample'),
+              onPressed: () async {
+                if (playing) {
+                  await Voice.stop();
+                  if (mounted) setState(() => previewing = null);
+                } else {
+                  await _preview(id);
+                }
+              },
+              icon: Icon(playing ? Icons.stop_circle_rounded : Icons.play_circle_rounded),
+            ),
+        ]),
+      ),
+    );
   }
 
   @override
@@ -48,33 +146,68 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final cs = Theme.of(context).colorScheme;
     final web = Native.instance.isWeb || s['platform'] == 'web';
     final here = web ? tr('this browser') : tr('this phone');
+    if (voicesLang != L10n.lang.value && !voicesLoading) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _loadVoices();
+      });
+    }
     return Scaffold(
       appBar: AppBar(title: Text(tr('Settings')), actions: const [LanguageButton(), SizedBox(width: 8)]),
       body: ListView(padding: const EdgeInsets.fromLTRB(18, 4, 18, 32), children: [
-        SectionLabel(tr('Language and voice')),
+        SectionLabel(tr('Language')),
+        Panel(
+          child: Wrap(spacing: 8, runSpacing: 8, children: [
+            for (final c in L10n.supported)
+              ChoiceChip(
+                label: Text(L10n.names[c]!),
+                selected: L10n.lang.value == c,
+                onSelected: (_) async {
+                  await L10n.set(c);
+                  if (mounted) setState(() {});
+                },
+              ),
+          ]),
+        ),
+        SectionLabel(tr('Voice')),
         Panel(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Wrap(spacing: 8, runSpacing: 8, children: [
-              for (final c in L10n.supported)
-                ChoiceChip(
-                  label: Text(L10n.names[c]!),
-                  selected: L10n.lang.value == c,
-                  onSelected: (_) async {
-                    await L10n.set(c);
-                    if (mounted) setState(() {});
-                  },
-                ),
-            ]),
-            const SizedBox(height: 6),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               secondary: const Icon(Icons.record_voice_over_rounded),
-              title: Text(tr('Read results aloud')),
-              subtitle: Text(tr('Speaks the verdict and what to do, using your phone\'s own voice. Nothing is sent anywhere.')),
+              title: Text(tr('Read results aloud automatically')),
+              subtitle: Text(tr('Off: results are read only when you tap Listen. Uses your phone\'s own voice; nothing is sent anywhere.')),
               value: Voice.auto,
-              onChanged: (v) {
-                Voice.setAuto(v);
-                setState(() {});
+              onChanged: (v) async {
+                await Voice.setAuto(v);
+                if (mounted) setState(() {});
+              },
+            ),
+            const Divider(height: 20),
+            Text(tr('Choose a voice'), style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 4),
+            _voiceRow('', tr('Phone\'s default voice'), null),
+            if (voicesLoading && voices.isEmpty)
+              const Padding(padding: EdgeInsets.all(12), child: Center(child: SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2))))
+            else
+              for (var i = 0; i < voices.length; i++)
+                _voiceRow('${voices[i]['id']}', tr('Voice {n}', {'n': i + 1}), voices[i]['network'] == true ? tr('Needs internet') : null),
+            if (!voicesLoading && voices.isEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(tr('No other voices found for this language on this device.'), style: TextStyle(fontSize: 13, color: cs.onSurface.withAlpha(150))),
+              ),
+            const Divider(height: 24),
+            Text(tr('Speed'), style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 8),
+            SegmentedButton<bool>(
+              segments: [
+                ButtonSegment(value: true, label: Text(tr('Slow')), icon: const Icon(Icons.slow_motion_video_rounded)),
+                ButtonSegment(value: false, label: Text(tr('Normal')), icon: const Icon(Icons.play_arrow_rounded)),
+              ],
+              selected: {Voice.slow},
+              onSelectionChanged: (v) async {
+                await Voice.setSlow(v.first);
+                if (mounted) setState(() {});
               },
             ),
           ]),
@@ -149,7 +282,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ListTile(
                   leading: Icon(r['kind'] == 'safe' ? Icons.verified_rounded : Icons.block_rounded),
                   title: Text('${r['number']}'),
-                  subtitle: Text('${r['label']}'),
+                  subtitle: Text(_reportLabel(r)),
                   trailing: IconButton(
                     tooltip: tr('Remove'),
                     icon: const Icon(Icons.close_rounded),
@@ -173,6 +306,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ]),
           ),
         ] else ...[
+          if (s['platform'] != 'ios') ...[
+            SectionLabel(tr('Shields')),
+            Panel(
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              child: ListTile(
+                leading: Icon(Icons.health_and_safety_rounded, color: healthIssues(health) > 0 ? SL.fg(context, 'warning') : null),
+                title: Text(tr('Protection check')),
+                subtitle: Text(healthIssues(health) > 0
+                    ? tr('Something may stop your shields. Tap to fix.')
+                    : tr('See if anything stops your shields, and send a test alert')),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () async {
+                  await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ShieldHealthScreen()));
+                  if (mounted) load();
+                },
+              ),
+            ),
+          ],
           SectionLabel(tr('Security')),
           Panel(
             padding: const EdgeInsets.symmetric(vertical: 6),
@@ -316,6 +467,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ]),
     );
   }
+}
+
+/// The label of a number the user marked (Block / Spam / Fraud / Safe, or an older report type).
+String _reportLabel(Map<String, dynamic> r) {
+  final type = '${r['type'] ?? ''}';
+  switch (type) {
+    case 'blocked':
+      return tr('Blocked');
+    case 'spam':
+      return tr('Spam');
+    case 'fraud':
+      return tr('Fraud');
+    case 'safe':
+      return tr('Safe');
+  }
+  return reportTypeLabel(L10n.lang.value, type) ?? '${r['label'] ?? type}';
 }
 
 class _Check extends StatelessWidget {

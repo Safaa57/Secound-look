@@ -91,6 +91,14 @@ fi
 if [ -f ios/Runner/Info.plist ] && ! grep -q GADApplicationIdentifier ios/Runner/Info.plist; then
   perl -0pi -e "s|</dict>\\s*</plist>|\t<key>GADApplicationIdentifier</key>\n\t<string>$ADMOB_APP_ID_IOS</string>\n\t<key>SKAdNetworkItems</key>\n\t<array>\n\t\t<dict>\n\t\t\t<key>SKAdNetworkIdentifier</key>\n\t\t\t<string>cstr6suwn9.skadnetwork</string>\n\t\t</dict>\n\t</array>\n</dict>\n</plist>|" ios/Runner/Info.plist
 fi
+# "Chat on WhatsApp" button: lets the app ask iOS whether WhatsApp is installed (canOpenURL needs the scheme listed)
+if [ -f ios/Runner/Info.plist ] && ! grep -q '<string>whatsapp</string>' ios/Runner/Info.plist; then
+  if grep -q LSApplicationQueriesSchemes ios/Runner/Info.plist; then
+    perl -0pi -e 's|(<key>LSApplicationQueriesSchemes</key>\s*<array>)|$1\n\t\t<string>whatsapp</string>|' ios/Runner/Info.plist
+  else
+    perl -0pi -e 's|</dict>\s*</plist>|\t<key>LSApplicationQueriesSchemes</key>\n\t<array>\n\t\t<string>whatsapp</string>\n\t</array>\n</dict>\n</plist>|' ios/Runner/Info.plist
+  fi
+fi
 sed -i.bak -E "s/^# platform :ios, '[0-9.]+'/platform :ios, '14.0'/" ios/Podfile 2>/dev/null && rm -f ios/Podfile.bak || true
 
 echo "→ Laptop (web): the same JavaScript engine the iPhone app uses"

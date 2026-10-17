@@ -9,8 +9,10 @@ import 'image_meta.dart';
 
 /// A picked or shared image, already read on the device.
 class PickedImage {
-  PickedImage({required this.bytes, this.text = '', this.qr = const [], this.editor, this.readError});
+  PickedImage({required this.bytes, this.text = '', this.qr = const [], this.editor, this.readError, this.layout});
   final Uint8List bytes;
+  /// Text-geometry check from the on-device reader: {checked, lines, odd, samples}. Null if not available.
+  final Map<String, dynamic>? layout;
   final String text;
   final List<String> qr;
   final String? editor;
@@ -50,6 +52,7 @@ class ImageReader {
         text: (r['text'] as String?) ?? '',
         qr: ((r['qr'] as List?) ?? const []).map((e) => '$e').toList(),
         editor: editor,
+        layout: (r['layout'] as Map?)?.cast<String, dynamic>(),
       );
     } on PlatformException catch (e) {
       return PickedImage(bytes: bytes, editor: editor, readError: e.message ?? 'Couldn\'t read this image.');

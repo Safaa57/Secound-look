@@ -42,13 +42,16 @@ final class CallDirectoryHandler: CXCallDirectoryProvider {
         if let s = shared?.string(forKey: "reports"), let data = s.data(using: .utf8),
            let reports = try? JSONSerialization.jsonObject(with: data) as? [[String: Any]] {
             for r in reports {
-                guard let n = r["number"] as? String, let num = CXCallDirectoryPhoneNumber(n.filter { $0.isNumber }) else { continue }
+                // Only phone numbers: SMS headers such as "VK-ALERTS" can be marked too, and must not turn into digits.
+                guard let n = r["number"] as? String, n.range(of: "^\\+?[0-9]{6,15}$", options: .regularExpression) != nil,
+                      let num = CXCallDirectoryPhoneNumber(n.filter { $0.isNumber }) else { continue }
                 let kind = r["kind"] as? String ?? "scam"
                 let text = r["label"] as? String ?? "Reported"
+                let blocked = r["blocked"] as? Bool ?? false // "Block" in the Alerts tab
                 if kind == "safe" {
                     entries[num] = (false, "Trusted · \(text)")
                 } else {
-                    entries[num] = (kind == "scam", "Second Look: \(text)")
+                    entries[num] = (blocked || kind == "scam", "Second Look: \(text)")
                 }
             }
         }

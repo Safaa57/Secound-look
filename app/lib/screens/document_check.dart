@@ -26,18 +26,10 @@ class DocumentCheckScreen extends StatefulWidget {
 }
 
 class _DocumentCheckScreenState extends State<DocumentCheckScreen> {
-  /// Chip label (English, shown with tr()) and the docType sent to the engine.
-  static const _types = [
-    ['Auto-detect', 'auto'],
-    ['Aadhaar / ID card', 'id'],
-    ['Passport', 'passport'],
-    ['PAN card', 'id'],
-    ['Bank statement', 'statement'],
-    ['Letter or notice', 'letter'],
-  ];
-
   final words = TextEditingController();
-  int typeIndex = 0;
+
+  /// The type the user picked with "Wrong type?" (a detected-type key), or null to let the app decide.
+  String? chosenType;
 
   String? fileName;
   String? fileKind; // 'pdf' or 'image'
@@ -46,6 +38,8 @@ class _DocumentCheckScreenState extends State<DocumentCheckScreen> {
   Uint8List? preview; // photos only, kept in memory while this screen is open
   Map<String, dynamic>? qr; // Aadhaar QR details, in memory only
   bool qrUnreadable = false;
+  Map<String, dynamic>? layout; // text-geometry check from the on-device reader
+  Map<String, dynamic>? forensic; // file forensics (photos: ela/screenshot/camera/size; PDFs: fonts/whiteBoxes)
 
   Map<String, dynamic>? result;
   bool busy = false;
@@ -68,7 +62,47 @@ class _DocumentCheckScreenState extends State<DocumentCheckScreen> {
     preview = null;
     qr = null;
     qrUnreadable = false;
+    layout = null;
+    forensic = null;
+    chosenType = null;
     result = null;
+  }
+
+  /// Old check modes the engine still uses when the user overrides the detected type.
+  static String _legacyType(String key) {
+    switch (key) {
+      case 'aadhaar':
+      case 'pan':
+      case 'voter_id':
+      case 'driving_licence':
+        return 'id';
+      case 'bank_statement':
+      case 'salary_slip':
+        return 'statement';
+      case 'passport':
+        return 'passport';
+      default:
+        return 'letter';
+    }
+  }
+
+  // File forensics (checks/image_meta.dart and checks/pdf_meta.dart); a failure never stops the check.
+  static Future<Map<String, dynamic>?> _imageForensics(Uint8List bytes, String? name) async {
+    if (bytes.isEmpty) return null;
+    try {
+      return await imageForensics(bytes, name: name);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static Future<Map<String, dynamic>?> _pdfForensics(Uint8List bytes) async {
+    if (bytes.isEmpty) return null;
+    try {
+      return await pdfForensics(bytes);
+    } catch (_) {
+      return null;
+    }
   }
 
   Future<void> _pickFile() async {
@@ -117,6 +151,7 @@ class _DocumentCheckScreenState extends State<DocumentCheckScreen> {
         text: img.text,
         qrs: img.qr,
         editor: img.editor,
+        layout: img.layout,
         readNote: err == null ? null : () => tr(err),
       );
     } on PlatformException {
@@ -149,11 +184,13 @@ class _DocumentCheckScreenState extends State<DocumentCheckScreen> {
     } else if (image) {
       var text = '';
       var qrs = <String>[];
+      Map<String, dynamic>? lay;
       String Function()? n;
       if (path != null && !kIsWeb) {
         try {
           final r = await Native.instance.readImage(path, layout: true);
           text = (r['text'] as String?) ?? '';
+          lay = (r['layout'] as Map?)?.cast<String, dynamic>();
           qrs = ((r['qr'] as List?) ?? const []).map((e) => '$e').toList();
           if (text.trim().isEmpty) n = () => tr('No words could be read in this photo. Type the important lines below.');
         } on PlatformException {
@@ -162,7 +199,7 @@ class _DocumentCheckScreenState extends State<DocumentCheckScreen> {
       } else {
         n = () => tr('In the browser the words in a photo can\'t be read. Type the important lines below.');
       }
-      await _useImage(name: name, bytes: bytes, text: text, qrs: qrs, editor: ImageMeta.editorIn(bytes), readNote: n);
+      await _useImage(name: name, bytes: bytes, text: text, qrs: qrs, editor: ImageMeta.editorIn(bytes), layout: lay, readNote: n);
     } else {
       setState(() => note = () => tr('Choose a PDF or a photo (JPG or PNG).'));
     }
@@ -172,12 +209,15 @@ class _DocumentCheckScreenState extends State<DocumentCheckScreen> {
 
   Future<void> _usePdf({required String name, required String? path, required Uint8List bytes}) async {
     final meta = PdfMeta.parse(bytes);
+    final fz = await _pdfForensics(bytes);
     var text = '';
+    Map<String, dynamic>? lay;
     String Function()? n;
     if (path != null && !kIsWeb) {
       try {
         final r = await Native.instance.readPdf(path);
         text = '${r['text'] ?? ''}';
+        lay = (r['layout'] as Map?)?.cast<String, dynamic>();
         final pages = (r['pages'] as num?)?.toInt() ?? 0;
         final read = (r['pagesRead'] as num?)?.toInt() ?? pages;
         if (text.trim().isEmpty) {
@@ -199,6 +239,8 @@ class _DocumentCheckScreenState extends State<DocumentCheckScreen> {
       fileName = name.isEmpty ? null : name;
       fileKind = 'pdf';
       pdfMeta = meta;
+      layout = lay;
+      forensic = fz;
       words.text = text;
       note = n;
     });
@@ -211,8 +253,10 @@ class _DocumentCheckScreenState extends State<DocumentCheckScreen> {
     required String text,
     required List<String> qrs,
     required String? editor,
+    Map<String, dynamic>? layout,
     String Function()? readNote,
   }) async {
+    final fz = await _imageForensics(bytes, name);
     Map<String, dynamic>? found;
     var unreadable = false;
     for (final q in qrs) {
@@ -231,6 +275,8 @@ class _DocumentCheckScreenState extends State<DocumentCheckScreen> {
       fileName = name == null || name.isEmpty ? null : name;
       fileKind = 'image';
       imageEditor = editor;
+      this.layout = layout;
+      forensic = fz;
       preview = bytes;
       qr = found;
       qrUnreadable = unreadable;
@@ -252,9 +298,13 @@ class _DocumentCheckScreenState extends State<DocumentCheckScreen> {
     try {
       final m = pdfMeta;
       final q = qr;
+      final lay = layout;
+      final fz = forensic;
+      final o = chosenType;
       final input = <String, dynamic>{
         'text': t,
-        'docType': _types[typeIndex][1],
+        // The app recognises the type itself; the old check modes are only used when the user corrects it.
+        'docType': o == null ? 'auto' : _legacyType(o),
         'file': fileKind == null
             ? <String, dynamic>{}
             : <String, dynamic>{
@@ -265,6 +315,18 @@ class _DocumentCheckScreenState extends State<DocumentCheckScreen> {
                 'modified': m?['modified'],
                 'revisions': m?['revisions'] ?? 0,
                 'imageEditor': imageEditor,
+                if (lay != null) 'layout': lay,
+                if (fz != null && fileKind == 'image') ...{
+                  if (fz['ela'] is Map) 'ela': fz['ela'],
+                  if (fz['screenshot'] != null) 'screenshot': fz['screenshot'] == true,
+                  if (fz['camera'] != null) 'camera': fz['camera'] == true,
+                  if (fz['width'] is num) 'width': fz['width'],
+                  if (fz['height'] is num) 'height': fz['height'],
+                },
+                if (fz != null && fileKind == 'pdf') ...{
+                  if (fz['fonts'] is Map) 'fonts': fz['fonts'],
+                  if (fz['whiteBoxes'] is num) 'whiteBoxes': fz['whiteBoxes'],
+                },
               },
         'aadhaarQr': q == null || q['decoded'] != true
             ? null
@@ -289,6 +351,42 @@ class _DocumentCheckScreenState extends State<DocumentCheckScreen> {
     } finally {
       if (mounted) setState(() => busy = false);
     }
+  }
+
+  /// "Wrong type?": the user picks the right type and the check runs again.
+  Future<void> _chooseType() async {
+    final picked = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (c) => SafeArea(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: MediaQuery.of(c).size.height * 0.8),
+          child: ListView(shrinkWrap: true, padding: const EdgeInsets.only(bottom: 12), children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+              child: Text(tr('What is this document?'), style: Theme.of(c).textTheme.titleLarge),
+            ),
+            ListTile(
+              leading: const Icon(Icons.auto_awesome_rounded),
+              title: Text(tr('Let the app decide')),
+              trailing: chosenType == null ? const Icon(Icons.check_rounded) : null,
+              onTap: () => Navigator.pop(c, 'auto'),
+            ),
+            for (final k in docTypeKeys)
+              ListTile(
+                leading: Icon(docTypeIcon(k)),
+                title: Text(docTypeLabel(k)),
+                trailing: chosenType == k ? const Icon(Icons.check_rounded) : null,
+                onTap: () => Navigator.pop(c, k),
+              ),
+          ]),
+        ),
+      ),
+    );
+    if (picked == null || !mounted) return;
+    setState(() => chosenType = picked == 'auto' ? null : picked);
+    await _check();
   }
 
   @override
@@ -326,20 +424,6 @@ class _DocumentCheckScreenState extends State<DocumentCheckScreen> {
             ),
           ]),
         ),
-        SectionLabel(tr('What kind of document?')),
-        Wrap(spacing: 8, runSpacing: 8, children: [
-          for (var i = 0; i < _types.length; i++)
-            ChoiceChip(
-              label: Text(tr(_types[i][0])),
-              selected: typeIndex == i,
-              onSelected: busy
-                  ? null
-                  : (_) {
-                      setState(() => typeIndex = i);
-                      if (result != null) _check();
-                    },
-            ),
-        ]),
         const SizedBox(height: 16),
         if (preview != null) ...[
           ClipRRect(
@@ -396,7 +480,13 @@ class _DocumentCheckScreenState extends State<DocumentCheckScreen> {
         ),
         if (result != null) ...[
           const SizedBox(height: 22),
-          _FoundCard(info: info, fileName: fileName, editor: imageEditor, qrUnreadable: qrUnreadable),
+          _DetectedHeader(
+            detected: (info['detected'] as Map?)?.cast<String, dynamic>(),
+            chosenType: chosenType,
+            onWrongType: busy ? null : _chooseType,
+          ),
+          const SizedBox(height: 12),
+          _FoundCard(info: info, fileName: fileName, editor: imageEditor, qrUnreadable: qrUnreadable, layout: layout, forensic: forensic),
           const SizedBox(height: 12),
           VerdictView(result: result!),
           const SizedBox(height: 12),
@@ -433,11 +523,178 @@ class _DocumentCheckScreenState extends State<DocumentCheckScreen> {
   }
 }
 
+/// Document types the app can recognise (keys from the engine's info.detected), for the "Wrong type?" list.
+const docTypeKeys = [
+  'aadhaar',
+  'pan',
+  'passport',
+  'voter_id',
+  'driving_licence',
+  'bank_statement',
+  'cheque',
+  'salary_slip',
+  'itr',
+  'gst_certificate',
+  'utility_bill',
+  'invoice',
+  'offer_letter',
+  'legal_notice',
+  'payment_screenshot',
+  'certificate',
+  'letter',
+];
+
+String docTypeLabel(String key) {
+  switch (key) {
+    case 'aadhaar':
+      return tr('Aadhaar card');
+    case 'pan':
+      return tr('PAN card');
+    case 'passport':
+      return tr('Passport');
+    case 'voter_id':
+      return tr('Voter ID card');
+    case 'driving_licence':
+      return tr('Driving licence');
+    case 'bank_statement':
+      return tr('Bank statement');
+    case 'cheque':
+      return tr('Cheque');
+    case 'salary_slip':
+      return tr('Salary slip');
+    case 'itr':
+      return tr('Income tax return (ITR)');
+    case 'gst_certificate':
+      return tr('GST certificate');
+    case 'utility_bill':
+      return tr('Electricity, water or phone bill');
+    case 'invoice':
+      return tr('Invoice or bill');
+    case 'offer_letter':
+      return tr('Job offer letter');
+    case 'legal_notice':
+      return tr('Legal or police notice');
+    case 'payment_screenshot':
+      return tr('Payment screenshot');
+    case 'certificate':
+      return tr('Certificate');
+    case 'letter':
+      return tr('Letter or notice');
+    default:
+      return tr('Other document');
+  }
+}
+
+IconData docTypeIcon(String key) {
+  switch (key) {
+    case 'aadhaar':
+      return Icons.badge_rounded;
+    case 'pan':
+      return Icons.credit_card_rounded;
+    case 'passport':
+      return Icons.public_rounded;
+    case 'voter_id':
+      return Icons.how_to_vote_rounded;
+    case 'driving_licence':
+      return Icons.directions_car_rounded;
+    case 'bank_statement':
+      return Icons.account_balance_rounded;
+    case 'cheque':
+      return Icons.payments_rounded;
+    case 'salary_slip':
+      return Icons.request_quote_rounded;
+    case 'itr':
+      return Icons.receipt_long_rounded;
+    case 'gst_certificate':
+      return Icons.verified_rounded;
+    case 'utility_bill':
+      return Icons.bolt_rounded;
+    case 'invoice':
+      return Icons.receipt_rounded;
+    case 'offer_letter':
+      return Icons.work_rounded;
+    case 'legal_notice':
+      return Icons.gavel_rounded;
+    case 'payment_screenshot':
+      return Icons.phone_android_rounded;
+    case 'certificate':
+      return Icons.workspace_premium_rounded;
+    case 'letter':
+      return Icons.mail_rounded;
+    default:
+      return Icons.help_outline_rounded;
+  }
+}
+
+/// "Detected: PAN card" header with how sure the app is, and a "Wrong type?" button.
+class _DetectedHeader extends StatelessWidget {
+  const _DetectedHeader({required this.detected, required this.chosenType, required this.onWrongType});
+  final Map<String, dynamic>? detected;
+  final String? chosenType;
+  final VoidCallback? onWrongType;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final o = chosenType;
+    final key = o ?? '${detected?['key'] ?? 'unknown'}';
+    final known = key != 'unknown' && key.isNotEmpty;
+    final conf = '${detected?['confidence'] ?? ''}';
+    final String sure;
+    switch (conf) {
+      case 'high':
+        sure = tr('Sure');
+        break;
+      case 'medium':
+        sure = tr('Fairly sure');
+        break;
+      default:
+        sure = tr('Not sure');
+    }
+    final title = o != null
+        ? tr('Checked as: {type}', {'type': docTypeLabel(key)})
+        : known
+            ? tr('Detected: {type}', {'type': docTypeLabel(key)})
+            : tr('Couldn\'t tell what kind of document this is');
+    return Panel(
+      color: cs.primary.withAlpha(18),
+      borderColor: cs.primary.withAlpha(70),
+      padding: const EdgeInsets.fromLTRB(16, 14, 8, 8),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(color: cs.primary.withAlpha(36), borderRadius: BorderRadius.circular(14)),
+            child: Icon(docTypeIcon(key), color: cs.primary, size: 26),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, height: 1.25)),
+              const SizedBox(height: 2),
+              Text(
+                o != null ? tr('You chose this type.') : (known ? sure : tr('General checks were used.')),
+                style: TextStyle(fontSize: 13, color: cs.onSurface.withAlpha(160), fontWeight: FontWeight.w600),
+              ),
+            ]),
+          ),
+        ]),
+        Align(
+          alignment: Alignment.centerRight,
+          child: TextButton(onPressed: onWrongType, child: Text(tr('Wrong type?'))),
+        ),
+      ]),
+    );
+  }
+}
+
 class _FoundCard extends StatelessWidget {
-  const _FoundCard({required this.info, this.fileName, this.editor, this.qrUnreadable = false});
+  const _FoundCard({required this.info, this.fileName, this.editor, this.qrUnreadable = false, this.layout, this.forensic});
   final Map<String, dynamic> info;
   final String? fileName, editor;
   final bool qrUnreadable;
+  final Map<String, dynamic>? layout, forensic;
 
   @override
   Widget build(BuildContext context) {
@@ -470,6 +727,7 @@ class _FoundCard extends StatelessWidget {
       if (kind == 'pdf') _Row(tr('Edits recorded'), revs > 1 ? '${revs - 1}' : tr('None')),
       if (kind == 'image')
         _Row(tr('Photo editor in file'), editor != null ? tr('Yes, saved by a photo-editing app') : tr('None found (normal for forwarded images)')),
+      ..._forensicRows(context, kind),
     ]);
 
     // ---- ID numbers
@@ -544,6 +802,57 @@ class _FoundCard extends StatelessWidget {
         ...sections,
       ]),
     );
+  }
+
+  /// What the file-level checks found: text alignment, fonts, white boxes, screenshot or camera photo, edited areas.
+  List<Widget> _forensicRows(BuildContext context, String? kind) {
+    final warn = SL.fg(context, 'warning');
+    final rows = <Widget>[];
+    final lay = layout;
+    if (lay != null && lay['checked'] == true) {
+      final odd = (lay['odd'] as num?)?.toInt() ?? 0;
+      rows.add(_Row(
+        tr('Text alignment'),
+        odd > 0 ? tr('{n} words look out of line', {'n': odd}) : tr('Looks even'),
+        color: odd > 0 ? warn : null,
+      ));
+      final samples = ((lay['samples'] as List?) ?? const []).map((e) => '$e').where((e) => e.isNotEmpty).take(5).toList();
+      if (odd > 0 && samples.isNotEmpty) rows.add(_Row(tr('For example'), samples.join(', ')));
+    }
+    final fz = forensic;
+    if (fz == null) return rows;
+    if (kind == 'pdf') {
+      final fonts = (fz['fonts'] as Map?)?.cast<String, dynamic>();
+      if (fonts != null && fonts['checked'] == true) {
+        final rare = (fonts['rare'] as List?) ?? const [];
+        final count = (fonts['count'] as num?)?.toInt() ?? 0;
+        rows.add(_Row(
+          tr('Fonts'),
+          rare.isNotEmpty ? tr('A font used only for a few numbers') : tr('{n} fonts, nothing unusual', {'n': count}),
+          color: rare.isNotEmpty ? SL.fg(context, 'danger') : null,
+        ));
+      }
+      final wb = (fz['whiteBoxes'] as num?)?.toInt();
+      if (wb != null) {
+        rows.add(_Row(tr('White boxes over content'), wb > 0 ? '$wb' : tr('None'), color: wb > 0 ? SL.fg(context, 'danger') : null));
+      }
+    } else if (kind == 'image') {
+      if (fz['screenshot'] == true) {
+        rows.add(_Row(tr('Type of image'), tr('Screenshot, not original'), color: warn));
+      } else if (fz['camera'] == true) {
+        rows.add(_Row(tr('Type of image'), tr('Photo taken with a camera')));
+      }
+      final w = (fz['width'] as num?)?.toInt(), h = (fz['height'] as num?)?.toInt();
+      if (w != null && h != null && w > 0 && h > 0) rows.add(_Row(tr('Image size'), '$w × $h'));
+      final ela = (fz['ela'] as Map?)?.cast<String, dynamic>();
+      if (ela != null && ela['checked'] == true) {
+        final score = (ela['score'] as num?)?.toDouble() ?? 0;
+        final spots = (ela['hotspots'] as num?)?.toInt() ?? 0;
+        final flagged = score >= 0.6 && spots >= 1;
+        rows.add(_Row(tr('Signs of editing'), flagged ? tr('Some areas may have been changed') : tr('None found'), color: flagged ? warn : null));
+      }
+    }
+    return rows;
   }
 
   static String _when(String iso) {

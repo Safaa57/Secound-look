@@ -1,13 +1,19 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Only two sensitive permissions, both requested at the moment the user switches a shield ON.
-         No READ_SMS (we never read the inbox), no READ_CALL_LOG, no READ_CONTACTS. -->
+    <!-- Runtime permissions: only RECEIVE_SMS and POST_NOTIFICATIONS, both requested at the moment the user
+         switches a shield ON (or taps "Fix" in Shield health). No READ_SMS (we never read the inbox), no
+         READ_CALL_LOG, no READ_CONTACTS, no READ_PHONE_STATE. -->
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- "Display over other apps": a small card naming an unknown caller while the phone rings. Nothing is granted
+         at install; the user switches it on in Settings from Shield health, and can switch the card off in the app.
+         The card is our own window only; it can't read the screen or other apps. -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <!-- Internet is used ONLY for things the user starts: an optional "Deep check" of a link
          (just the link is sent), an optional rewarded ad, and Plus. SMS text, callers' numbers and
-         contacts are never sent. Cleartext (http://) traffic is blocked below. -->
+         contacts are never sent by the app (a "Chat on WhatsApp" tap hands that one number to WhatsApp or the
+         browser). Cleartext (http://) traffic is blocked below. -->
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- Optional app lock (fingerprint / face / phone PIN) -->
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
@@ -70,7 +76,8 @@
         </receiver>
 
         <!-- Call Shield: Android's caller ID & spam role (Android 10+). Android only sends us calls from
-             numbers that are NOT in the user's contacts, and only after the user picks Second Look. -->
+             numbers that are NOT in the user's contacts, and only after the user picks Second Look. Numbers the
+             user blocked in Second Look are rejected; nothing else is ever stopped. -->
         <service
             android:name=".ScreeningService"
             android:exported="true"
@@ -84,6 +91,15 @@
     </application>
 
     <queries>
+        <!-- "Chat on WhatsApp" button: only to know whether it's installed -->
+        <package android:name="com.whatsapp" />
+        <package android:name="com.whatsapp.w4b" />
+        <!-- Phone makers' "autostart" settings screens (Shield health opens them so the shields keep running) -->
+        <package android:name="com.miui.securitycenter" />
+        <package android:name="com.coloros.safecenter" />
+        <package android:name="com.vivo.permissionmanager" />
+        <package android:name="com.iqoo.secure" />
+        <package android:name="com.huawei.systemmanager" />
         <intent>
             <action android:name="android.intent.action.VIEW" />
             <data android:scheme="https" />

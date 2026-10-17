@@ -189,7 +189,10 @@ final class DocScan {
     }
 
     // ------------------------------------------------------------------ reading a PDF
-    /** Returns {"text", "pages", "pagesRead", "ocr": true}. Text is rebuilt in reading rows, at most 50,000 characters. */
+    /**
+     * Returns {"text", "pages", "pagesRead", "ocr": true, "layout": {checked, lines, odd, samples}}. Text is rebuilt in
+     * reading rows, at most 50,000 characters. Every page is read by OCR, so the layout check covers every page read.
+     */
     static String readPdf(File f) throws DocError {
         ParcelFileDescriptor pfd = null;
         PdfRenderer renderer = null;
@@ -208,11 +211,12 @@ final class DocScan {
             int toRead = Math.min(pages, MAX_PDF_PAGES);
             tr = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
             StringBuilder sb = new StringBuilder();
+            TextRows.LayoutCheck lc = new TextRows.LayoutCheck();
             int read = 0;
             for (int i = 0; i < toRead && sb.length() < MAX_DOC_TEXT; i++) {
                 String pageText;
                 try {
-                    pageText = readPage(renderer, i, tr);
+                    pageText = readPage(renderer, i, tr, lc);
                 } catch (Exception | OutOfMemoryError e) {
                     if (read == 0) throw unreadable();
                     break; // keep what the earlier pages gave
@@ -223,7 +227,8 @@ final class DocScan {
                     sb.append(pageText);
                 }
             }
-            return Json.stringify(Json.map("text", capText(sb.toString(), MAX_DOC_TEXT), "pages", pages, "pagesRead", read, "ocr", true));
+            return Json.stringify(Json.map("text", capText(sb.toString(), MAX_DOC_TEXT), "pages", pages, "pagesRead", read, "ocr", true,
+                    "layout", lc.toMap()));
         } catch (DocError e) {
             throw e;
         } catch (RuntimeException | OutOfMemoryError e) {
@@ -239,7 +244,7 @@ final class DocScan {
         }
     }
 
-    private static String readPage(PdfRenderer renderer, int index, TextRecognizer tr) throws Exception {
+    private static String readPage(PdfRenderer renderer, int index, TextRecognizer tr, TextRows.LayoutCheck lc) throws Exception {
         Bitmap bmp;
         try (PdfRenderer.Page page = renderer.openPage(index)) {
             int pw = Math.max(1, page.getWidth()), ph = Math.max(1, page.getHeight());
@@ -252,6 +257,7 @@ final class DocScan {
         }
         try {
             Text text = Tasks.await(tr.process(InputImage.fromBitmap(bmp, 0)), TIMEOUT_S, TimeUnit.SECONDS);
+            ImageScan.layout(text, lc);
             return TextRows.build(ImageScan.lines(text));
         } finally {
             bmp.recycle();
