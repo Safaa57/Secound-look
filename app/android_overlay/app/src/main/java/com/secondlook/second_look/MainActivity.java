@@ -10,6 +10,8 @@ import android.os.CancellationSignal;
 import android.view.MotionEvent;
 import android.view.WindowManager;
 import android.content.ActivityNotFoundException;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -23,6 +25,7 @@ import android.os.SystemClock;
 import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.Voice;
+import android.telecom.TelecomManager;
 
 import androidx.annotation.NonNull;
 
@@ -447,9 +450,10 @@ public class MainActivity extends FlutterActivity {
             case "markNumber": {
                 String num = call.argument("number"), action = call.argument("action");
                 String comment = call.argument("comment"), historyId = call.argument("historyId");
-                bg(result, () -> markNumber(num, action, comment, historyId));
+                bg(result, () -> markNumber(this, num, action, comment, historyId));
                 return;
             }
+            case "openBlockedNumbers": result.success(openBlockedNumbers(call.argument("number"))); return;
             case "numberActions": {
                 String num = call.argument("number");
                 bg(result, () -> numberActions(num));
@@ -702,8 +706,8 @@ public class MainActivity extends FlutterActivity {
 
     // ------------------------------------------------------------------ Shield health / setup checker
     private static final Set<String> PREF_KEYS = new HashSet<>(Arrays.asList(
-            "language", "voice", "community_off", "community_sync", "voice_name", "log_all", "call_popup", "voice_rate"));
-    private static final Set<String> ON_OFF_KEYS = new HashSet<>(Arrays.asList("voice", "log_all", "call_popup"));
+            "language", "voice", "community_off", "community_sync", "voice_name", "log_all", "call_popup", "voice_rate", "sms_popup"));
+    private static final Set<String> ON_OFF_KEYS = new HashSet<>(Arrays.asList("voice", "log_all", "call_popup", "sms_popup"));
     private static final Set<String> MARK_ACTIONS = new HashSet<>(Arrays.asList("block", "spam", "fraud", "safe", "comment", "unblock"));
     private long roleAskedAt;
 
@@ -755,6 +759,24 @@ public class MainActivity extends FlutterActivity {
             // unknown
         }
         return ignoring && !restricted;
+    }
+
+    private boolean batteryOptimized() {
+        try {
+            PowerManager pm = getSystemService(PowerManager.class);
+            return pm == null || !pm.isIgnoringBatteryOptimizations(getPackageName());
+        } catch (RuntimeException e) {
+            return true;
+        }
+    }
+
+    private boolean backgroundRestricted() {
+        try {
+            android.app.ActivityManager am = getSystemService(android.app.ActivityManager.class);
+            return am != null && am.isBackgroundRestricted();
+        } catch (RuntimeException e) {
+            return false;
+        }
     }
 
     private boolean isSamsung() {
@@ -814,6 +836,8 @@ public class MainActivity extends FlutterActivity {
                 "callWanted", Store.bool(this, "call_on"),
                 "overlayAllowed", CallPopup.allowed(this),
                 "batteryUnrestricted", batteryUnrestricted(),
+                "batteryOptimized", batteryOptimized(),
+                "backgroundRestricted", backgroundRestricted(),
                 "restrictedSettingsLikely", sdk >= 33 && sideloaded && smsWanted && !smsPermission,
                 "autostartPage", autostartIntent() != null);
     }
@@ -907,27 +931,55 @@ public class MainActivity extends FlutterActivity {
         }
     }
 
-    /** Block / Spam / Fraud / Safe / comment / unblock for a number or sender header. Call off the main thread. */
-    private Map<String, Object> markNumber(String number, String action, String comment, String historyId) {
+    /**
+     * Block / Spam / Fraud / Safe / comment / unblock for a number or sender header. Works from any Context (the
+     * method channel and the on-screen card both use it). Call off the main thread.
+     */
+    static Map<String, Object> markNumber(Context ctx, String number, String action, String comment, String historyId) {
         if (action == null || !MARK_ACTIONS.contains(action)) return Json.map("ok", false);
-        String key = EngineHolder.senderKey(this, number);
+        Context c = ctx.getApplicationContext();
+        String key = EngineHolder.senderKey(c, number);
         if (key == null) return Json.map("ok", false);
         String note = Security.cleanComment(comment);
         switch (action) {
-            case "block": Store.report(this, key, "blocked", "Blocked", "scam", true); break;
-            case "spam": Store.report(this, key, "spam", "Spam", "spam"); break;
-            case "fraud": Store.report(this, key, "fraud", "Fraud", "scam"); break;
-            case "safe": Store.report(this, key, "safe", "Safe", "safe"); break;
-            case "unblock": Store.removeReport(this, key); break;
+            case "block": Store.report(c, key, "blocked", "Blocked", "scam", true); break;
+            case "spam": Store.report(c, key, "spam", "Spam", "spam"); break;
+            case "fraud": Store.report(c, key, "fraud", "Fraud", "scam"); break;
+            case "safe": Store.report(c, key, "safe", "Safe", "safe"); break;
+            case "unblock": Store.removeReport(c, key); break;
             default: break; // comment: only noted
         }
         long now = System.currentTimeMillis();
         String hid = Security.isAlertId(historyId) ? historyId : null;
         Map<String, Object> entry = Json.map("number", key, "action", action, "comment", note, "at", now);
         if (hid != null) entry.put("historyId", hid);
-        Store.addAction(this, entry);
-        if (hid != null) Store.setUserAction(this, hid, Store.userAction(action, note, now));
+        Store.addAction(c, entry);
+        if (hid != null) Store.setUserAction(c, hid, Store.userAction(action, note, now));
         return Json.map("ok", true);
+    }
+
+    /**
+     * Opens the phone's own blocked-numbers screen (blocks calls AND SMS phone-wide, and keeps working even if Second
+     * Look is removed), with the number copied to the clipboard so the user can paste it. Falls back to the dialer
+     * with the number filled in (the user blocks it from the dialer's menu). True if a screen opened.
+     */
+    private boolean openBlockedNumbers(String number) {
+        String n = Security.cleanNumber(number);
+        if (!n.isEmpty()) {
+            try {
+                ClipboardManager cm = getSystemService(ClipboardManager.class);
+                if (cm != null) cm.setPrimaryClip(ClipData.newPlainText("Number", n));
+            } catch (RuntimeException ignored) {
+                // clipboard unavailable: the screen still opens
+            }
+        }
+        try {
+            TelecomManager tm = getSystemService(TelecomManager.class);
+            if (tm != null && tryStart(tm.createManageBlockedNumbersIntent())) return true;
+        } catch (RuntimeException ignored) {
+            // not available on this phone: use the dialer
+        }
+        return tryStart(new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + n)));
     }
 
     /** The user's marks, newest first; only those for one number when given. */
@@ -957,6 +1009,7 @@ public class MainActivity extends FlutterActivity {
                         "voice_rate", Store.str(this, "pref_voice_rate"),
                         "log_all", Store.prefOn(this, "log_all", true) ? "on" : "off",
                         "call_popup", Store.prefOn(this, "call_popup", true) ? "on" : "off",
+                        "sms_popup", Store.prefOn(this, "sms_popup", true) ? "on" : "off",
                         "community_off", Store.str(this, "pref_community_off"),
                         "community_sync", Store.str(this, "pref_community_sync")),
                 "communityCount", EngineHolder.communityCount(this),

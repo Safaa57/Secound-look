@@ -1,7 +1,7 @@
 name: second_look
 description: Second Look — on-device scam protection for SMS, links and calls.
 publish_to: "none"
-version: 1.0.0+1
+version: 1.5.0+15
 
 environment:
   sdk: ">=3.3.0 <4.0.0"
@@ -33,3 +33,12 @@ flutter:
     - assets/legal/
     - assets/i18n/
     - assets/certs/
+    - assets/fonts/OFL-Sora.txt
+    - assets/fonts/OFL-Manrope.txt
+  fonts:
+    - family: Sora
+      fonts:
+        - asset: assets/fonts/Sora.ttf
+    - family: Manrope
+      fonts:
+        - asset: assets/fonts/Manrope.ttf

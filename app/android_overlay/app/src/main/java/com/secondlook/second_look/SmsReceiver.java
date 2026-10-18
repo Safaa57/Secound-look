@@ -16,7 +16,8 @@ import java.util.Map;
  * Checks each new SMS on the phone. Every checked SMS is listed in Alerts (unless the user turned "log all" off,
  * then only warnings): the verdict, the sender and a short preview with one-time codes masked. The SMS is never
  * sent anywhere. Warnings raise a notification; a normal-looking SMS from a phone number seen for the first time
- * raises a quiet one; numbers the user blocked raise none.
+ * raises a quiet one; numbers the user blocked raise none. The same two cases also show the on-screen card
+ * (CallPopup, when "Display over other apps" is allowed and pref sms_popup is on).
  */
 public class SmsReceiver extends BroadcastReceiver {
     static final int PREVIEW_CHARS = 160;
@@ -97,6 +98,14 @@ public class SmsReceiver extends BroadcastReceiver {
             else if (firstTime && phone) Notifier.newSender(app, sender, id);
         } catch (RuntimeException ignored) {
             // notifications switched off or the channel was removed: the alert is still listed in the app
+        }
+        // On-screen card for risky SMS and for a phone number seen for the first time (pref sms_popup, default on).
+        try {
+            if ((!safe || (firstTime && phone) || test) && Store.prefOn(app, "sms_popup", true)) {
+                CallPopup.showSms(app, sender, r, id, preview(body), test);
+            }
+        } catch (RuntimeException ignored) {
+            // the card is extra: the alert is listed and notified either way
         }
         return id;
     }

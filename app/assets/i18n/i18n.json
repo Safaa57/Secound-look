@@ -1481,7 +1481,16 @@
    "New sender checked: looks normal": "नए भेजने वाले की जाँच हुई: सामान्य लगता है",
    "Unknown caller": "अज्ञात कॉलर",
    "Looks normal — unknown number": "सामान्य लगता है — अनजान नंबर",
-   "Close": "बंद करें"
+   "Close": "बंद करें",
+   "Incoming call": "आने वाली कॉल",
+   "New SMS": "नया SMS",
+   "Looks normal — new sender": "सामान्य लगता है — नया भेजने वाला",
+   "Block": "ब्लॉक करें",
+   "Spam": "स्पैम",
+   "Open": "खोलें",
+   "Blocked in Second Look": "Second Look में ब्लॉक किया गया",
+   "Marked as spam": "स्पैम के रूप में चिह्नित किया गया",
+   "Couldn't save. Open Second Look and try again.": "सेव नहीं हो सका। Second Look खोलकर फिर से कोशिश करें।"
   },
   "kn": {
    "Likely scam SMS": "ವಂಚನೆ SMS ಇರಬಹುದು",
@@ -1506,7 +1515,16 @@
    "New sender checked: looks normal": "ಹೊಸ ಕಳುಹಿಸುವವರನ್ನು ಪರಿಶೀಲಿಸಲಾಗಿದೆ: ಸಾಮಾನ್ಯವಾಗಿ ಕಾಣುತ್ತದೆ",
    "Unknown caller": "ಅಪರಿಚಿತ ಕರೆದಾರ",
    "Looks normal — unknown number": "ಸಾಮಾನ್ಯವಾಗಿ ಕಾಣುತ್ತದೆ — ಅಪರಿಚಿತ ಸಂಖ್ಯೆ",
-   "Close": "ಮುಚ್ಚಿ"
+   "Close": "ಮುಚ್ಚಿ",
+   "Incoming call": "ಒಳಬರುವ ಕರೆ",
+   "New SMS": "ಹೊಸ SMS",
+   "Looks normal — new sender": "ಸಾಮಾನ್ಯವಾಗಿ ಕಾಣುತ್ತದೆ — ಹೊಸ ಕಳುಹಿಸುವವರು",
+   "Block": "ನಿರ್ಬಂಧಿಸಿ",
+   "Spam": "ಸ್ಪ್ಯಾಮ್",
+   "Open": "ತೆರೆಯಿರಿ",
+   "Blocked in Second Look": "Second Look ನಲ್ಲಿ ನಿರ್ಬಂಧಿಸಲಾಗಿದೆ",
+   "Marked as spam": "ಸ್ಪ್ಯಾಮ್ ಎಂದು ಗುರುತಿಸಲಾಗಿದೆ",
+   "Couldn't save. Open Second Look and try again.": "ಉಳಿಸಲಾಗಲಿಲ್ಲ. Second Look ತೆರೆದು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ."
   }
  },
  "docTypes": {

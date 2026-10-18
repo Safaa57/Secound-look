@@ -724,6 +724,7 @@ public class SecondLookPlugin: NSObject, FlutterPlugin {
                 "voice_rate": d.string(forKey: "pref_voice_rate") ?? "",
                 "log_all": d.string(forKey: "pref_log_all") ?? "",
                 "call_popup": d.string(forKey: "pref_call_popup") ?? "",
+                "sms_popup": d.string(forKey: "pref_sms_popup") ?? "",
                 "community_off": d.string(forKey: "pref_community_off") ?? "",
                 "community_sync": d.string(forKey: "pref_community_sync") ?? "",
             ],
@@ -952,7 +953,7 @@ public class SecondLookPlugin: NSObject, FlutterPlugin {
             result(nil)
         case "setPref":
             let key = str("key")
-            guard ["language", "voice", "voice_name", "log_all", "call_popup", "voice_rate", "community_off", "community_sync"].contains(key) else {
+            guard ["language", "voice", "voice_name", "log_all", "call_popup", "sms_popup", "voice_rate", "community_off", "community_sync"].contains(key) else {
                 result(FlutterError(code: "blocked", message: "Unknown setting", details: nil)); return
             }
             // Voice ids (e.g. "com.apple.voice.enhanced.en-IN.Rishi") are longer than the other values.
@@ -1102,6 +1103,9 @@ public class SecondLookPlugin: NSObject, FlutterPlugin {
             } else {
                 result(false)
             }
+        case "openBlockedNumbers":
+            // iOS has no public way to open the blocked-contacts list; the app explains the steps instead.
+            result(false)
         case "openChat":
             // The only place that may open wa.me. Needs the full number with country code.
             normalize(str("number")) { number in
