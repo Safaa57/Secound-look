@@ -21,12 +21,13 @@ String? shieldBroken(Map<String, dynamic>? h) {
 }
 
 /// How many checks need attention (used for the warning dot on Home and in Settings).
-int healthIssues(Map<String, dynamic>? h) => _checks(h).where((c) => !c.ok).length;
+int healthIssues(Map<String, dynamic>? h) => _checks(h).where((c) => !c.ok && !c.optional).length;
 
 class _Item {
-  const _Item(this.title, this.ok, this.fix, {this.why});
+  const _Item(this.title, this.ok, this.fix, {this.why, this.optional = false});
   final String title;
   final bool ok;
+  final bool optional; // recommended only: shown in blue, not counted as a problem
   final String fix; // openSettings target
   final String? why;
 }
@@ -36,17 +37,29 @@ List<_Item> _checks(Map<String, dynamic>? h) {
   final m = h!;
   bool t(String k) => m[k] == true;
   final sms = t('smsWanted'), call = t('callWanted');
+  final samsung = '${m['manufacturer'] ?? ''}'.toLowerCase().contains('samsung');
   return [
     if (sms) _Item(tr('SMS Shield can read new SMS'), t('smsPermission'), 'sms', why: tr('Without this, new SMS can\'t be checked.')),
     if (sms && m.containsKey('smsReceiverEnabled'))
-      _Item(tr('SMS Shield is listening for new SMS'), t('smsReceiverEnabled'), 'app', why: tr('Switch SMS Shield off and on again on the Protection tab.')),
+      _Item(tr('SMS Shield is listening for new SMS'), t('smsReceiverEnabled'), 'app', why: tr('Switch SMS Shield off and on again on the Home tab.')),
     if (call) _Item(tr('Second Look is your caller ID & spam app'), t('callRoleHeld'), 'callRole', why: tr('Without this, calls from new numbers can\'t be checked.')),
     if (sms || call) _Item(tr('Notifications are allowed'), t('notificationsAllowed'), 'notifications', why: tr('Alerts can\'t appear without notifications.')),
     if ((sms || call) && m.containsKey('alertChannelOn'))
       _Item(tr('Scam alert notifications are switched on'), t('alertChannelOn'), 'notifications', why: tr('This kind of notification is switched off in your phone\'s settings.')),
     if (call && m.containsKey('overlayAllowed'))
       _Item(tr('Call popup can show over other apps'), t('overlayAllowed'), 'overlay', why: tr('Optional: shows who may be calling on top of the ringing screen.')),
-    if (sms || call) _Item(tr('Battery saver won\'t stop Second Look'), t('batteryUnrestricted'), 'battery', why: tr('Some phones stop apps in the background to save battery.')),
+    if (sms || call)
+      _Item(
+        tr('Battery saver won\'t stop Second Look'),
+        t('batteryUnrestricted'),
+        'battery',
+        optional: true,
+        why: t('backgroundRestricted')
+            ? tr('Battery use is set to "Restricted". Tap Fix, then Battery, and choose "Unrestricted".')
+            : (samsung
+                ? '${tr('Recommended. Tap Fix, then Battery (or App battery usage), and choose "Unrestricted". Choosing "Optimised" keeps this warning.')}\n${tr('On Samsung also: Settings → Battery → Background usage limits → remove Second Look from "Sleeping apps" and "Deep sleeping apps".')}'
+                : tr('Recommended. Tap Fix, then Battery (or App battery usage), and choose "Unrestricted". Choosing "Optimised" keeps this warning.')),
+      ),
   ];
 }
 
@@ -136,7 +149,7 @@ class _ShieldHealthScreenState extends State<ShieldHealthScreen> with WidgetsBin
     final cs = Theme.of(context).colorScheme;
     final m = h;
     final checks = _checks(m);
-    final bad = checks.where((c) => !c.ok).length;
+    final bad = checks.where((c) => !c.ok && !c.optional).length;
     final available = healthAvailable(m);
     final sms = m?['smsWanted'] == true, call = m?['callWanted'] == true;
 
@@ -153,7 +166,7 @@ class _ShieldHealthScreenState extends State<ShieldHealthScreen> with WidgetsBin
                   Panel(
                     child: Text(
                       m?['platform'] == 'ios'
-                          ? tr('On iPhone, the shields are switched on in iPhone Settings. Follow the steps under each shield on the Protection tab.')
+                          ? tr('On iPhone, the shields are switched on in iPhone Settings. Follow the steps under each shield on the Home tab.')
                           : tr('Protection check works in the Android app.'),
                       style: TextStyle(color: cs.onSurface.withAlpha(180), height: 1.4),
                     ),
@@ -168,7 +181,7 @@ class _ShieldHealthScreenState extends State<ShieldHealthScreen> with WidgetsBin
                       Expanded(
                         child: Text(
                           !sms && !call
-                              ? tr('Both shields are off. Switch them on on the Protection tab, then come back here.')
+                              ? tr('Both shields are off. Switch them on on the Home tab, then come back here.')
                               : bad == 0
                                   ? tr('Everything looks ready. Send a test alert below to be sure.')
                                   : bad == 1
@@ -194,8 +207,8 @@ class _ShieldHealthScreenState extends State<ShieldHealthScreen> with WidgetsBin
                             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                               Padding(
                                 padding: const EdgeInsets.only(top: 2),
-                                child: Icon(c.ok ? Icons.check_circle_rounded : Icons.warning_rounded,
-                                    color: SL.fg(context, c.ok ? 'safe' : 'warning'), size: 22),
+                                child: Icon(c.ok ? Icons.check_circle_rounded : (c.optional ? Icons.info_rounded : Icons.warning_rounded),
+                                    color: c.ok ? SL.fg(context, 'safe') : (c.optional ? cs.primary : SL.fg(context, 'warning')), size: 22),
                               ),
                               const SizedBox(width: 12),
                               Expanded(
@@ -285,6 +298,13 @@ class _ShieldHealthScreenState extends State<ShieldHealthScreen> with WidgetsBin
                         subtitle: Text(tr('Needs "Display over other apps".')),
                         value: '${_prefs['call_popup'] ?? ''}' != 'off',
                         onChanged: (v) => _pref('call_popup', v),
+                      ),
+                      SwitchListTile(
+                        secondary: const Icon(Icons.mark_chat_unread_rounded),
+                        title: Text(tr('Show popup for new SMS')),
+                        subtitle: Text(tr('For suspicious SMS and new senders.')),
+                        value: '${_prefs['sms_popup'] ?? ''}' != 'off',
+                        onChanged: (v) => _pref('sms_popup', v),
                       ),
                     ]),
                   ),

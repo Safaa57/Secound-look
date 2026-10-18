@@ -20,20 +20,26 @@ class PanicScreen extends StatelessWidget {
     ];
     return Scaffold(
       appBar: AppBar(title: Text(tr('Being scammed?')), actions: const [LanguageButton()]),
-      body: ListView(padding: const EdgeInsets.fromLTRB(18, 4, 18, 32), children: [
+      body: ListView(padding: EdgeInsets.fromLTRB(20, 4, 20, MediaQuery.paddingOf(context).bottom + 32), children: [
         Panel(
-          color: SL.bg(context, 'danger'),
-          borderColor: SL.fg(context, 'danger').withAlpha(90),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(tr('Take a breath. You can still stop this.'), style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: SL.fg(context, 'danger'))),
+          radius: 24,
+          padding: const EdgeInsets.all(18),
+          color: SL.dangerD.withAlpha(18),
+          borderColor: SL.dangerD.withAlpha(102),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Text(tr('Take a breath. You can still stop this.'), style: SL.h(24, color: SL.dangerLight, height: 1.2)),
             const SizedBox(height: 8),
-            Text(tr('Scammers rush you on purpose. Follow these steps in order.')),
+            Text(tr('Scammers rush you on purpose. Follow these steps in order.'), style: const TextStyle(fontSize: 15.5, color: SL.textSoft, height: 1.4)),
             const SizedBox(height: 16),
-            FilledButton.icon(
-              style: FilledButton.styleFrom(backgroundColor: SL.fg(context, 'danger'), foregroundColor: Colors.white, minimumSize: const Size.fromHeight(56)),
+            GlowButton(
+              icon: Icons.call_rounded,
+              color: SL.dangerD,
+              textColor: SL.onDanger,
+              height: 60,
+              radius: 18,
+              fontSize: 17,
               onPressed: () => Native.instance.dial('1930'),
-              icon: const Icon(Icons.call_rounded),
-              label: Text(tr('Call 1930 · Cyber Crime Helpline')),
+              label: tr('Call 1930 · Cyber Crime Helpline'),
             ),
           ]),
         ),
@@ -41,13 +47,19 @@ class PanicScreen extends StatelessWidget {
         for (var i = 0; i < steps.length; i++) ...[
           Panel(
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              CircleAvatar(radius: 15, backgroundColor: Theme.of(context).colorScheme.primary, child: Text('${i + 1}', style: TextStyle(color: Theme.of(context).colorScheme.onPrimary, fontWeight: FontWeight.w800))),
+              Container(
+                width: 32,
+                height: 32,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(color: SL.accent.withAlpha(36), shape: BoxShape.circle, border: Border.all(color: SL.accent.withAlpha(102))),
+                child: Text('${i + 1}', style: SL.h(14, color: SL.accent)),
+              ),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(steps[i][0], style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+                  Text(steps[i][0], style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
                   const SizedBox(height: 3),
-                  Text(steps[i][1], style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withAlpha(170))),
+                  Text(steps[i][1], style: const TextStyle(color: SL.textSoft, height: 1.4)),
                 ]),
               ),
             ]),

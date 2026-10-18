@@ -209,7 +209,7 @@ class WebBridge {
         'trustedNumber': _get('trusted_number') ?? '',
       });
 
-  static const _prefKeys = ['language', 'voice', 'voice_name', 'log_all', 'call_popup', 'voice_rate', 'community_off', 'community_sync'];
+  static const _prefKeys = ['language', 'voice', 'voice_name', 'log_all', 'call_popup', 'sms_popup', 'voice_rate', 'community_off', 'community_sync'];
 
   static String _langCode(Object? lang) => lang == 'hi' || lang == 'kn' ? lang as String : 'en';
 
@@ -623,6 +623,8 @@ class WebBridge {
         return jsonEncode(all.where((e) => e['number'] == n || e['number'] == raw).toList());
       case 'isAppInstalled':
         return false; // a browser can't tell
+      case 'openBlockedNumbers':
+        return false; // a browser can't open the phone's blocked-numbers list
       case 'openChat':
         // The only place that may open wa.me. Needs the full number with country code.
         final n = _normalize(_cap(a['number'], 64));

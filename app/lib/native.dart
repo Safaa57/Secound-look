@@ -134,7 +134,7 @@ class Native {
   }
 
   /// Small preferences kept on the device: language, voice ('on'|'off', missing = off), voice_name, community_off,
-  /// community_sync, log_all ('on'|'off', default on), call_popup ('on'|'off', default on).
+  /// community_sync, log_all ('on'|'off', default on), call_popup ('on'|'off', default on), sms_popup ('on'|'off', default on).
   Future<Map<String, dynamic>> setPref(String key, String value) => _json('setPref', {'key': key, 'value': value});
 
   /// Like [setPref], but never throws (for example when an older build doesn't know the key). Null if not saved.
@@ -285,6 +285,16 @@ class Native {
       return false;
     }
   }
+  /// Android: copies [number] to the clipboard and opens the phone's own blocked-numbers screen (blocks calls and
+  /// SMS phone-wide). False where that isn't possible (iPhone, browser, older builds).
+  Future<bool> openBlockedNumbers(String number) async {
+    try {
+      return (await _call<Object>('openBlockedNumbers', {'number': number})) == true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   Future<String?> consumeSharedText() => _call<String>('consumeSharedText');
   Future<String?> consumeAlertId() => _call<String>('consumeAlertId');
 }

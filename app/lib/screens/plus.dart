@@ -109,7 +109,7 @@ class _PlusScreenState extends State<PlusScreen> {
               width: 60,
               height: 60,
               decoration: BoxDecoration(color: SL.amber.withAlpha(50), borderRadius: BorderRadius.circular(18)),
-              child: const Icon(Icons.workspace_premium_rounded, size: 34, color: Color(0xFF9A5B00)),
+              child: const Icon(Icons.workspace_premium_rounded, size: 34, color: SL.amber),
             ),
             const SizedBox(height: 14),
             Text(plus ? tr('Plus is active') : tr('More protection, no ads'), style: Theme.of(context).textTheme.headlineMedium),

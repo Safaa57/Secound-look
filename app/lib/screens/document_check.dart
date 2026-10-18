@@ -19,7 +19,13 @@ import '../widgets/verdict.dart';
 /// Checks an ID card, passport, bank statement or letter for common signs of forgery.
 /// Everything is read on the device; the file is never uploaded or saved, and results are not kept in history.
 class DocumentCheckScreen extends StatefulWidget {
-  const DocumentCheckScreen({super.key});
+  const DocumentCheckScreen({super.key, this.initialImage, this.pickFileOnOpen = false});
+
+  /// A photo already picked and read on the Check screen.
+  final PickedImage? initialImage;
+
+  /// Open the file picker straight away (the File button on the Check screen).
+  final bool pickFileOnOpen;
 
   @override
   State<DocumentCheckScreen> createState() => _DocumentCheckScreenState();
@@ -44,6 +50,31 @@ class _DocumentCheckScreenState extends State<DocumentCheckScreen> {
   Map<String, dynamic>? result;
   bool busy = false;
   String Function()? note; // built with tr() when shown, so it follows the language
+
+  @override
+  void initState() {
+    super.initState();
+    final img = widget.initialImage;
+    if (img != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        final err = img.readError;
+        _useImage(
+          name: null,
+          bytes: img.bytes,
+          text: img.text,
+          qrs: img.qr,
+          editor: img.editor,
+          layout: img.layout,
+          readNote: err == null ? null : () => tr(err),
+        );
+      });
+    } else if (widget.pickFileOnOpen) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _pickFile();
+      });
+    }
+  }
 
   @override
   void dispose() {

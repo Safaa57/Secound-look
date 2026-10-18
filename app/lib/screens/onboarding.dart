@@ -61,55 +61,57 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final noMotion = MediaQuery.of(context).disableAnimations;
     final move = Duration(milliseconds: noMotion ? 1 : 320);
     return Scaffold(
-      body: SafeArea(
-        child: Column(children: [
-          const Align(
-            alignment: Alignment.centerRight,
-            child: Padding(padding: EdgeInsets.fromLTRB(0, 8, 12, 0), child: LanguageButton()),
-          ),
-          Expanded(
-            child: PageView(
-              controller: pc,
-              onPageChanged: (i) => setState(() => page = i),
-              children: pages,
+      body: Backdrop(
+        child: SafeArea(
+          child: Column(children: [
+            const Align(
+              alignment: Alignment.centerRight,
+              child: Padding(padding: EdgeInsets.fromLTRB(0, 8, 12, 0), child: LanguageButton()),
             ),
-          ),
-          Semantics(
-            label: tr('Page {n} of {total}', {'n': page + 1, 'total': pages.length}),
-            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              for (var i = 0; i < pages.length; i++)
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 250),
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  width: i == page ? 22 : 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                      color: i == page ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface.withAlpha(40),
-                      borderRadius: BorderRadius.circular(4)),
-                ),
-            ]),
-          ),
-          if (last)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 10, 20, 0),
-              child: ConsentBox(value: agreed, onChanged: (v) => setState(() => agreed = v)),
-            ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
-            child: Row(children: [
-              if (!last)
-                TextButton(
-                  onPressed: () => pc.animateToPage(pages.length - 1, duration: move, curve: Curves.easeOut),
-                  child: Text(tr('Skip')),
-                ),
-              const Spacer(),
-              FilledButton(
-                onPressed: last ? (agreed ? widget.onDone : null) : () => pc.nextPage(duration: move, curve: Curves.easeOut),
-                child: Padding(padding: const EdgeInsets.symmetric(horizontal: 18), child: Text(last ? tr('Get started') : tr('Next'))),
+            Expanded(
+              child: PageView(
+                controller: pc,
+                onPageChanged: (i) => setState(() => page = i),
+                children: pages,
               ),
-            ]),
-          ),
-        ]),
+            ),
+            Semantics(
+              label: tr('Page {n} of {total}', {'n': page + 1, 'total': pages.length}),
+              child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                for (var i = 0; i < pages.length; i++)
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 250),
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    width: i == page ? 22 : 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                        color: i == page ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface.withAlpha(40),
+                        borderRadius: BorderRadius.circular(4)),
+                  ),
+              ]),
+            ),
+            if (last)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 10, 20, 0),
+                child: ConsentBox(value: agreed, onChanged: (v) => setState(() => agreed = v)),
+              ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
+              child: Row(children: [
+                if (!last)
+                  TextButton(
+                    onPressed: () => pc.animateToPage(pages.length - 1, duration: move, curve: Curves.easeOut),
+                    child: Text(tr('Skip')),
+                  ),
+                const Spacer(),
+                FilledButton(
+                  onPressed: last ? (agreed ? widget.onDone : null) : () => pc.nextPage(duration: move, curve: Curves.easeOut),
+                  child: Padding(padding: const EdgeInsets.symmetric(horizontal: 18), child: Text(last ? tr('Get started') : tr('Next'))),
+                ),
+              ]),
+            ),
+          ]),
+        ),
       ),
     );
   }
@@ -122,12 +124,22 @@ class _Page extends StatelessWidget {
   final List<String> points;
   @override
   Widget build(BuildContext context) => ListView(padding: const EdgeInsets.fromLTRB(24, 12, 24, 12), children: [
-        Center(child: SizedBox(width: 220, height: 170, child: art)),
-        const SizedBox(height: 22),
+        Center(
+          child: Container(
+            width: 240,
+            height: 190,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              gradient: RadialGradient(colors: [SL.accent.withAlpha(40), SL.accent.withAlpha(0)]),
+            ),
+            child: SizedBox(width: 220, height: 170, child: art),
+          ),
+        ),
+        const SizedBox(height: 18),
         Text(title, style: Theme.of(context).textTheme.headlineMedium),
-        const SizedBox(height: 14),
-        Text(text, style: TextStyle(fontSize: 16.5, height: 1.5, color: Theme.of(context).colorScheme.onSurface.withAlpha(185))),
-        const SizedBox(height: 22),
+        const SizedBox(height: 12),
+        Text(text, style: TextStyle(fontSize: 15.5, height: 1.5, color: Theme.of(context).colorScheme.onSurface.withAlpha(180))),
+        const SizedBox(height: 18),
         Panel(
           child: Column(children: [
             for (final p in points)
@@ -239,7 +251,7 @@ class _ScanPainter extends CustomPainter {
       final r = 15.0 * Curves.easeOutBack.transform(shown.clamp(0.0, 1.0).toDouble());
       canvas.drawCircle(c, r, Paint()..color = danger);
       final tp = TextPainter(
-        text: TextSpan(text: '!', style: TextStyle(color: Colors.white, fontSize: r * 1.3, fontWeight: FontWeight.w900)),
+        text: TextSpan(text: '!', style: TextStyle(color: SL.onDanger, fontSize: r * 1.3, fontWeight: FontWeight.w900)),
         textDirection: TextDirection.ltr,
       )..layout();
       tp.paint(canvas, c - Offset(tp.width / 2, tp.height / 2));

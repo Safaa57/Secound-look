@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'i18n/i18n.dart';
 import 'i18n/reasons.dart';
 import 'native.dart';
+import 'theme.dart';
 
 /// Reads a result aloud in the chosen language, using the phone's (or browser's) own text-to-speech.
 /// Nothing is sent anywhere.
@@ -149,10 +150,25 @@ class _ListenButtonState extends State<ListenButton> {
   }
 
   @override
-  Widget build(BuildContext context) => TextButton.icon(
-        style: TextButton.styleFrom(foregroundColor: widget.color, minimumSize: const Size(0, 44)),
-        onPressed: _play,
-        icon: Icon(speaking ? Icons.stop_circle_rounded : Icons.volume_up_rounded),
-        label: Text(speaking ? tr('Stop') : tr('Listen')),
-      );
+  Widget build(BuildContext context) {
+    final c = widget.color ?? SL.text;
+    final r = BorderRadius.circular(22);
+    return Material(
+      color: const Color(0x0DFFFFFF),
+      shape: RoundedRectangleBorder(borderRadius: r, side: const BorderSide(color: Color(0x33FFFFFF))),
+      child: InkWell(
+        borderRadius: r,
+        onTap: _play,
+        child: Container(
+          height: 44,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Icon(speaking ? Icons.stop_circle_outlined : Icons.volume_up_outlined, size: 18, color: c),
+            const SizedBox(width: 8),
+            Text(speaking ? tr('Stop') : tr('Listen'), style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: c)),
+          ]),
+        ),
+      ),
+    );
+  }
 }

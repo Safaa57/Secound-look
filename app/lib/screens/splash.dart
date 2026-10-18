@@ -26,10 +26,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   bool _done = false;
   Timer? _still;
 
-  // Deep night-blue backdrop with the brand cobalt; works the same in light and dark mode.
-  static const _top = Color(0xFF0B1328);
-  static const _bottom = Color(0xFF15245C);
-  static const _glow = Color(0xFF5B7BFF);
+  // The app's near-black navy ground with a soft cyan glow.
+  static const _ground = SL.ground;
+  static const _glow = SL.accent;
   static const _tick = SL.safeD;
 
   @override
@@ -89,8 +88,12 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
         child: Material(
           type: MaterialType.transparency,
           child: Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [_top, _bottom]),
+            decoration: BoxDecoration(
+              gradient: RadialGradient(
+                center: const Alignment(0, -0.25),
+                radius: 0.9,
+                colors: [Color.alphaBlend(SL.accent.withAlpha(28), _ground), _ground],
+              ),
             ),
             child: SafeArea(
               child: AnimatedBuilder(
@@ -114,8 +117,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                           opacity: title,
                           child: Transform.translate(
                             offset: Offset(0, 8 * (1 - title)),
-                            child: const Text('Second Look',
-                                style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w800, letterSpacing: -0.3)),
+                            child: Text('Second Look', style: SL.h(30, spacing: 0.3)),
                           ),
                         ),
                         const SizedBox(height: 26),
@@ -136,14 +138,20 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
         opacity: t,
         child: Transform.translate(
           offset: Offset(0, 10 * (1 - t)),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Container(
+            margin: const EdgeInsets.symmetric(vertical: 5),
+            padding: const EdgeInsets.fromLTRB(10, 7, 16, 7),
+            decoration: BoxDecoration(
+              color: SL.glass,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: SL.glassBorder),
+            ),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
               SizedBox(width: 22, height: 22, child: CustomPaint(painter: _TickPainter(t, _tick))),
               const SizedBox(width: 10),
               Flexible(
                 child: Text(text,
-                    style: TextStyle(color: Colors.white.withAlpha(230), fontSize: 15.5, fontWeight: FontWeight.w600, height: 1.3)),
+                    style: const TextStyle(fontFamily: SL.body, color: SL.text, fontSize: 15, fontWeight: FontWeight.w600, height: 1.3)),
               ),
             ]),
           ),
@@ -194,7 +202,7 @@ class _ShieldPainter extends CustomPainter {
           ..shader = LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [SL.cobalt.withAlpha((235 * fill).round()), const Color(0xFF1A33A8).withAlpha((235 * fill).round())],
+            colors: [SL.accent.withAlpha((225 * fill).round()), SL.accentDeep.withAlpha((235 * fill).round())],
           ).createShader(Offset.zero & size),
       );
     }
@@ -205,7 +213,7 @@ class _ShieldPainter extends CustomPainter {
       ..strokeWidth = 4
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round
-      ..color = const Color(0xFFBFCBFF);
+      ..color = SL.accentLight;
     for (final m in path.computeMetrics()) {
       canvas.drawPath(m.extractPath(0, m.length * draw), stroke);
     }
@@ -236,7 +244,7 @@ class _ShieldPainter extends CustomPainter {
       );
       canvas.drawRRect(body, white);
       // Keyhole.
-      final kh = Paint()..color = SL.cobalt.withAlpha((255 * o).round());
+      final kh = Paint()..color = SL.accentDeep.withAlpha((255 * o).round());
       canvas.drawCircle(Offset(center.dx, bodyTop + bodyH * 0.42), w * 0.03, kh);
       canvas.drawRect(Rect.fromCenter(center: Offset(center.dx, bodyTop + bodyH * 0.62), width: w * 0.022, height: bodyH * 0.3), kh);
     }

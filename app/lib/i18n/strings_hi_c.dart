@@ -30,7 +30,7 @@ const stringsHiC = <String, String>{
   'Job offer or loan letters that ask for a fee or deposit first.': 'नौकरी या लोन की चिट्ठियाँ, जो पहले फ़ीस या डिपॉज़िट माँगती हैं।',
   'The file': 'फ़ाइल',
   'Checked as': 'किस रूप में जाँचा',
-  'File': 'फ़ाइल का नाम',
+  'File': 'फ़ाइल',
   'Photo': 'फ़ोटो',
   'Program recorded in the file': 'फ़ाइल में दर्ज प्रोग्राम',
   'None recorded': 'कुछ दर्ज नहीं',

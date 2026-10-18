@@ -141,88 +141,177 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  Map get _prefs => (s['prefs'] as Map?) ?? const {};
+
+  /// Saves an on/off preference ('' or missing means on for these keys).
+  Future<void> _pref(String key, bool on) async {
+    final st = await Native.instance.trySetPref(key, on ? 'on' : 'off');
+    if (!mounted) return;
+    if (st == null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr('Couldn\'t save. Please try again.'))));
+      return;
+    }
+    setState(() => s = st);
+  }
+
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final web = Native.instance.isWeb || s['platform'] == 'web';
+    final ios = s['platform'] == 'ios';
+    final android = !web && !ios;
     final here = web ? tr('this browser') : tr('this phone');
     if (voicesLang != L10n.lang.value && !voicesLoading) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) _loadVoices();
       });
     }
+    final secChecks = <List<Object>>[
+      [tr('Your data is encrypted on this phone'), sec['encryptedStorage'] == true],
+      [tr('Messages, numbers and contacts never leave this phone'), sec['privateChecks'] != false],
+      if (sec.containsKey('rulesIntact')) [tr('Scam rules are the original, untouched files'), sec['rulesIntact'] != false],
+      if (sec['signatureConfigured'] == true) [tr('This is the official, unmodified app'), sec['signatureOk'] != false],
+      [tr('No debugger attached'), sec['debugger'] != true],
+      [tr('No hacking tools inside the app'), sec['hooking'] != true],
+      [ios ? tr('iPhone is not jailbroken') : tr('Phone is not rooted'), sec['rooted'] != true],
+    ];
+    final secBad = secChecks.where((c) => c[1] != true).length;
+    final issues = healthIssues(health);
+
     return Scaffold(
-      appBar: AppBar(title: Text(tr('Settings')), actions: const [LanguageButton(), SizedBox(width: 8)]),
-      body: ListView(padding: const EdgeInsets.fromLTRB(18, 4, 18, 32), children: [
-        SectionLabel(tr('Language')),
-        Panel(
-          child: Wrap(spacing: 8, runSpacing: 8, children: [
-            for (final c in L10n.supported)
-              ChoiceChip(
-                label: Text(L10n.names[c]!),
-                selected: L10n.lang.value == c,
-                onSelected: (_) async {
-                  await L10n.set(c);
-                  if (mounted) setState(() {});
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        toolbarHeight: 76,
+        titleSpacing: 20,
+        title: Text(tr('Settings'), style: SL.h(28)),
+        actions: const [LanguageButton(), SizedBox(width: 12)],
+      ),
+      body: ListView(padding: EdgeInsets.fromLTRB(20, 0, 20, MediaQuery.paddingOf(context).bottom + 24), children: [
+        // ---- shields (Android)
+        if (android) ...[
+          SectionLabel(tr('Shields'), icon: Icons.shield_rounded),
+          Panel(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: Column(children: [
+              ListTile(
+                leading: Icon(Icons.health_and_safety_rounded, color: issues > 0 ? SL.fg(context, 'warning') : SL.accent),
+                title: Text(tr('Protection check')),
+                subtitle: Text(issues > 0 ? tr('Something may stop your shields. Tap to fix.') : tr('Test alerts and fixes')),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () async {
+                  await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ShieldHealthScreen()));
+                  if (mounted) load();
                 },
               ),
-          ]),
-        ),
-        SectionLabel(tr('Voice')),
+              if (s['callShield'] == true)
+                SwitchListTile(
+                  secondary: const Icon(Icons.volume_off_rounded),
+                  title: Text(tr('Silence likely scam calls')),
+                  value: s['autoSilence'] == true,
+                  onChanged: (v) async {
+                    final st = await Native.instance.setAutoSilence(v);
+                    if (mounted) setState(() => s = st);
+                  },
+                ),
+              SwitchListTile(
+                secondary: const Icon(Icons.picture_in_picture_alt_rounded),
+                title: Text(tr('Show a popup while an unknown number rings')),
+                subtitle: Text(tr('Needs "Display over other apps".')),
+                value: '${_prefs['call_popup'] ?? ''}' != 'off',
+                onChanged: (v) => _pref('call_popup', v),
+              ),
+              SwitchListTile(
+                secondary: const Icon(Icons.mark_chat_unread_rounded),
+                title: Text(tr('Show popup for new SMS')),
+                subtitle: Text(tr('For suspicious SMS and new senders.')),
+                value: '${_prefs['sms_popup'] ?? ''}' != 'off',
+                onChanged: (v) => _pref('sms_popup', v),
+              ),
+              SwitchListTile(
+                secondary: const Icon(Icons.list_alt_rounded),
+                title: Text(tr('List every checked SMS and call in Alerts')),
+                value: '${_prefs['log_all'] ?? ''}' != 'off',
+                onChanged: (v) => _pref('log_all', v),
+              ),
+            ]),
+          ),
+        ],
+        // ---- language & voice
+        SectionLabel(tr('Language & voice'), icon: Icons.translate_rounded),
         Panel(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Wrap(spacing: 8, runSpacing: 8, children: [
+              for (final c in L10n.supported)
+                ChoiceChip(
+                  label: Text(L10n.names[c]!),
+                  selected: L10n.lang.value == c,
+                  onSelected: (_) async {
+                    await L10n.set(c);
+                    if (mounted) setState(() {});
+                  },
+                ),
+            ]),
+            const Divider(height: 24),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               secondary: const Icon(Icons.record_voice_over_rounded),
               title: Text(tr('Read results aloud automatically')),
-              subtitle: Text(tr('Off: results are read only when you tap Listen. Uses your phone\'s own voice; nothing is sent anywhere.')),
+              subtitle: Text(tr('Off: tap Listen on a result.')),
               value: Voice.auto,
               onChanged: (v) async {
                 await Voice.setAuto(v);
                 if (mounted) setState(() {});
               },
             ),
-            const Divider(height: 20),
-            Text(tr('Choose a voice'), style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 4),
-            _voiceRow('', tr('Phone\'s default voice'), null),
-            if (voicesLoading && voices.isEmpty)
-              const Padding(padding: EdgeInsets.all(12), child: Center(child: SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2))))
-            else
-              for (var i = 0; i < voices.length; i++)
-                _voiceRow('${voices[i]['id']}', tr('Voice {n}', {'n': i + 1}), voices[i]['network'] == true ? tr('Needs internet') : null),
-            if (!voicesLoading && voices.isEmpty)
-              Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: Text(tr('No other voices found for this language on this device.'), style: TextStyle(fontSize: 13, color: cs.onSurface.withAlpha(150))),
-              ),
-            const Divider(height: 24),
-            Text(tr('Speed'), style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 8),
-            SegmentedButton<bool>(
-              segments: [
-                ButtonSegment(value: true, label: Text(tr('Slow')), icon: const Icon(Icons.slow_motion_video_rounded)),
-                ButtonSegment(value: false, label: Text(tr('Normal')), icon: const Icon(Icons.play_arrow_rounded)),
-              ],
-              selected: {Voice.slow},
-              onSelectionChanged: (v) async {
-                await Voice.setSlow(v.first);
-                if (mounted) setState(() {});
-              },
+            LearnMore(
+              label: tr('Voice and speed'),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(tr('Choose a voice'), style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: 4),
+                _voiceRow('', tr('Phone\'s default voice'), null),
+                if (voicesLoading && voices.isEmpty)
+                  const Padding(padding: EdgeInsets.all(12), child: Center(child: SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2))))
+                else
+                  for (var i = 0; i < voices.length; i++)
+                    _voiceRow('${voices[i]['id']}', tr('Voice {n}', {'n': i + 1}), voices[i]['network'] == true ? tr('Needs internet') : null),
+                if (!voicesLoading && voices.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(tr('No other voices found for this language on this device.'), style: TextStyle(fontSize: 13, color: cs.onSurface.withAlpha(150))),
+                  ),
+                const SizedBox(height: 14),
+                Text(tr('Speed'), style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: 8),
+                SegmentedButton<bool>(
+                  segments: [
+                    ButtonSegment(value: true, label: Text(tr('Slow')), icon: const Icon(Icons.slow_motion_video_rounded)),
+                    ButtonSegment(value: false, label: Text(tr('Normal')), icon: const Icon(Icons.play_arrow_rounded)),
+                  ],
+                  selected: {Voice.slow},
+                  onSelectionChanged: (v) async {
+                    await Voice.setSlow(v.first);
+                    if (mounted) setState(() {});
+                  },
+                ),
+                const SizedBox(height: 6),
+                Text(tr('Uses your phone\'s own voice; nothing is sent anywhere.'), style: TextStyle(fontSize: 12.5, color: cs.onSurface.withAlpha(140))),
+              ]),
             ),
           ]),
         ),
         if (Cloud.configured) ...[
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           Panel(
             onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PlusScreen())),
+            color: SL.amber.withAlpha(16),
+            borderColor: SL.amber.withAlpha(60),
             child: Row(children: [
-              const Icon(Icons.workspace_premium_rounded, color: Color(0xFF9A5B00), size: 30),
+              const Icon(Icons.workspace_premium_rounded, color: SL.amber, size: 30),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   const Text('Second Look Plus', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
-                  Text(tr('Unlimited deep checks, no ads, more devices')),
+                  Text(tr('Unlimited deep checks, no ads, more devices'), style: TextStyle(color: cs.onSurface.withAlpha(170))),
                 ]),
               ),
               Icon(Icons.chevron_right_rounded, color: cs.onSurface.withAlpha(120)),
@@ -230,16 +319,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ],
         if (Cloud.configured) ...[
-          SectionLabel(tr('Community protection')),
+          SectionLabel(tr('Community protection'), icon: Icons.groups_rounded),
           Panel(
             padding: const EdgeInsets.symmetric(vertical: 6),
             child: SwitchListTile(
               secondary: const Icon(Icons.groups_rounded),
               title: Text(tr('Use community reports')),
-              subtitle: Text(web
-                  ? tr('Show what other users reported when you check a number.')
-                  : tr('Show what other users reported when you check a number, and let Call Shield warn about numbers many people reported. '
-                      'Call Shield uses a list downloaded to this phone; callers\' numbers are never sent.')),
+              subtitle: Text(web ? tr('Show what other users reported when you check a number.') : tr('See what others reported. Callers\' numbers are never sent.')),
               value: ((s['prefs'] as Map?)?['community_off'] ?? '') != '1',
               onChanged: (v) async {
                 var st = await Native.instance.setPref('community_off', v ? '' : '1');
@@ -252,11 +338,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
         ],
-        SectionLabel(tr('Trusted person')),
+        // ---- people & numbers
+        SectionLabel(tr('Trusted person'), icon: Icons.family_restroom_rounded),
         Panel(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(tr('When something looks like a scam, you get a button to ask this person to check it with you. Nothing is sent automatically.'),
-                style: TextStyle(color: cs.onSurface.withAlpha(170))),
+            Text(tr('Get a button to ask them to check a scary message. Nothing is sent automatically.'), style: TextStyle(color: cs.onSurface.withAlpha(170))),
             const SizedBox(height: 12),
             TextField(controller: name, decoration: InputDecoration(labelText: tr('Name'), hintText: tr('e.g. Ayesha (daughter)'))),
             const SizedBox(height: 10),
@@ -271,31 +357,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ]),
         ),
-        SectionLabel(tr('Numbers you marked ({n})', {'n': reports.length})),
+        SectionLabel(tr('Numbers you marked ({n})', {'n': reports.length}), icon: Icons.bookmark_rounded),
         if (reports.isEmpty)
-          Panel(child: Text('${tr('Numbers you report or trust appear here.')} ${s['platform'] == 'ios' ? tr('Reported numbers are blocked and labelled by Call Shield.') : tr('Call Shield warns you when they call again.')}'))
+          Panel(child: Text('${tr('Numbers you report or trust appear here.')} ${ios ? tr('Reported numbers are blocked and labelled by Call Shield.') : tr('Call Shield warns you when they call again.')}',
+              style: TextStyle(color: cs.onSurface.withAlpha(170))))
         else
           Panel(
             padding: const EdgeInsets.symmetric(vertical: 6),
             child: Column(children: [
               for (final r in reports)
                 ListTile(
-                  leading: Icon(r['kind'] == 'safe' ? Icons.verified_rounded : Icons.block_rounded),
+                  leading: Icon(r['kind'] == 'safe' ? Icons.verified_rounded : Icons.block_rounded, color: SL.fg(context, r['kind'] == 'safe' ? 'safe' : 'danger')),
                   title: Text('${r['number']}'),
                   subtitle: Text(_reportLabel(r)),
                   trailing: IconButton(
                     tooltip: tr('Remove'),
                     icon: const Icon(Icons.close_rounded),
                     onPressed: () async {
-                      await Native.instance.removeReport(r['number'] as String);
+                      await Native.instance.removeReport('${r['number']}');
                       load();
                     },
                   ),
                 ),
             ]),
           ),
+        // ---- security
         if (web) ...[
-          SectionLabel(tr('On this laptop')),
+          SectionLabel(tr('On this laptop'), icon: Icons.laptop_rounded),
           Panel(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               _Check(tr('Checks run in this browser. Nothing you paste is uploaded.'), true),
@@ -306,32 +394,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ]),
           ),
         ] else ...[
-          if (s['platform'] != 'ios') ...[
-            SectionLabel(tr('Shields')),
-            Panel(
-              padding: const EdgeInsets.symmetric(vertical: 6),
-              child: ListTile(
-                leading: Icon(Icons.health_and_safety_rounded, color: healthIssues(health) > 0 ? SL.fg(context, 'warning') : null),
-                title: Text(tr('Protection check')),
-                subtitle: Text(healthIssues(health) > 0
-                    ? tr('Something may stop your shields. Tap to fix.')
-                    : tr('See if anything stops your shields, and send a test alert')),
-                trailing: const Icon(Icons.chevron_right_rounded),
-                onTap: () async {
-                  await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ShieldHealthScreen()));
-                  if (mounted) load();
-                },
-              ),
-            ),
-          ],
-          SectionLabel(tr('Security')),
+          SectionLabel(tr('Security'), icon: Icons.lock_rounded),
           Panel(
             padding: const EdgeInsets.symmetric(vertical: 6),
             child: Column(children: [
               SwitchListTile(
                 secondary: const Icon(Icons.fingerprint_rounded),
                 title: Text(tr('App lock')),
-                subtitle: Text(tr('Ask for fingerprint, face or phone PIN to open Second Look')),
+                subtitle: Text(tr('Fingerprint, face or phone PIN')),
                 value: s['appLock'] == true,
                 onChanged: (v) async {
                   final err = await Native.instance.setAppLock(v);
@@ -339,36 +409,41 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   load();
                 },
               ),
-              if (s['platform'] != 'ios')
+              if (!ios)
                 SwitchListTile(
                   secondary: const Icon(Icons.screenshot_monitor_rounded),
                   title: Text(tr('Screen protection')),
-                  subtitle: Text(tr('Blocks screenshots and hides the app from screen-sharing and remote-control apps')),
+                  subtitle: Text(tr('Blocks screenshots and screen sharing')),
                   value: s['screenProtection'] != false,
                   onChanged: (v) async {
                     await Native.instance.setScreenProtection(v);
                     load();
                   },
                 ),
-            ]),
-          ),
-          const SizedBox(height: 12),
-          Panel(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(tr('Security check'), style: Theme.of(context).textTheme.titleMedium),
-              const SizedBox(height: 6),
-              _Check(tr('Your data is encrypted on this phone'), sec['encryptedStorage'] == true),
-              _Check(tr('Messages, numbers and contacts never leave this phone'), sec['privateChecks'] != false),
-              if (sec.containsKey('rulesIntact')) _Check(tr('Scam rules are the original, untouched files'), sec['rulesIntact'] != false),
-              if (sec['signatureConfigured'] == true) _Check(tr('This is the official, unmodified app'), sec['signatureOk'] != false),
-              _Check(tr('No debugger attached'), sec['debugger'] != true),
-              _Check(tr('No hacking tools inside the app'), sec['hooking'] != true),
-              _Check(s['platform'] == 'ios' ? tr('iPhone is not jailbroken') : tr('Phone is not rooted'), sec['rooted'] != true),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 4, 16, 6),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Row(children: [
+                    Icon(secBad == 0 ? Icons.verified_user_rounded : Icons.gpp_maybe_rounded, color: SL.fg(context, secBad == 0 ? 'safe' : 'danger')),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(secBad == 0 ? tr('Security check passed') : tr('Security check found a problem'),
+                          style: TextStyle(fontWeight: FontWeight.w700, color: SL.fg(context, secBad == 0 ? 'safe' : 'danger'))),
+                    ),
+                  ]),
+                  LearnMore(
+                    initiallyOpen: secBad > 0,
+                    child: Column(children: [for (final c in secChecks) _Check(c[0] as String, c[1] == true)]),
+                  ),
+                ]),
+              ),
             ]),
           ),
         ],
-        SectionLabel(tr('Your privacy')),
+        // ---- privacy
+        SectionLabel(tr('Your privacy'), icon: Icons.privacy_tip_rounded),
         Panel(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             _Promise(Icons.phone_android_rounded, tr('Checks run on {place}', {'place': here}), tr('SMS text, links and numbers are analysed on the device. Nothing is uploaded unless you tap Deep check.')),
             if (Cloud.configured)
@@ -380,7 +455,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         const SizedBox(height: 12),
         OutlinedButton.icon(
-          style: OutlinedButton.styleFrom(foregroundColor: cs.error),
+          style: OutlinedButton.styleFrom(foregroundColor: SL.fg(context, 'danger'), side: BorderSide(color: SL.fg(context, 'danger').withAlpha(110))),
           onPressed: () async {
             final ok = await showDialog<bool>(
               context: context,
@@ -416,7 +491,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           icon: const Icon(Icons.delete_forever_rounded),
           label: Text(tr('Delete all my data')),
         ),
-        SectionLabel(tr('Legal')),
+        // ---- legal & about
+        SectionLabel(tr('Legal'), icon: Icons.gavel_rounded),
         Panel(
           padding: const EdgeInsets.symmetric(vertical: 6),
           child: Column(children: [
@@ -453,16 +529,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ]),
         ),
-        SectionLabel(tr('About')),
+        SectionLabel(tr('About'), icon: Icons.info_outline_rounded),
         Panel(
-          child: Text(
-            [
-              tr('Second Look 1.0 by {operator}. Rules for Indian scams (KYC, UPI, digital arrest, courier, job and investment fraud, fake payments), registered SMS sender checks, and TRAI number series.', {'operator': Operator.name}),
-              tr('Results are automated opinions, not guarantees: it can miss new tricks or warn about something genuine. When money or OTPs are involved, check with the organisation directly.'),
-              tr('Second Look is not affiliated with any bank, app, company or government body named in it.'),
-            ].join(' '),
-            style: TextStyle(color: cs.onSurface.withAlpha(170)),
-          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(tr('Results are automated opinions, not guarantees.'), style: const TextStyle(fontWeight: FontWeight.w600)),
+            const SizedBox(height: 4),
+            Text('Version 1.5', style: TextStyle(color: cs.onSurface.withAlpha(170), fontSize: 13)),
+            LearnMore(
+              child: Text(
+                [
+                  tr('Second Look 1.0 by {operator}. Rules for Indian scams (KYC, UPI, digital arrest, courier, job and investment fraud, fake payments), registered SMS sender checks, and TRAI number series.', {'operator': Operator.name}),
+                  tr('Results are automated opinions, not guarantees: it can miss new tricks or warn about something genuine. When money or OTPs are involved, check with the organisation directly.'),
+                  tr('Second Look is not affiliated with any bank, app, company or government body named in it.'),
+                ].join(' '),
+                style: TextStyle(color: cs.onSurface.withAlpha(170), height: 1.45),
+              ),
+            ),
+          ]),
         ),
       ]),
     );
@@ -500,23 +583,39 @@ class _Check extends StatelessWidget {
       );
 }
 
-class _Promise extends StatelessWidget {
+/// One privacy promise: the title, with the detail a tap away.
+class _Promise extends StatefulWidget {
   const _Promise(this.icon, this.title, this.text);
   final IconData icon;
   final String title, text;
   @override
-  Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Icon(icon, color: Theme.of(context).colorScheme.primary),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
-              Text(text, style: TextStyle(fontSize: 13.5, color: Theme.of(context).colorScheme.onSurface.withAlpha(160))),
-            ]),
-          ),
-        ]),
+  State<_Promise> createState() => _PromiseState();
+}
+
+class _PromiseState extends State<_Promise> {
+  bool open = false;
+  @override
+  Widget build(BuildContext context) => InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () => setState(() => open = !open),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Icon(widget.icon, color: SL.accent),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Padding(padding: const EdgeInsets.only(top: 2), child: Text(widget.title, style: const TextStyle(fontWeight: FontWeight.w700))),
+                if (open)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 3),
+                    child: Text(widget.text, style: TextStyle(fontSize: 13.5, height: 1.4, color: Theme.of(context).colorScheme.onSurface.withAlpha(165))),
+                  ),
+              ]),
+            ),
+            Icon(open ? Icons.expand_less_rounded : Icons.expand_more_rounded, color: Theme.of(context).colorScheme.onSurface.withAlpha(120)),
+          ]),
+        ),
       );
 }
 

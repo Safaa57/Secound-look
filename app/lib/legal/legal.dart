@@ -193,5 +193,18 @@ void registerLicences() {
         const LicenseEntryWithLineBreaks(['Phishing.Database (used by the Deep check server)'], 'Phishing.Database by Mitchell Krog and Nissar Chababy. MIT License.'),
         const LicenseEntryWithLineBreaks(['Google Web Risk'], 'Advisory provided by Google: https://docs.cloud.google.com/web-risk/docs/advisory. Google cannot guarantee that its information is comprehensive and error-free.'),
       ]));
+  // The two bundled fonts (SIL Open Font License 1.1); the full licence texts ship beside the font files.
+  LicenseRegistry.addLicense(() async* {
+    for (final f in const [
+      ['Sora (font)', 'assets/fonts/OFL-Sora.txt'],
+      ['Manrope (font)', 'assets/fonts/OFL-Manrope.txt'],
+    ]) {
+      try {
+        yield LicenseEntryWithLineBreaks([f[0]], await rootBundle.loadString(f[1]));
+      } catch (_) {
+        yield LicenseEntryWithLineBreaks([f[0]], 'Licensed under the SIL Open Font License, Version 1.1 (https://openfontlicense.org).');
+      }
+    }
+  });
   if (kDebugMode) debugPrint('Second Look licences registered');
 }
