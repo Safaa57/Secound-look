@@ -270,11 +270,86 @@ class _AlertCardState extends State<AlertCard> {
     }
   }
 
+  /// Clock time for today's alerts ("9:41 am"), otherwise "2 d ago".
+  String _when(BuildContext context, int ms) {
+    if (ms <= 0) return '';
+    final d = DateTime.fromMillisecondsSinceEpoch(ms);
+    final now = DateTime.now();
+    if (d.year == now.year && d.month == now.month && d.day == now.day) {
+      return MaterialLocalizations.of(context).formatTimeOfDay(TimeOfDay.fromDateTime(d));
+    }
+    return timeAgo(ms);
+  }
+
+  Future<void> _chat() async {
+    final ok = await Native.instance.openChat(_chatNumber(widget.a));
+    if (!ok && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr('Couldn\'t open WhatsApp.'))));
+    }
+  }
+
+  /// "⋯": the marks and call-backs that aren't already on the card.
+  Future<void> _more(List<String> keys) async {
+    final sender = alertSender(widget.a);
+    final picked = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (c) => SafeArea(
+        child: ListView(shrinkWrap: true, padding: const EdgeInsets.fromLTRB(12, 0, 12, 12), children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+            child: Text(sender, maxLines: 1, overflow: TextOverflow.ellipsis, style: SL.h(18)),
+          ),
+          for (final k in keys)
+            ListTile(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              leading: Icon(_moreIcon(k), color: _moreColor(k)),
+              title: Text(_moreLabel(k)),
+              trailing: mark?['action'] == k ? const Icon(Icons.check_rounded, color: SL.accent) : null,
+              onTap: () => Navigator.pop(c, k),
+            ),
+        ]),
+      ),
+    );
+    if (picked == null || !mounted) return;
+    switch (picked) {
+      case 'call':
+        Native.instance.dial(sender);
+        break;
+      case 'sms':
+        Native.instance.smsTo(sender, '');
+        break;
+      case 'chat':
+        await _chat();
+        break;
+      default:
+        await _mark(picked);
+    }
+  }
+
+  static IconData _moreIcon(String k) => k == 'call' ? Icons.call_outlined : (k == 'sms' ? Icons.sms_outlined : (k == 'chat' ? Icons.chat_outlined : markIcon(k)));
+  static Color _moreColor(String k) => k == 'call' || k == 'sms' || k == 'chat' ? SL.accent : (k == 'comment' ? SL.accent : SL.fgOf(markLevel(k)));
+  static String _moreLabel(String k) {
+    switch (k) {
+      case 'call':
+        return tr('Call back');
+      case 'sms':
+        return tr('Send SMS');
+      case 'chat':
+        return tr('Chat on WhatsApp');
+      case 'block':
+        return tr('Block');
+      default:
+        return markLabel(k);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final a = widget.a;
-    final cs = Theme.of(context).colorScheme;
-    final level = a['level'] as String? ?? 'safe';
+    final raw = '${a['level'] ?? 'safe'}';
+    final level = raw == 'danger' || raw == 'warning' ? raw : 'safe';
+    final bad = level != 'safe';
     final call = a['kind'] == 'call';
     final sender = alertSender(a);
     final isNumber = alertFromNumber(a);
@@ -283,125 +358,187 @@ class _AlertCardState extends State<AlertCard> {
     final m = mark;
     final mAction = '${m?['action'] ?? ''}';
     final mComment = '${m?['comment'] ?? ''}'.trim();
-    final muted = cs.onSurface.withAlpha(150);
-
     final chat = whatsAppAllowed(a, installed: widget.whatsApp, mark: m);
-    return Panel(
-      padding: const EdgeInsets.fromLTRB(14, 14, 14, 8),
-      borderColor: level == 'safe' ? null : SL.fg(context, level).withAlpha(70),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        InkWell(
-          borderRadius: BorderRadius.circular(12),
-          onTap: () => _openResult(context, a),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              IconTile(call ? Icons.call_rounded : Icons.sms_rounded, color: SL.fg(context, level), size: 42),
+
+    final fg = SL.fgOf(level);
+    final Color fill, edge, disc;
+    switch (level) {
+      case 'danger':
+        fill = fg.withAlpha(18);
+        edge = fg.withAlpha(102);
+        disc = fg.withAlpha(46);
+        break;
+      case 'warning':
+        fill = fg.withAlpha(15);
+        edge = fg.withAlpha(89);
+        disc = fg.withAlpha(41);
+        break;
+      default:
+        fill = SL.glass;
+        edge = SL.glassBorder;
+        disc = fg.withAlpha(36);
+    }
+    final who = sender.isEmpty ? tr('Unknown sender') : sender;
+    final title = bad ? '$who · ${level == 'danger' ? tr('Likely scam') : tr('Suspicious')}' : who;
+    final line = preview.isNotEmpty ? preview : (summary.isNotEmpty ? summary : (call ? tr('Call') : 'SMS'));
+    final r = BorderRadius.circular(20);
+
+    // The inline buttons, and what goes behind "⋯".
+    Widget? actions;
+    if (sender.isNotEmpty) {
+      final List<Widget> row;
+      final List<String> more;
+      if (bad) {
+        row = [
+          _btn(mAction == 'block' ? tr('Blocked') : tr('Block'), () => _mark('block'), filled: true),
+          _btn(tr('Spam'), () => _mark('spam'), selected: mAction == 'spam', selColor: SL.warnD),
+          _btn(tr('Fraud'), () => _mark('fraud'), selected: mAction == 'fraud', selColor: SL.dangerD),
+        ];
+        more = ['safe', 'comment', if (isNumber && level != 'danger') ...['call', 'sms']];
+      } else if (isNumber) {
+        row = [
+          _btn(tr('Call back'), () => Native.instance.dial(sender)),
+          if (chat) _btn(tr('Chat on WhatsApp'), _chat, tint: SL.safeD) else _btn(tr('Send SMS'), () => Native.instance.smsTo(sender, '')),
+        ];
+        more = ['block', 'spam', 'fraud', 'safe', 'comment', if (chat) 'sms'];
+      } else {
+        row = [
+          _btn(tr('Safe'), () => _mark('safe'), selected: mAction == 'safe', selColor: SL.safeD),
+          _btn(tr('Comment'), () => _mark('comment'), selected: mAction == 'comment', selColor: SL.accent),
+        ];
+        more = ['block', 'spam', 'fraud'];
+      }
+      actions = Row(children: [
+        for (final w in row) ...[Expanded(child: w), const SizedBox(width: 8)],
+        _moreButton(() => _more(more)),
+      ]);
+    }
+
+    return Material(
+      color: fill,
+      shape: RoundedRectangleBorder(borderRadius: r, side: BorderSide(color: edge)),
+      child: InkWell(
+        borderRadius: r,
+        onTap: () => _openResult(context, a),
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Row(children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(color: disc, shape: BoxShape.circle),
+                child: Icon(bad ? (call ? Icons.phone_outlined : Icons.chat_bubble_outline_rounded) : Icons.check_rounded, size: 22, color: fg),
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(sender.isEmpty ? tr('Unknown sender') : sender,
-                      maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15.5)),
+                  Row(children: [
+                    Flexible(child: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: SL.text))),
+                    if (a['firstTime'] == true) ...[const SizedBox(width: 8), _Tag(tr('NEW'), color: SL.accentLight, bg: SL.accent.withAlpha(36))],
+                    if (a['test'] == true) ...[const SizedBox(width: 6), _Tag(tr('Test'), color: SL.textSecondary, bg: const Color(0x14FFFFFF))],
+                  ]),
                   const SizedBox(height: 2),
-                  Text('${call ? tr('Call') : 'SMS'} · ${timeAgo(_ms(a['at']))}', style: TextStyle(fontSize: 12.5, color: muted)),
+                  Text(line, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13.5, color: SL.textSoft)),
                 ]),
               ),
               const SizedBox(width: 8),
-              _levelPill(context, level),
+              Text(_when(context, _ms(a['at'])), style: const TextStyle(fontSize: 12, color: SL.textMuted)),
             ]),
-            if (a['firstTime'] == true || a['test'] == true || m != null) ...[
+            if (m != null && (mAction != 'block' || !bad)) ...[
               const SizedBox(height: 8),
-              Wrap(spacing: 6, runSpacing: 6, children: [
-                if (a['firstTime'] == true) _Badge(tr('New sender'), icon: Icons.fiber_new_rounded),
-                if (a['test'] == true) _Badge(tr('Test'), icon: Icons.science_rounded, color: muted),
-                if (m != null) _Badge(markLabel(mAction), icon: markIcon(mAction), color: SL.fg(context, markLevel(mAction))),
-              ]),
-            ],
-            if (preview.isNotEmpty) ...[
-              const SizedBox(height: 10),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(color: Colors.white.withAlpha(8), borderRadius: BorderRadius.circular(14), border: Border.all(color: Colors.white.withAlpha(16))),
-                child: Text(preview, maxLines: 3, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 14, height: 1.4)),
-              ),
-            ],
-            if (summary.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Text(summary, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13.5, color: cs.onSurface.withAlpha(175))),
+              Align(alignment: Alignment.centerLeft, child: _Badge(markLabel(mAction), icon: markIcon(mAction), color: SL.fgOf(markLevel(mAction)))),
             ],
             if (mComment.isNotEmpty) ...[
               const SizedBox(height: 6),
               Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Icon(Icons.chat_bubble_outline_rounded, size: 15, color: muted),
+                const Icon(Icons.chat_bubble_outline_rounded, size: 15, color: SL.textMuted),
                 const SizedBox(width: 6),
-                Expanded(child: Text(mComment, style: TextStyle(fontSize: 13.5, fontStyle: FontStyle.italic, color: cs.onSurface.withAlpha(190)))),
+                Expanded(child: Text(mComment, style: const TextStyle(fontSize: 13.5, fontStyle: FontStyle.italic, color: SL.textSoft))),
               ]),
             ],
-          ]),
-        ),
-        if (sender.isNotEmpty) ...[
-          const SizedBox(height: 8),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(children: [
-              _chip('block', tr('Block'), Icons.block_rounded, 'danger'),
-              _chip('spam', tr('Spam'), Icons.campaign_rounded, 'warning'),
-              _chip('fraud', tr('Fraud'), Icons.gpp_bad_rounded, 'danger'),
-              _chip('safe', tr('Safe'), Icons.verified_rounded, 'safe'),
-              _chip('comment', tr('Comment'), Icons.edit_note_rounded, null),
-            ]),
-          ),
-        ],
-        if (isNumber && level != 'danger' && sender.isNotEmpty) ...[
-          Wrap(spacing: 4, children: [
-            TextButton.icon(
-              onPressed: () => Native.instance.dial(sender),
-              icon: const Icon(Icons.call_rounded, size: 18),
-              label: Text(tr('Call')),
-            ),
-            TextButton.icon(
-              onPressed: () => Native.instance.smsTo(sender, ''),
-              icon: const Icon(Icons.sms_rounded, size: 18),
-              label: Text(tr('Send SMS')),
-            ),
-            if (chat)
-              TextButton.icon(
-                onPressed: () async {
-                  final ok = await Native.instance.openChat(_chatNumber(a));
-                  if (!ok && context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr('Couldn\'t open WhatsApp.'))));
-                  }
-                },
-                icon: const Icon(Icons.chat_rounded, size: 18),
-                label: Text(tr('Chat on WhatsApp')),
+            if (actions != null) ...[const SizedBox(height: 10), actions],
+            if (chat && !bad)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(2, 8, 2, 0),
+                child: Text(tr('Opens WhatsApp; it will tell you if this number isn\'t on WhatsApp.'), style: const TextStyle(fontSize: 12, color: SL.textMuted)),
               ),
           ]),
-          if (chat)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(8, 0, 8, 6),
-              child: Text(tr('Opens WhatsApp; it will tell you if this number isn\'t on WhatsApp.'), style: TextStyle(fontSize: 12, color: muted)),
-            ),
-        ],
-      ]),
-    );
-  }
-
-  Widget _chip(String action, String label, IconData icon, String? level) {
-    final selected = mark?['action'] == action;
-    final c = level == null ? Theme.of(context).colorScheme.primary : SL.fg(context, level);
-    return Padding(
-      padding: const EdgeInsets.only(right: 6),
-      child: ActionChip(
-        avatar: Icon(icon, size: 17, color: c),
-        label: Text(label),
-        side: BorderSide(color: selected ? c : c.withAlpha(60)),
-        backgroundColor: selected ? c.withAlpha(30) : null,
-        labelStyle: TextStyle(fontWeight: FontWeight.w700, color: c),
-        visualDensity: VisualDensity.compact,
-        onPressed: busy ? null : () => _mark(action),
+        ),
       ),
     );
   }
+
+  /// A 44 px card button: red filled (Block), quiet outlined, green-tinted (WhatsApp) or highlighted when chosen.
+  Widget _btn(String label, VoidCallback onTap, {bool filled = false, Color? tint, bool selected = false, Color? selColor}) {
+    final r = BorderRadius.circular(12);
+    final Color fill;
+    final Color edge;
+    final Color text;
+    if (filled) {
+      fill = SL.dangerD;
+      edge = SL.dangerD;
+      text = SL.onDanger;
+    } else if (tint != null) {
+      fill = tint.withAlpha(26);
+      edge = tint.withAlpha(115);
+      text = SL.pale('safe');
+    } else if (selected && selColor != null) {
+      fill = selColor.withAlpha(36);
+      edge = selColor;
+      text = SL.text;
+    } else {
+      fill = const Color(0x0AFFFFFF);
+      edge = const Color(0x2EFFFFFF);
+      text = SL.text;
+    }
+    return Material(
+      color: fill,
+      shape: RoundedRectangleBorder(borderRadius: r, side: BorderSide(color: edge)),
+      child: InkWell(
+        borderRadius: r,
+        onTap: busy ? null : onTap,
+        child: Container(
+          height: 44,
+          alignment: Alignment.center,
+          padding: const EdgeInsets.symmetric(horizontal: 6),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(label, maxLines: 1, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: text)),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _moreButton(VoidCallback onTap) {
+    final r = BorderRadius.circular(12);
+    return Tooltip(
+      message: tr('More'),
+      child: Material(
+        color: const Color(0x0AFFFFFF),
+        shape: RoundedRectangleBorder(borderRadius: r, side: const BorderSide(color: Color(0x2EFFFFFF))),
+        child: InkWell(
+          borderRadius: r,
+          onTap: busy ? null : onTap,
+          child: const SizedBox(width: 44, height: 44, child: Icon(Icons.more_horiz_rounded, size: 20, color: SL.text)),
+        ),
+      ),
+    );
+  }
+}
+
+/// A tiny label next to the sender ("NEW", "Test").
+class _Tag extends StatelessWidget {
+  const _Tag(this.text, {required this.color, required this.bg});
+  final String text;
+  final Color color, bg;
+  @override
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+        decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(10)),
+        child: Text(text, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: color)),
+      );
 }
 
 /// Asks for a short note about a number (max 200 characters). Null if cancelled.

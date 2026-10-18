@@ -28,16 +28,22 @@ class _ResultScreenState extends State<ResultScreen> {
     final input = widget.result['input'];
     final body = input is Map ? '${input['body'] ?? ''}' : '${input ?? ''}';
     return Scaffold(
-      appBar: AppBar(title: Text(tr(widget.title))),
-      body: ListView(padding: const EdgeInsets.fromLTRB(18, 4, 18, 32), children: [
-        VerdictView(result: widget.result, trustedName: status['trustedName'] as String?, trustedNumber: status['trustedNumber'] as String?),
-        if (body.isNotEmpty && widget.result['kind'] != 'number') ...[
-          SectionLabel(tr('What was checked'), icon: Icons.notes_rounded),
-          Panel(
-            padding: const EdgeInsets.all(14),
-            child: _CheckedText(body),
+      body: ListView(padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom + 32), children: [
+        VerdictView(
+          result: widget.result,
+          trustedName: status['trustedName'] as String?,
+          trustedNumber: status['trustedNumber'] as String?,
+          title: widget.title,
+          onBack: () => Navigator.of(context).maybePop(),
+        ),
+        if (body.isNotEmpty && widget.result['kind'] != 'number')
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              SectionLabel(tr('What was checked')),
+              Panel(padding: const EdgeInsets.all(14), child: _CheckedText(body)),
+            ]),
           ),
-        ],
       ]),
     );
   }

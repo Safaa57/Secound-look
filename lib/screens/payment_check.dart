@@ -13,10 +13,13 @@ import '../widgets/verdict.dart';
 
 /// Checks a "payment done" screenshot for signs that it's fake or edited.
 class PaymentCheckScreen extends StatefulWidget {
-  const PaymentCheckScreen({super.key, this.sharedPath});
+  const PaymentCheckScreen({super.key, this.sharedPath, this.initialImage});
 
   /// Android: a screenshot shared to Second Look from another app.
   final String? sharedPath;
+
+  /// A screenshot already picked and read on the Check screen.
+  final PickedImage? initialImage;
 
   @override
   State<PaymentCheckScreen> createState() => _PaymentCheckScreenState();
@@ -37,6 +40,8 @@ class _PaymentCheckScreenState extends State<PaymentCheckScreen> {
     Native.instance.status().then((s) => mounted ? setState(() => status = s) : null);
     final p = widget.sharedPath;
     if (p != null && !kIsWeb) _loadShared(p);
+    final img = widget.initialImage;
+    if (img != null) WidgetsBinding.instance.addPostFrameCallback((_) => _use(img));
   }
 
   @override

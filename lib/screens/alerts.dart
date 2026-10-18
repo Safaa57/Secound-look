@@ -81,117 +81,112 @@ class _AlertsScreenState extends State<AlertsScreen> {
   }
 
   @override
-  Widget build(BuildContext context) => DefaultTabController(
-        length: 2,
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
-          appBar: AppBar(
-            title: Text(tr('Alerts')),
-            actions: [
-              const LanguageButton(),
-              IconButton(tooltip: tr('Refresh'), onPressed: load, icon: const Icon(Icons.refresh_rounded)),
-              if (items.isNotEmpty) IconButton(tooltip: tr('Clear all'), onPressed: _clearAll, icon: const Icon(Icons.delete_sweep_rounded)),
-            ],
-            bottom: TabBar(
-              indicatorColor: SL.accent,
-              labelColor: SL.text,
-              unselectedLabelColor: SL.textMuted,
-              dividerColor: Colors.transparent,
-              labelStyle: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14.5),
-              tabs: [
-                Tab(text: tr('Checked')),
-                Tab(text: marks.isEmpty ? tr('My marks') : '${tr('My marks')} (${marks.length})'),
-              ],
+  Widget build(BuildContext context) {
+    final bottom = MediaQuery.paddingOf(context).bottom;
+    final danger = items.where((a) => a['level'] == 'danger').length;
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: SafeArea(
+        bottom: false,
+        child: RefreshIndicator(
+          onRefresh: load,
+          child: ListView(padding: EdgeInsets.fromLTRB(20, 16, 20, bottom + 24), children: [
+            Row(children: [
+              Expanded(child: Text(tr('Alerts'), maxLines: 1, overflow: TextOverflow.ellipsis, style: SL.h(28))),
+              _RoundIcon(icon: Icons.refresh_rounded, tooltip: tr('Refresh'), onTap: load),
+              if (items.isNotEmpty) ...[const SizedBox(width: 8), _RoundIcon(icon: Icons.delete_sweep_outlined, tooltip: tr('Clear all'), onTap: _clearAll)],
+            ]),
+            const SizedBox(height: 14),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(children: [
+                _filter('all', tr('All')),
+                _filter('danger', danger > 0 ? '${tr('Danger')} $danger' : tr('Danger')),
+                _filter('call', tr('Calls')),
+                _filter('marked', tr('Marked')),
+              ]),
             ),
-          ),
-          body: TabBarView(children: [_alertsTab(context), _marksTab(context)]),
+            const SizedBox(height: 14),
+            if (filter == 'marked') ..._marksList(context) else ..._alertsList(context),
+          ]),
         ),
-      );
+      ),
+    );
+  }
 
-  Widget _alertsTab(BuildContext context) {
+  List<Widget> _alertsList(BuildContext context) {
     final shown = items.where((a) {
       switch (filter) {
-        case 'sms':
-          return a['kind'] == 'sms';
+        case 'danger':
+          return a['level'] == 'danger';
         case 'call':
           return a['kind'] == 'call';
-        case 'marked':
-          return alertMark(a) != null;
         default:
           return true;
       }
     }).toList();
-    final cs = Theme.of(context).colorScheme;
-    return RefreshIndicator(
-      onRefresh: load,
-      child: ListView(padding: const EdgeInsets.fromLTRB(18, 12, 18, 32), children: [
-        if (loaded && items.isNotEmpty) ...[
-          Row(children: [
-            Expanded(child: _Stat(icon: Icons.fact_check_rounded, value: '${items.length}', label: tr('Checked'), color: SL.accent)),
-            const SizedBox(width: 10),
-            Expanded(
-              child: _Stat(
-                icon: Icons.gpp_maybe_rounded,
-                value: '${items.where((a) => a['level'] != null && a['level'] != 'safe').length}',
-                label: tr('Flagged'),
-                color: SL.fg(context, 'danger'),
-              ),
+    if (!loaded) return const [Padding(padding: EdgeInsets.all(32), child: Center(child: CircularProgressIndicator()))];
+    if (shown.isEmpty) {
+      return [
+        Panel(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            const IconTile(Icons.notifications_none_rounded, color: SL.accent),
+            const SizedBox(height: 12),
+            Text(
+              tr('Nothing here yet. Each SMS and call that Second Look checks is listed here, only on this phone.'),
+              style: const TextStyle(color: SL.textSoft, height: 1.4),
             ),
-            const SizedBox(width: 10),
-            Expanded(child: _Stat(icon: Icons.bookmark_rounded, value: '${items.where((a) => alertMark(a) != null).length}', label: tr('Marked'), color: SL.fg(context, 'warning'))),
-          ]),
-          const SizedBox(height: 14),
-        ],
-        Wrap(spacing: 8, runSpacing: 8, children: [
-          _filter('all', tr('All'), null),
-          _filter('sms', 'SMS', Icons.sms_rounded),
-          _filter('call', tr('Calls'), Icons.call_rounded),
-          _filter('marked', tr('Marked'), Icons.bookmark_rounded),
-        ]),
-        const SizedBox(height: 14),
-        if (!loaded)
-          const Padding(padding: EdgeInsets.all(32), child: Center(child: CircularProgressIndicator()))
-        else if (shown.isEmpty)
-          Panel(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              IconTile(filter == 'marked' ? Icons.bookmark_border_rounded : Icons.notifications_none_rounded, color: SL.accent),
-              const SizedBox(height: 12),
-              Text(
-                filter == 'marked'
-                    ? tr('No marked alerts yet. Use Block, Spam, Fraud, Safe or Comment on any alert.')
-                    : tr('Nothing here yet. Each SMS and call that Second Look checks is listed here, only on this phone.'),
-                style: TextStyle(color: cs.onSurface.withAlpha(180), height: 1.4),
+            if (_phone) ...[
+              const SizedBox(height: 10),
+              Text(tr('Not seeing new SMS or calls? Run a Protection check.'), style: const TextStyle(fontWeight: FontWeight.w700)),
+              const SizedBox(height: 10),
+              OutlinedButton.icon(
+                onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ShieldHealthScreen())),
+                icon: const Icon(Icons.health_and_safety_outlined),
+                label: Text(tr('Protection check')),
               ),
-              if (_phone && filter != 'marked') ...[
-                const SizedBox(height: 10),
-                Text(tr('Not seeing new SMS or calls? Run a Protection check.'), style: const TextStyle(fontWeight: FontWeight.w700)),
-                const SizedBox(height: 8),
-                OutlinedButton.icon(
-                  onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ShieldHealthScreen())),
-                  icon: const Icon(Icons.health_and_safety_rounded),
-                  label: Text(tr('Protection check')),
-                ),
-              ],
-            ]),
-          )
-        else
-          for (final a in shown) ...[
-            AlertCard(key: ValueKey('${a['id']}'), a: a, whatsApp: whatsApp, onChanged: _loadMarks),
-            const SizedBox(height: 10),
-          ],
-      ]),
+            ],
+          ]),
+        ),
+      ];
+    }
+    return [
+      for (final a in shown) ...[
+        AlertCard(key: ValueKey('${a['id']}'), a: a, whatsApp: whatsApp, onChanged: _loadMarks),
+        const SizedBox(height: 12),
+      ],
+    ];
+  }
+
+  /// A filter chip: solid cyan when chosen, outlined otherwise.
+  Widget _filter(String key, String label) {
+    final on = filter == key;
+    final r = BorderRadius.circular(20);
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: Semantics(
+        selected: on,
+        button: true,
+        child: Material(
+          color: on ? SL.accent : Colors.transparent,
+          shape: RoundedRectangleBorder(borderRadius: r, side: on ? BorderSide.none : const BorderSide(color: Color(0x338CDCFF))),
+          child: InkWell(
+            borderRadius: r,
+            onTap: () => setState(() => filter = key),
+            child: Container(
+              height: 40,
+              alignment: Alignment.center,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(label, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: on ? SL.onAccent : SL.text)),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
-  Widget _filter(String key, String label, IconData? icon) => ChoiceChip(
-        label: Text(label),
-        avatar: icon == null ? null : Icon(icon, size: 17),
-        selected: filter == key,
-        onSelected: (_) => setState(() => filter = key),
-      );
-
-  Widget _marksTab(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+  /// "Marked": every number and sender the user marked, newest first, with undo.
+  List<Widget> _marksList(BuildContext context) {
     // Only the newest mark of each number can be undone, and only if it's still in effect.
     final undoable = <int>{};
     final seen = <String>{};
@@ -202,42 +197,39 @@ class _AlertsScreenState extends State<AlertsScreen> {
       seen.add(n);
       if (act != 'unblock') undoable.add(i);
     }
-    return RefreshIndicator(
-      onRefresh: load,
-      child: ListView(padding: const EdgeInsets.fromLTRB(18, 12, 18, 32), children: [
-        Text(tr('Numbers and senders you marked. Kept only on this phone.'), style: TextStyle(color: cs.onSurface.withAlpha(160))),
-        const SizedBox(height: 12),
-        if (marks.isEmpty)
-          Panel(child: Text(tr('Nothing marked yet. In the Checked tab, tap Block, Spam, Fraud, Safe or Comment on any alert.'), style: const TextStyle(height: 1.4)))
-        else
-          for (var i = 0; i < marks.length; i++) ...[
-            _markRow(context, marks[i], undoable.contains(i)),
-            const SizedBox(height: 8),
-          ],
-      ]),
-    );
+    return [
+      Text(tr('Numbers and senders you marked. Kept only on this phone.'), style: const TextStyle(color: SL.textSecondary)),
+      const SizedBox(height: 12),
+      if (marks.isEmpty)
+        Panel(child: Text(tr('No marked alerts yet. Use Block, Spam, Fraud, Safe or Comment on any alert.'), style: const TextStyle(height: 1.4)))
+      else
+        for (var i = 0; i < marks.length; i++) ...[
+          _markRow(context, marks[i], undoable.contains(i)),
+          const SizedBox(height: 10),
+        ],
+    ];
   }
 
   Widget _markRow(BuildContext context, Map<String, dynamic> e, bool canUndo) {
-    final cs = Theme.of(context).colorScheme;
     final number = '${e['number'] ?? ''}';
     final action = '${e['action'] ?? ''}';
     final comment = '${e['comment'] ?? ''}'.trim();
     final at = e['at'] is num ? (e['at'] as num).toInt() : int.tryParse('${e['at']}') ?? 0;
     final level = markLevel(action);
+    final c = action == 'comment' ? SL.accent : SL.fgOf(level);
     return Panel(
       padding: const EdgeInsets.fromLTRB(14, 12, 8, 12),
       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        IconTile(markIcon(action), color: SL.fg(context, level), size: 38),
+        IconTile(markIcon(action), color: c, size: 44),
         const SizedBox(width: 12),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(number, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w800)),
+            Text(number, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
             const SizedBox(height: 2),
-            Text('${markLabel(action)}${at > 0 ? ' · ${timeAgo(at)}' : ''}', style: TextStyle(fontSize: 13, color: SL.fg(context, level), fontWeight: FontWeight.w700)),
+            Text('${markLabel(action)}${at > 0 ? ' · ${timeAgo(at)}' : ''}', style: TextStyle(fontSize: 13, color: c, fontWeight: FontWeight.w700)),
             if (comment.isNotEmpty) ...[
               const SizedBox(height: 4),
-              Text(comment, style: TextStyle(fontSize: 13.5, color: cs.onSurface.withAlpha(185))),
+              Text(comment, style: const TextStyle(fontSize: 13.5, color: SL.textSoft)),
             ],
           ]),
         ),
@@ -260,24 +252,23 @@ class _AlertsScreenState extends State<AlertsScreen> {
   }
 }
 
-/// A small number tile at the top of the Alerts list.
-class _Stat extends StatelessWidget {
-  const _Stat({required this.icon, required this.value, required this.label, required this.color});
+/// A 44 px round icon button in the header.
+class _RoundIcon extends StatelessWidget {
+  const _RoundIcon({required this.icon, required this.tooltip, required this.onTap});
   final IconData icon;
-  final String value, label;
-  final Color color;
+  final String tooltip;
+  final VoidCallback onTap;
   @override
-  Widget build(BuildContext context) => Panel(
-        padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-        child: Row(children: [
-          Icon(icon, color: color, size: 20),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(value, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, height: 1.1)),
-              Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withAlpha(150))),
-            ]),
+  Widget build(BuildContext context) => Tooltip(
+        message: tooltip,
+        child: Material(
+          color: Colors.transparent,
+          shape: const CircleBorder(side: BorderSide(color: Color(0x2E8CDCFF))),
+          child: InkWell(
+            customBorder: const CircleBorder(),
+            onTap: onTap,
+            child: SizedBox(width: 44, height: 44, child: Icon(icon, size: 21, color: SL.text)),
           ),
-        ]),
+        ),
       );
 }

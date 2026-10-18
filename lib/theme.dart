@@ -1,88 +1,142 @@
+import 'dart:ui' show FontVariation;
+
 import 'package:flutter/material.dart';
 
-/// Second Look visual system ("dark premium"): deep navy backdrop, glass-like cards, a cyan accent for
-/// primary actions and clear green / amber / red signal colours for verdicts. The app always runs in dark mode.
+/// Second Look visual system: a near-black navy ground, faint glass cards with a cool cyan hairline, one bright
+/// cyan accent for primary actions and clear green / amber / red signal colours. Sora for headings and primary
+/// buttons, Manrope for everything else. The app always runs in dark mode.
 class SL {
-  // Brand / accent
-  static const accent = Color(0xFF22D3EE); // cyan: primary actions, focus, links
-  static const accentDeep = Color(0xFF0891B2);
-  static const onAccent = Color(0xFF03141A);
+  // ---- fonts (bundled in assets/fonts; Devanagari and Kannada fall back to the system fonts)
+  static const display = 'Sora';
+  static const body = 'Manrope';
+
+  // ---- ground and text
+  static const ground = Color(0xFF060912);
+  static const text = Color(0xFFEAF2FF);
+  static const textSecondary = Color(0xFFA9B8D0);
+  static const textSoft = Color(0xFFCBD5E1);
+  static const textMuted = Color(0xFF93A4BF);
+  static const navFill = Color(0xEB0E1424); // rgba(14,20,36,.92)
+  static const sheet = Color(0xFF0E1424);
+
+  // ---- accent
+  static const accent = Color(0xFF38E1FF);
+  static const accentLight = Color(0xFF8BEFFF);
+  static const accentDeep = Color(0xFF0E7490);
+  static const onAccent = Color(0xFF04121A);
   static const teal = Color(0xFF2DD4BF);
 
-  // Backdrop
-  static const bgTop = Color(0xFF070B14);
-  static const bgBottom = Color(0xFF0B1220);
-  static const bgSolid = Color(0xFF090F1B); // sub-pages (a solid colour keeps page transitions clean)
-  static const text = Color(0xFFF1F5F9);
-  static const textMuted = Color(0xFF9AA4B5);
-
-  // Glass surfaces
-  static final glass = Colors.white.withAlpha(13);
-  static final glassStrong = Colors.white.withAlpha(20);
-  static final glassBorder = Colors.white.withAlpha(24);
+  // ---- glass cards: white @4% with a cyan hairline rgba(140,220,255,.14)
+  static const glass = Color(0x0AFFFFFF);
+  static const glassStrong = Color(0x14FFFFFF);
+  static const glassBorder = Color(0x248CDCFF);
+  static const hairline = Color(0x14FFFFFF); // rgba(255,255,255,.08)
   static const radius = 20.0;
 
   // Older names, still used in a few places.
+  static const bgTop = ground;
+  static const bgBottom = ground;
+  static const bgSolid = ground;
   static const cobalt = accentDeep;
-  static const cobaltSoft = Color(0xFF123241);
-  static const ink = bgBottom;
-  static const amber = Color(0xFFF59E0B);
+  static const cobaltSoft = Color(0xFF0C2733);
+  static const ink = ground;
+  static const amber = Color(0xFFFBBF24);
 
-  // Verdict signals (light; kept for completeness, the app uses the dark set)
-  static const safe = Color(0xFF15803D);
-  static const safeBg = Color(0xFFE3F4EA);
-  static const warn = Color(0xFF9A5B00);
-  static const warnBg = Color(0xFFFFF1D6);
-  static const danger = Color(0xFFC0262D);
-  static const dangerBg = Color(0xFFFDE8E8);
+  // ---- signals
+  static const safeD = Color(0xFF34D399);
+  static const safeLight = Color(0xFFBFF5DE);
+  static const safeDeep = Color(0xFF0B1A17);
+  static const warnD = Color(0xFFFBBF24);
+  static const warnLight = Color(0xFFFDE68A);
+  static const warnDeep = Color(0xFF221A08);
+  static const dangerD = Color(0xFFF87171);
+  static const dangerLight = Color(0xFFFECACA);
+  static const dangerSoft = Color(0xFFFCA5A5);
+  static const dangerDeep = Color(0xFF2A0E12);
+  static const onDanger = Color(0xFF1A0507);
 
-  // Verdict signals (dark). All pass WCAG AA as text on the navy backdrop.
-  static const safeD = Color(0xFF22C55E);
-  static const safeBgD = Color(0x2E22C55E);
-  static const warnD = Color(0xFFF59E0B);
-  static const warnBgD = Color(0x2EF59E0B);
-  static const dangerD = Color(0xFFEF4444);
-  static const dangerBgD = Color(0x30EF4444);
+  static const safeBgD = Color(0x1F34D399);
+  static const warnBgD = Color(0x1FFBBF24);
+  static const dangerBgD = Color(0x24F87171);
 
-  /// Solid red for filled buttons with white text (darker than [dangerD] so the label stays readable).
-  static const dangerFill = Color(0xFFDC2626);
+  // Kept for old call sites; the app only uses the dark set.
+  static const safe = safeD;
+  static const safeBg = safeBgD;
+  static const warn = warnD;
+  static const warnBg = warnBgD;
+  static const danger = dangerD;
+  static const dangerBg = dangerBgD;
 
-  static Color fg(BuildContext c, String level) {
-    final dark = Theme.of(c).brightness == Brightness.dark;
-    switch (level) {
+  /// Solid red for filled buttons; put [onDanger] text on it.
+  static const dangerFill = dangerD;
+
+  static String _lv(String level) => level == 'danger' || level == 'warning' ? level : 'safe';
+
+  /// The signal colour for 'safe' | 'warning' | 'danger'.
+  static Color fg(BuildContext c, String level) => fgOf(level);
+
+  static Color fgOf(String level) {
+    switch (_lv(level)) {
       case 'danger':
-        return dark ? dangerD : danger;
+        return dangerD;
       case 'warning':
-        return dark ? warnD : warn;
+        return warnD;
       default:
-        return dark ? safeD : safe;
+        return safeD;
     }
   }
 
+  /// A soft tint of the signal colour for backgrounds.
   static Color bg(BuildContext c, String level) {
-    final dark = Theme.of(c).brightness == Brightness.dark;
-    switch (level) {
+    switch (_lv(level)) {
       case 'danger':
-        return dark ? dangerBgD : dangerBg;
+        return dangerBgD;
       case 'warning':
-        return dark ? warnBgD : warnBg;
+        return warnBgD;
       default:
-        return dark ? safeBgD : safeBg;
+        return safeBgD;
     }
   }
+
+  /// Light text in the signal colour (headings on tinted surfaces).
+  static Color pale(String level) {
+    switch (_lv(level)) {
+      case 'danger':
+        return dangerLight;
+      case 'warning':
+        return warnLight;
+      default:
+        return safeLight;
+    }
+  }
+
+  /// The very dark fill inside verdict circles.
+  static Color deep(String level) {
+    switch (_lv(level)) {
+      case 'danger':
+        return dangerDeep;
+      case 'warning':
+        return warnDeep;
+      default:
+        return safeDeep;
+    }
+  }
+
+  /// Text colour on a filled signal-colour button.
+  static Color on(String level) => _lv(level) == 'danger' ? onDanger : onAccent;
 
   static IconData icon(String level) {
     switch (level) {
       case 'danger':
-        return Icons.gpp_bad_rounded;
+        return Icons.gpp_bad_outlined;
       case 'warning':
-        return Icons.report_rounded;
+        return Icons.gpp_maybe_outlined;
       default:
-        return Icons.verified_user_rounded;
+        return Icons.gpp_good_outlined;
     }
   }
 
-  /// The simple mark shown inside verdict rings: ✓ / ! / ✕.
+  /// The simple mark shown inside verdict circles: ✓ / ! / ✕.
   static IconData mark(String level) {
     switch (level) {
       case 'danger':
@@ -94,10 +148,33 @@ class SL {
     }
   }
 
-  /// The navy gradient behind the main tabs, splash and onboarding.
-  static const backdrop = BoxDecoration(
-    gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [bgTop, bgBottom]),
-  );
+  /// The flat ground behind every screen.
+  static const backdrop = BoxDecoration(color: ground);
+
+  static const _weights = [
+    FontWeight.w100,
+    FontWeight.w200,
+    FontWeight.w300,
+    FontWeight.w400,
+    FontWeight.w500,
+    FontWeight.w600,
+    FontWeight.w700,
+    FontWeight.w800,
+    FontWeight.w900,
+  ];
+
+  /// The 'wght' axis for a weight, so the bundled variable fonts draw their real weight (not a synthesized bold).
+  static List<FontVariation> wght(FontWeight w) {
+    final i = _weights.indexOf(w);
+    return [FontVariation('wght', i < 0 ? 400.0 : (i + 1) * 100.0)];
+  }
+
+  /// Heading text in Sora.
+  static TextStyle h(double size, {Color color = text, FontWeight weight = FontWeight.w700, double? height, double? spacing}) =>
+      TextStyle(fontFamily: display, fontSize: size, fontWeight: weight, fontVariations: wght(weight), color: color, height: height, letterSpacing: spacing);
+
+  static TextStyle _sora(double size, {FontWeight weight = FontWeight.w700, double? height, double? spacing}) =>
+      TextStyle(fontFamily: display, fontSize: size, fontWeight: weight, fontVariations: wght(weight), height: height, letterSpacing: spacing);
 
   static ThemeData light() => _base();
   static ThemeData dark() => _base();
@@ -106,123 +183,145 @@ class SL {
     final scheme = ColorScheme.fromSeed(seedColor: accent, brightness: Brightness.dark).copyWith(
       primary: accent,
       onPrimary: onAccent,
-      primaryContainer: const Color(0xFF0E3A47),
-      onPrimaryContainer: const Color(0xFFCFF7FF),
+      primaryContainer: const Color(0xFF0B2E3A),
+      onPrimaryContainer: accentLight,
       secondary: teal,
       onSecondary: onAccent,
-      secondaryContainer: const Color(0xFF123241),
-      onSecondaryContainer: const Color(0xFFCFF7FF),
+      secondaryContainer: const Color(0xFF0C2733),
+      onSecondaryContainer: accentLight,
       tertiary: amber,
       error: dangerD,
-      onError: Colors.white,
-      surface: const Color(0xFF111A2B),
+      onError: onDanger,
+      surface: const Color(0xFF0E1424),
       onSurface: text,
       onSurfaceVariant: textMuted,
-      surfaceContainerLowest: bgTop,
-      surfaceContainerLow: const Color(0xFF0E1626),
-      surfaceContainer: const Color(0xFF121B2D),
-      surfaceContainerHigh: const Color(0xFF162034),
-      surfaceContainerHighest: const Color(0xFF1B263C),
-      outline: const Color(0xFF3A4760),
-      outlineVariant: const Color(0xFF253047),
+      surfaceContainerLowest: ground,
+      surfaceContainerLow: const Color(0xFF0A0F1C),
+      surfaceContainer: const Color(0xFF0E1424),
+      surfaceContainerHigh: const Color(0xFF121A2C),
+      surfaceContainerHighest: const Color(0xFF172036),
+      outline: const Color(0x3D8CDCFF),
+      outlineVariant: glassBorder,
       surfaceTint: Colors.transparent,
     );
-    final round = RoundedRectangleBorder(borderRadius: BorderRadius.circular(16));
-    final fieldBorder = OutlineInputBorder(borderRadius: BorderRadius.circular(radius), borderSide: BorderSide(color: glassBorder));
+    final round16 = RoundedRectangleBorder(borderRadius: BorderRadius.circular(16));
+    final fieldBorder = OutlineInputBorder(borderRadius: BorderRadius.circular(18), borderSide: const BorderSide(color: Color(0x338CDCFF)));
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
+      fontFamily: body,
       colorScheme: scheme,
-      scaffoldBackgroundColor: bgSolid,
-      canvasColor: bgSolid,
-      dividerColor: Colors.white.withAlpha(20),
-      appBarTheme: const AppBarTheme(
+      scaffoldBackgroundColor: ground,
+      canvasColor: ground,
+      dividerColor: hairline,
+      dividerTheme: const DividerThemeData(color: hairline, space: 1),
+      appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
         foregroundColor: text,
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: false,
-        titleTextStyle: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: text, letterSpacing: -0.3),
+        toolbarHeight: 64,
+        titleTextStyle: h(22),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           backgroundColor: accent,
           foregroundColor: onAccent,
-          disabledBackgroundColor: Colors.white.withAlpha(22),
-          disabledForegroundColor: Colors.white.withAlpha(110),
-          minimumSize: const Size(0, 54),
-          shape: round,
-          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, letterSpacing: 0.1),
+          disabledBackgroundColor: const Color(0x1AFFFFFF),
+          disabledForegroundColor: const Color(0x80EAF2FF),
+          minimumSize: const Size(0, 56),
+          elevation: 0,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+          textStyle: _sora(16.5),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: text,
-          minimumSize: const Size(0, 50),
-          side: BorderSide(color: Colors.white.withAlpha(40)),
-          backgroundColor: Colors.white.withAlpha(8),
-          shape: round,
-          textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+          minimumSize: const Size(0, 52),
+          side: const BorderSide(color: Color(0x33FFFFFF)),
+          backgroundColor: const Color(0x0DFFFFFF),
+          shape: round16,
+          textStyle: const TextStyle(fontFamily: body, fontSize: 15, fontWeight: FontWeight.w700),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(foregroundColor: accent, textStyle: const TextStyle(fontWeight: FontWeight.w700)),
+        style: TextButton.styleFrom(foregroundColor: accent, textStyle: const TextStyle(fontFamily: body, fontWeight: FontWeight.w700)),
       ),
+      iconButtonTheme: IconButtonThemeData(style: IconButton.styleFrom(foregroundColor: text)),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: Colors.white.withAlpha(10),
-        hintStyle: TextStyle(color: text.withAlpha(110)),
+        fillColor: glass,
+        hintStyle: const TextStyle(color: Color(0x99A9B8D0), fontWeight: FontWeight.w600),
+        labelStyle: const TextStyle(color: textSecondary, fontWeight: FontWeight.w600),
+        helperStyle: const TextStyle(color: textMuted),
         border: fieldBorder,
         enabledBorder: fieldBorder,
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(radius), borderSide: const BorderSide(color: accent, width: 1.6)),
-        contentPadding: const EdgeInsets.all(16),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(18), borderSide: const BorderSide(color: accent, width: 1.6)),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),
       switchTheme: SwitchThemeData(
-        thumbColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.selected) ? onAccent : const Color(0xFF8A94A6)),
-        trackColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.selected) ? accent : Colors.white.withAlpha(22)),
-        trackOutlineColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.selected) ? accent : Colors.white.withAlpha(50)),
+        thumbColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.selected) ? onAccent : textMuted),
+        trackColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.selected) ? accent : const Color(0x14FFFFFF)),
+        trackOutlineColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.selected) ? accent : const Color(0x3D8CDCFF)),
       ),
       chipTheme: ChipThemeData(
-        backgroundColor: Colors.white.withAlpha(10),
-        selectedColor: accent.withAlpha(46),
-        side: BorderSide(color: Colors.white.withAlpha(30)),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
-        labelStyle: const TextStyle(fontWeight: FontWeight.w600, color: text),
+        backgroundColor: Colors.transparent,
+        selectedColor: accent,
+        checkmarkColor: onAccent,
+        side: const BorderSide(color: Color(0x338CDCFF)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        labelStyle: TextStyle(
+          fontFamily: body,
+          fontWeight: FontWeight.w700,
+          fontSize: 14,
+          color: WidgetStateColor.resolveWith((s) => s.contains(WidgetState.selected) ? onAccent : text),
+        ),
+        secondaryLabelStyle: const TextStyle(fontFamily: body, fontWeight: FontWeight.w700, color: onAccent, fontSize: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       ),
-      navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: const Color(0xF20A101C),
+      popupMenuTheme: PopupMenuThemeData(
+        color: sheet,
         surfaceTintColor: Colors.transparent,
-        indicatorColor: accent.withAlpha(40),
-        height: 68,
-        iconTheme: WidgetStateProperty.resolveWith(
-            (s) => IconThemeData(color: s.contains(WidgetState.selected) ? accent : textMuted, size: 25)),
-        labelTextStyle: WidgetStateProperty.resolveWith((s) => TextStyle(
-            fontSize: 12, fontWeight: s.contains(WidgetState.selected) ? FontWeight.w800 : FontWeight.w600, color: s.contains(WidgetState.selected) ? text : textMuted)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: const BorderSide(color: glassBorder)),
+        textStyle: const TextStyle(fontFamily: body, fontWeight: FontWeight.w600, color: text),
       ),
       bottomSheetTheme: const BottomSheetThemeData(
-        backgroundColor: Color(0xFF111A2B),
+        backgroundColor: sheet,
         surfaceTintColor: Colors.transparent,
         showDragHandle: true,
+        dragHandleColor: Color(0x4D8CDCFF),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
-        backgroundColor: const Color(0xFF1B263C),
-        contentTextStyle: const TextStyle(color: text, fontSize: 14.5, height: 1.35),
+        backgroundColor: const Color(0xFF172036),
+        contentTextStyle: const TextStyle(fontFamily: body, color: text, fontSize: 14.5, height: 1.35, fontWeight: FontWeight.w600),
         actionTextColor: accent,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: const BorderSide(color: glassBorder)),
       ),
-      listTileTheme: const ListTileThemeData(iconColor: textMuted, textColor: text),
+      listTileTheme: const ListTileThemeData(
+        iconColor: textMuted,
+        textColor: text,
+        titleTextStyle: TextStyle(fontFamily: body, fontSize: 15.5, fontWeight: FontWeight.w700, color: text),
+        subtitleTextStyle: TextStyle(fontFamily: body, fontSize: 13.5, color: textSecondary, height: 1.35),
+      ),
       progressIndicatorTheme: const ProgressIndicatorThemeData(color: accent),
-      textTheme: const TextTheme(
-        headlineMedium: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, letterSpacing: -0.6, height: 1.12),
-        headlineSmall: TextStyle(fontSize: 23, fontWeight: FontWeight.w800, letterSpacing: -0.4, height: 1.15),
-        titleLarge: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, letterSpacing: -0.3),
-        titleMedium: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, letterSpacing: -0.1),
-        bodyLarge: TextStyle(fontSize: 16, height: 1.45),
-        bodyMedium: TextStyle(fontSize: 14.5, height: 1.45),
-        labelLarge: TextStyle(fontWeight: FontWeight.w700),
+      textSelectionTheme: const TextSelectionThemeData(cursorColor: accent, selectionColor: Color(0x5538E1FF), selectionHandleColor: accent),
+      textTheme: TextTheme(
+        displaySmall: _sora(34, height: 1.1),
+        headlineLarge: _sora(30, height: 1.12),
+        headlineMedium: _sora(28, height: 1.15, spacing: -0.3),
+        headlineSmall: _sora(23, height: 1.18),
+        titleLarge: _sora(20),
+        titleMedium: const TextStyle(fontFamily: body, fontSize: 16, fontWeight: FontWeight.w700),
+        titleSmall: const TextStyle(fontFamily: body, fontSize: 14, fontWeight: FontWeight.w700),
+        bodyLarge: const TextStyle(fontFamily: body, fontSize: 16, height: 1.45, fontWeight: FontWeight.w500),
+        bodyMedium: const TextStyle(fontFamily: body, fontSize: 14.5, height: 1.45, fontWeight: FontWeight.w500),
+        bodySmall: const TextStyle(fontFamily: body, fontSize: 12.5, height: 1.4, color: textMuted),
+        labelLarge: const TextStyle(fontFamily: body, fontWeight: FontWeight.w700),
       ),
     );
   }

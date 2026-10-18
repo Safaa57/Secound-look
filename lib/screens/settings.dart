@@ -180,8 +180,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      appBar: AppBar(title: Text(tr('Settings')), actions: const [LanguageButton(), SizedBox(width: 8)]),
-      body: ListView(padding: const EdgeInsets.fromLTRB(18, 4, 18, 32), children: [
+      appBar: AppBar(
+        toolbarHeight: 76,
+        titleSpacing: 20,
+        title: Text(tr('Settings'), style: SL.h(28)),
+        actions: const [LanguageButton(), SizedBox(width: 12)],
+      ),
+      body: ListView(padding: EdgeInsets.fromLTRB(20, 0, 20, MediaQuery.paddingOf(context).bottom + 24), children: [
         // ---- shields (Android)
         if (android) ...[
           SectionLabel(tr('Shields'), icon: Icons.shield_rounded),

@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'dart:math' as math;
 
-import '../community.dart';
+import 'package:flutter/material.dart';
+
 import '../i18n/i18n.dart';
 import '../native.dart';
 import '../theme.dart';
@@ -10,9 +10,7 @@ import '../widgets/common.dart';
 import 'document_check.dart';
 import 'panic.dart';
 import 'payment_check.dart';
-import 'result.dart';
 import 'shield_health.dart';
-import 'upi_check.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, required this.onCheck, required this.onAlerts});
@@ -28,8 +26,6 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   bool captured = false;
   List<Map<String, dynamic>> alerts = [];
   bool busy = false;
-  bool checking = false;
-  final paste = TextEditingController();
 
   @override
   void initState() {
@@ -44,7 +40,6 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   void dispose() {
     alertsVersion.removeListener(refresh);
     WidgetsBinding.instance.removeObserver(this);
-    paste.dispose();
     super.dispose();
   }
 
@@ -117,393 +112,394 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     if (mounted) refresh();
   }
 
-  Future<void> _pasteFromClipboard() async {
-    final d = await Clipboard.getData(Clipboard.kTextPlain);
-    final t = d?.text;
-    if (!mounted || t == null || t.trim().isEmpty) return;
-    setState(() => paste.text = t);
-  }
+  static int _ms(Object? v) => v is num ? v.toInt() : int.tryParse('$v') ?? 0;
 
-  /// Checks whatever was pasted. The engine works out whether it's a link, a message, a phone number or a UPI ID.
-  Future<void> _check() async {
-    final t = paste.text.trim();
-    final messenger = ScaffoldMessenger.of(context);
-    if (t.isEmpty) {
-      messenger.showSnackBar(SnackBar(content: Text(tr('Paste a link, message, number or UPI ID first.'))));
-      return;
-    }
-    FocusScope.of(context).unfocus();
-    setState(() => checking = true);
-    Map<String, dynamic>? r;
-    try {
-      final first = await Native.instance.analyze(t);
-      final st = await Native.instance.status(); // the community setting may have changed in Settings
-      r = await Community.enrich(first, st);
-    } on PlatformException catch (e) {
-      messenger.showSnackBar(SnackBar(content: Text(e.message ?? tr('The check failed'))));
-    } catch (_) {
-      messenger.showSnackBar(SnackBar(content: Text(tr('The check failed'))));
-    }
-    if (!mounted) return;
-    setState(() => checking = false);
-    final res = r;
-    if (res == null) return;
-    await Navigator.of(context).push(MaterialPageRoute(builder: (_) => ResultScreen(result: res, title: 'Check result')));
-    if (mounted) refresh();
+  /// "12 messages and 3 calls checked today", from this phone's alert list.
+  String _todayLine() {
+    final now = DateTime.now();
+    final start = DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
+    final today = alerts.where((a) => _ms(a['at']) >= start).toList();
+    final m = today.where((a) => a['kind'] == 'sms').length;
+    final c = today.where((a) => a['kind'] == 'call').length;
+    final ms = m == 1 ? tr('1 message') : tr('{n} messages', {'n': m});
+    final cs = c == 1 ? tr('1 call') : tr('{n} calls', {'n': c});
+    return tr('{messages} and {calls} checked today', {'messages': ms, 'calls': cs});
   }
 
   @override
   Widget build(BuildContext context) {
     final sms = s['smsShield'] == true, call = s['callShield'] == true;
-    final cs = Theme.of(context).colorScheme;
+    final bottom = MediaQuery.paddingOf(context).bottom;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
+        bottom: false,
         child: RefreshIndicator(
           onRefresh: refresh,
-          child: ListView(padding: const EdgeInsets.fromLTRB(18, 8, 18, 28), children: [
-            // ---- top bar: name + language switch
+          child: ListView(padding: EdgeInsets.fromLTRB(20, 16, 20, bottom + 24), children: [
+            // ---- header: logo + name, language pill
             Row(children: [
-              Container(
-                width: 38,
-                height: 38,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(colors: [SL.accent, SL.accentDeep], begin: Alignment.topLeft, end: Alignment.bottomRight),
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [BoxShadow(color: SL.accent.withAlpha(70), blurRadius: 16)],
-                ),
-                child: const Icon(Icons.shield_rounded, color: SL.onAccent, size: 22),
-              ),
+              const Icon(Icons.shield_outlined, color: SL.accent, size: 28),
               const SizedBox(width: 10),
-              Expanded(child: Text('Second Look', style: Theme.of(context).textTheme.titleLarge)),
+              Expanded(child: Text('Second Look', maxLines: 1, overflow: TextOverflow.ellipsis, style: SL.h(18, spacing: 0.36))),
               const LanguageButton(),
             ]),
-            if (captured) ...[
-              const SizedBox(height: 14),
+            if (captured)
               _Warn(
                 icon: Icons.cast_connected_rounded,
                 title: tr('Your screen is being shared or recorded'),
                 text: tr('If someone on a call asked you to share your screen, stop now. Scammers use it to read your OTPs.'),
               ),
-            ],
-            if (sec['signatureOk'] == false || sec['rulesIntact'] == false) ...[
-              const SizedBox(height: 14),
+            if (sec['signatureOk'] == false || sec['rulesIntact'] == false)
               _Warn(
                 icon: Icons.gpp_bad_rounded,
                 title: tr('This copy of Second Look was modified'),
                 text: tr('Delete it and install Second Look again from the official store.'),
-              ),
-            ] else if (sec['hooking'] == true || sec['debugger'] == true) ...[
-              const SizedBox(height: 14),
+              )
+            else if (sec['hooking'] == true || sec['debugger'] == true)
               _Warn(
                 icon: Icons.bug_report_rounded,
                 title: tr('A hacking tool is attached to this app'),
                 text: tr('Something is trying to read or change Second Look while it runs. Restart your phone, and don\'t do banking until it\'s gone.'),
-              ),
-            ] else if (sec['rooted'] == true) ...[
-              const SizedBox(height: 14),
+              )
+            else if (sec['rooted'] == true)
               _Warn(
                 icon: Icons.warning_amber_rounded,
                 title: ios ? tr('This iPhone is jailbroken') : tr('This phone is rooted'),
                 text: tr('Apps on it can bypass normal security. Be extra careful with banking and OTPs.'),
               ),
-            ],
-            const SizedBox(height: 16),
-            // ---- hero status
-            if (web) _webHero(context) else _hero(context, sms, call),
-            const SizedBox(height: 14),
-            // ---- paste & check
-            Panel(
-              padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                Row(children: [
-                  const Icon(Icons.content_paste_search_rounded, color: SL.accent, size: 22),
-                  const SizedBox(width: 8),
-                  Expanded(child: Text(tr('Paste & check'), style: Theme.of(context).textTheme.titleMedium)),
-                ]),
-                const SizedBox(height: 10),
-                TextField(
-                  controller: paste,
-                  minLines: 1,
-                  maxLines: 4,
-                  inputFormatters: [LengthLimitingTextInputFormatter(10000)],
-                  textInputAction: TextInputAction.done,
-                  onSubmitted: (_) => _check(),
-                  decoration: InputDecoration(
-                    hintText: tr('Link, SMS, phone number or UPI ID'),
-                    suffixIcon: IconButton(tooltip: tr('Paste'), onPressed: _pasteFromClipboard, icon: const Icon(Icons.content_paste_rounded)),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                FilledButton.icon(
-                  onPressed: checking ? null : _check,
-                  icon: checking
-                      ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
-                      : const Icon(Icons.shield_rounded),
-                  label: Text(checking ? tr('Checking…') : tr('Check it')),
-                ),
-              ]),
-            ),
-            // ---- tools
-            SectionLabel(tr('Tools'), icon: Icons.grid_view_rounded),
-            GridView(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              padding: EdgeInsets.zero,
-              // A fixed row height keeps two-line labels from overflowing on narrow phones.
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3, mainAxisSpacing: 10, crossAxisSpacing: 10, mainAxisExtent: 120),
-              children: [
-                _Tool(icon: Icons.sms_rounded, title: tr('Message or link'), onTap: widget.onCheck),
-                _Tool(icon: Icons.phone_in_talk_rounded, title: tr('Phone number'), onTap: widget.onCheck),
-                _Tool(icon: Icons.receipt_long_rounded, title: tr('Payment proof'), onTap: () => _open(const PaymentCheckScreen())),
-                _Tool(icon: Icons.qr_code_scanner_rounded, title: tr('UPI or QR'), onTap: () => _open(const UpiCheckScreen())),
-                _Tool(icon: Icons.badge_rounded, title: tr('Document'), onTap: () => _open(const DocumentCheckScreen())),
-                _Tool(icon: Icons.sos_rounded, title: tr('Being scammed?'), danger: true, onTap: () => _open(const PanicScreen())),
-              ],
-            ),
-            // ---- recent alerts
-            SectionLabel(
-              tr('Recent alerts'),
-              icon: Icons.notifications_rounded,
-              trailing: alerts.isEmpty ? null : TextButton(onPressed: widget.onAlerts, child: Text(tr('See all'))),
-            ),
-            if (alerts.isEmpty)
-              Panel(
-                child: Row(children: [
-                  Icon(Icons.inbox_rounded, color: cs.onSurface.withAlpha(140)),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      ios || web ? tr('Your checks will show up here.') : tr('Nothing checked yet. New SMS and calls show up here.'),
-                      style: TextStyle(color: cs.onSurface.withAlpha(170)),
-                    ),
-                  ),
-                ]),
-              )
-            else
-              for (final a in alerts.take(3)) ...[AlertTile(a: a), const SizedBox(height: 8)],
-            // ---- one safety tip
-            SectionLabel(tr('Safety tip'), icon: Icons.lightbulb_rounded),
-            const _TipCard(),
+            // ---- the status orb
+            const SizedBox(height: 24),
+            _status(context, sms, call),
+            // ---- the one big action
+            const SizedBox(height: 18),
+            GlowButton(label: tr('Check anything'), icon: Icons.qr_code_scanner_rounded, onPressed: widget.onCheck),
+            const SizedBox(height: 8),
+            Text(tr('Paste a link, SMS, number or UPI · or take a photo'), textAlign: TextAlign.center, style: const TextStyle(color: SL.textMuted, fontSize: 13)),
+            // ---- four quick tools
+            const SizedBox(height: 20),
+            Row(children: [
+              Expanded(child: _Tile(icon: Icons.chat_bubble_outline_rounded, label: tr('SMS'), onTap: widget.onCheck)),
+              const SizedBox(width: 10),
+              Expanded(child: _Tile(icon: Icons.phone_outlined, label: tr('Number'), onTap: widget.onCheck)),
+              const SizedBox(width: 10),
+              Expanded(child: _Tile(icon: Icons.credit_card_rounded, label: tr('Payment'), onTap: () => _open(const PaymentCheckScreen()))),
+              const SizedBox(width: 10),
+              Expanded(child: _Tile(icon: Icons.description_outlined, label: tr('Document'), onTap: () => _open(const DocumentCheckScreen()))),
+            ]),
+            // ---- help now
+            const SizedBox(height: 12),
+            _PanicButton(onTap: () => _open(const PanicScreen())),
           ]),
         ),
       ),
     );
   }
 
-  Widget _webHero(BuildContext context) => Panel(
-        padding: const EdgeInsets.all(20),
-        gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [SL.accent.withAlpha(40), Colors.white.withAlpha(8)]),
-        borderColor: SL.accent.withAlpha(70),
-        child: Row(children: [
-          const ShieldRing(activeCount: 1, total: 1, size: 88, level: 'safe'),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(tr('Check anything before you click'), style: Theme.of(context).textTheme.headlineSmall),
-              const SizedBox(height: 6),
-              Text(tr('Nothing you paste is uploaded'), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withAlpha(170))),
-            ]),
-          ),
-        ]),
-      );
-
-  /// The status card: a glowing shield, one clear headline, and the two shield switches.
-  Widget _hero(BuildContext context, bool sms, bool call) {
-    final active = (sms ? 1 : 0) + (call ? 1 : 0);
-    final caught = alerts.where((a) => a['level'] != null && a['level'] != 'safe').length;
-    final broken = shieldBroken(health);
-    var issues = healthIssues(health);
-    if (issues == 0 && (s['smsNeedsPermission'] == true || s['callNeedsRole'] == true)) issues = 1;
-    final android = !ios;
-
+  /// The radar orb, one clear headline and the two shield pills. Colour follows the real state:
+  /// green = protected, amber = something to fix or a shield off, red = a shield is on but broken.
+  Widget _status(BuildContext context, bool sms, bool call) {
     String title;
     String sub;
-    String? level; // null = grey (shields off)
+    String level;
     VoidCallback? onTap;
-    if (broken != null) {
-      title = broken == 'sms' ? tr('SMS Shield is on but isn\'t working yet') : tr('Call Shield is on but isn\'t working yet');
-      sub = tr('Tap to fix');
-      level = broken == 'sms' || health?['restrictedSettingsLikely'] == true ? 'danger' : 'warning';
-      onTap = _openHealth;
-    } else if (active == 0) {
-      title = tr('Shields are off');
-      sub = tr('Turn on a shield below.');
-    } else if (issues > 0 && android) {
-      title = issues == 1 ? tr('1 thing to fix') : tr('{n} things to fix', {'n': issues});
-      sub = tr('Tap to open Protection check');
-      level = 'warning';
-      onTap = _openHealth;
-    } else if (active == 1) {
-      title = tr('One shield is on');
-      sub = tr('Turn on both for full protection.');
-      level = 'warning';
-    } else {
-      title = tr('You\'re protected');
-      sub = caught > 0 ? tr('{n} threats caught', {'n': caught}) : tr('New SMS and calls are checked');
+    if (web) {
+      title = tr('Check anything before you click');
+      sub = tr('Nothing you paste is uploaded');
       level = 'safe';
+    } else {
+      final active = (sms ? 1 : 0) + (call ? 1 : 0);
+      final broken = shieldBroken(health);
+      var issues = healthIssues(health);
+      if (issues == 0 && (s['smsNeedsPermission'] == true || s['callNeedsRole'] == true)) issues = 1;
+      final android = !ios;
+      if (broken != null) {
+        title = broken == 'sms' ? tr('SMS Shield is on but isn\'t working yet') : tr('Call Shield is on but isn\'t working yet');
+        sub = tr('Tap to fix');
+        level = 'danger';
+        onTap = _openHealth;
+      } else if (active == 0) {
+        title = tr('Shields are off');
+        sub = tr('Turn on a shield below.');
+        level = 'warning';
+      } else if (issues > 0 && android) {
+        title = issues == 1 ? tr('1 thing to fix') : tr('{n} things to fix', {'n': issues});
+        sub = tr('Tap to open Protection check');
+        level = 'warning';
+        onTap = _openHealth;
+      } else if (active == 1) {
+        title = tr('One shield is on');
+        sub = tr('Turn on both for full protection.');
+        level = 'warning';
+      } else {
+        title = tr('You\'re protected');
+        sub = _todayLine();
+        level = 'safe';
+      }
     }
-    final tint = level == null ? Colors.white.withAlpha(26) : SL.fg(context, level).withAlpha(44);
-    final muted = Theme.of(context).colorScheme.onSurface.withAlpha(170);
-
-    return Panel(
-      padding: const EdgeInsets.fromLTRB(18, 18, 18, 12),
-      gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [tint, Colors.white.withAlpha(6)]),
-      borderColor: level == null ? null : SL.fg(context, level).withAlpha(80),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        InkWell(
-          borderRadius: BorderRadius.circular(16),
-          onTap: onTap,
-          child: Row(children: [
-            ShieldRing(activeCount: active, total: 2, size: 96, level: level),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(title, style: Theme.of(context).textTheme.headlineSmall),
-                const SizedBox(height: 4),
-                Row(children: [
-                  Flexible(child: Text(sub, style: TextStyle(color: onTap != null ? SL.fg(context, level ?? 'warning') : muted, fontWeight: FontWeight.w600))),
-                  if (onTap != null) Icon(Icons.chevron_right_rounded, size: 20, color: SL.fg(context, level ?? 'warning')),
-                ]),
-              ]),
-            ),
-          ]),
+    final head = Column(children: [
+      _StatusOrb(level: level),
+      const SizedBox(height: 10),
+      Text(title, textAlign: TextAlign.center, style: SL.h(30, height: 1.15, spacing: -0.3)),
+      const SizedBox(height: 4),
+      Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        Flexible(
+          child: Text(sub,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 15, color: onTap != null ? SL.pale(level) : SL.textSecondary, fontWeight: onTap != null ? FontWeight.w700 : FontWeight.w500)),
         ),
+        if (onTap != null) Icon(Icons.chevron_right_rounded, size: 20, color: SL.pale(level)),
+      ]),
+    ]);
+    return Column(children: [
+      if (onTap == null)
+        head
+      else
+        Semantics(
+          button: true,
+          child: InkWell(borderRadius: BorderRadius.circular(24), onTap: onTap, child: Padding(padding: const EdgeInsets.symmetric(vertical: 4), child: head)),
+        ),
+      if (!web) ...[
         const SizedBox(height: 14),
-        _ShieldRow(
-          icon: Icons.sms_rounded,
-          title: tr('SMS Shield'),
-          sub: ios ? tr('Filters unknown senders') : tr('Checks new SMS'),
-          value: sms,
-          onChanged: busy ? null : (v) => _shield('sms', v),
-        ),
-        if (ios && sms) _IosStep(text: tr('Also switch it on in iPhone Settings › Apps › Messages › Unknown & Spam › Second Look.'), which: 'sms_filter'),
-        const SizedBox(height: 8),
-        _ShieldRow(
-          icon: Icons.ring_volume_rounded,
-          title: tr('Call Shield'),
-          sub: ios ? tr('Labels reported numbers') : tr('Screens unknown callers'),
-          value: call,
-          onChanged: busy ? null : (v) => _shield('call', v),
-        ),
-        if (ios && call) _IosStep(text: tr('Also switch it on in iPhone Settings › Apps › Phone › Call Blocking & Identification.'), which: 'call_directory'),
-        if (android)
-          Align(
-            alignment: Alignment.centerLeft,
-            child: TextButton.icon(
-              onPressed: _openHealth,
-              icon: Icon(Icons.health_and_safety_rounded, size: 19, color: issues > 0 ? SL.fg(context, 'warning') : SL.accent),
-              label: Text(tr('Protection check')),
-            ),
-          )
-        else
-          const SizedBox(height: 4),
-      ]),
-    );
-  }
-}
-
-/// One shield as a pill-shaped row with its switch.
-class _ShieldRow extends StatelessWidget {
-  const _ShieldRow({required this.icon, required this.title, required this.sub, required this.value, required this.onChanged});
-  final IconData icon;
-  final String title, sub;
-  final bool value;
-  final ValueChanged<bool>? onChanged;
-  @override
-  Widget build(BuildContext context) {
-    final on = SL.fg(context, 'safe');
-    final muted = Theme.of(context).colorScheme.onSurface.withAlpha(150);
-    return Container(
-      padding: const EdgeInsets.fromLTRB(12, 6, 6, 6),
-      decoration: BoxDecoration(
-        color: value ? on.withAlpha(22) : Colors.white.withAlpha(8),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: value ? on.withAlpha(90) : Colors.white.withAlpha(24)),
-      ),
-      child: Row(children: [
-        Icon(icon, size: 22, color: value ? on : muted),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-            Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
-            Text('${value ? tr('ON') : tr('OFF')} · $sub',
-                maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: value ? on : muted)),
-          ]),
-        ),
-        Switch(value: value, onChanged: onChanged),
-      ]),
-    );
-  }
-}
-
-/// A compact tool button in the 3×2 grid.
-class _Tool extends StatelessWidget {
-  const _Tool({required this.icon, required this.title, required this.onTap, this.danger = false});
-  final IconData icon;
-  final String title;
-  final VoidCallback onTap;
-  final bool danger;
-  @override
-  Widget build(BuildContext context) {
-    final c = danger ? SL.fg(context, 'danger') : SL.accent;
-    return Panel(
-      onTap: onTap,
-      padding: const EdgeInsets.fromLTRB(8, 12, 8, 10),
-      color: danger ? SL.bg(context, 'danger') : null,
-      borderColor: danger ? c.withAlpha(90) : null,
-      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        IconTile(icon, color: c, size: 44),
-        const SizedBox(height: 8),
-        Text(title,
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, height: 1.2, color: danger ? c : null)),
-      ]),
-    );
-  }
-}
-
-/// One short, practical safety rule; a different one each day, with a button for the next.
-class _TipCard extends StatefulWidget {
-  const _TipCard();
-  @override
-  State<_TipCard> createState() => _TipCardState();
-}
-
-class _TipCardState extends State<_TipCard> {
-  static const tips = [
-    'No bank, police officer or company will ever ask for your OTP, UPI PIN or CVV.',
-    'You never enter a UPI PIN or scan a QR code to receive money.',
-    'There is no such thing as a "digital arrest". Police don\'t hold people on video calls.',
-    'Never install an app (APK) or screen-sharing app because a caller asked you to.',
-    'A payment screenshot isn\'t proof. Check the money in your own bank app first.',
-    'Never dial a code like *401* that someone sends you. It can forward your calls to a scammer.',
-    '"Urgent" and "within 2 hours" are there to stop you from checking. Slow down.',
-    'Call back on the number printed on your card or bill, not the one in the message.',
-    'Earning money for liking videos or rating hotels is a scam. It always ends with you paying.',
-    'If you lose money, call 1930 immediately. Quick reports can freeze the stolen money.',
-  ];
-  late int i = DateTime.now().difference(DateTime(2026)).inDays.abs() % tips.length;
-
-  @override
-  Widget build(BuildContext context) => Panel(
-        padding: const EdgeInsets.fromLTRB(16, 12, 6, 12),
-        color: SL.amber.withAlpha(18),
-        borderColor: SL.amber.withAlpha(60),
-        child: Row(children: [
-          const Icon(Icons.lightbulb_rounded, color: SL.amber, size: 26),
-          const SizedBox(width: 12),
-          Expanded(child: Text(tr(tips[i]), style: const TextStyle(fontSize: 14.5, height: 1.4, fontWeight: FontWeight.w600))),
-          IconButton(
-            tooltip: tr('Next tip'),
-            onPressed: () => setState(() => i = (i + 1) % tips.length),
-            icon: const Icon(Icons.arrow_forward_rounded, color: SL.amber),
+        Wrap(alignment: WrapAlignment.center, spacing: 10, runSpacing: 8, children: [
+          _ShieldPill(
+            on: sms,
+            label: sms ? tr('SMS shield on') : tr('SMS shield off'),
+            onTap: busy ? null : () => _shield('sms', !sms),
+          ),
+          _ShieldPill(
+            on: call,
+            label: call ? tr('Call shield on') : tr('Call shield off'),
+            onTap: busy ? null : () => _shield('call', !call),
           ),
         ]),
-      );
+        if (ios && sms) _IosStep(text: tr('Also switch it on in iPhone Settings › Apps › Messages › Unknown & Spam › Second Look.'), which: 'sms_filter'),
+        if (ios && call) _IosStep(text: tr('Also switch it on in iPhone Settings › Apps › Phone › Call Blocking & Identification.'), which: 'call_directory'),
+      ],
+    ]);
+  }
+}
+
+/// 236 px status orb: a thin outer ring, a dashed inner ring, a rotating radar sweep (4 s), a breathing glow (3 s)
+/// and a 112 px centre with the shield in the status colour. Holds still when the phone asks for reduced motion.
+class _StatusOrb extends StatefulWidget {
+  const _StatusOrb({required this.level});
+  final String level;
+  @override
+  State<_StatusOrb> createState() => _StatusOrbState();
+}
+
+class _StatusOrbState extends State<_StatusOrb> with TickerProviderStateMixin {
+  late final AnimationController sweep = AnimationController(vsync: this, duration: const Duration(seconds: 4));
+  late final AnimationController pulse = AnimationController(vsync: this, duration: const Duration(milliseconds: 1500));
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (MediaQuery.of(context).disableAnimations) {
+      sweep.stop();
+      pulse.stop();
+      sweep.value = 0.0;
+      pulse.value = 1.0;
+    } else {
+      if (!sweep.isAnimating) sweep.repeat();
+      if (!pulse.isAnimating) pulse.repeat(reverse: true);
+    }
+  }
+
+  @override
+  void dispose() {
+    sweep.dispose();
+    pulse.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final c = SL.fgOf(widget.level);
+    return ExcludeSemantics(
+      child: SizedBox(
+        width: 236,
+        height: 236,
+        child: Stack(alignment: Alignment.center, children: [
+          Positioned.fill(child: RepaintBoundary(child: CustomPaint(painter: _OrbPainter(c, sweep, pulse)))),
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 400),
+            width: 112,
+            height: 112,
+            decoration: BoxDecoration(
+              color: SL.deep(widget.level),
+              shape: BoxShape.circle,
+              border: Border.all(color: c, width: 2),
+              boxShadow: [BoxShadow(color: c.withAlpha(115), blurRadius: 40)],
+            ),
+            child: Icon(SL.icon(widget.level), size: 54, color: c),
+          ),
+        ]),
+      ),
+    );
+  }
+}
+
+class _OrbPainter extends CustomPainter {
+  _OrbPainter(this.color, this.sweep, this.pulse) : super(repaint: Listenable.merge([sweep, pulse]));
+  final Color color;
+  final Animation<double> sweep, pulse;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final c = size.center(Offset.zero);
+    final r = size.shortestSide / 2;
+
+    // Outer thin ring.
+    canvas.drawCircle(c, r - 0.5, Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1
+      ..color = color.withAlpha(56));
+
+    // Dashed inner ring (inset 22).
+    final dr = r - 22.5;
+    final dash = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1
+      ..color = color.withAlpha(89);
+    final n = (2 * math.pi * dr / 7).floor();
+    final step = 2 * math.pi / n;
+    final rect = Rect.fromCircle(center: c, radius: dr);
+    for (var i = 0; i < n; i++) {
+      canvas.drawArc(rect, i * step, step * 0.5, false, dash);
+    }
+
+    // Radar sweep: a 60° wedge that fades in to a sharp leading edge, turning once every 4 s.
+    final full = Rect.fromCircle(center: c, radius: r);
+    canvas.drawCircle(
+      c,
+      r,
+      Paint()
+        ..shader = SweepGradient(
+          colors: [color.withAlpha(0), color.withAlpha(89), color.withAlpha(0), color.withAlpha(0)],
+          stops: const [0.0, 60 / 360, 61 / 360, 1.0],
+          transform: GradientRotation(-math.pi / 2 + sweep.value * 2 * math.pi),
+        ).createShader(full),
+    );
+
+    // Breathing glow (inset 48): opacity .55 → 1, scale 1 → 1.04.
+    final p = Curves.easeInOut.transform(pulse.value.clamp(0.0, 1.0).toDouble());
+    final op = 0.55 + 0.45 * p;
+    final gr = (r - 48) * (1 + 0.04 * p);
+    final g = Rect.fromCircle(center: c, radius: gr);
+    canvas.drawCircle(
+      c,
+      gr,
+      Paint()
+        ..shader = RadialGradient(
+          colors: [color.withAlpha((82 * op).round()), color.withAlpha((10 * op).round()), color.withAlpha((10 * op).round())],
+          stops: const [0.0, 0.7, 1.0],
+        ).createShader(g),
+    );
+  }
+
+  @override
+  bool shouldRepaint(_OrbPainter o) => o.color != color || o.sweep != sweep || o.pulse != pulse;
+}
+
+/// "SMS shield on" — a pill with a status dot; tapping it switches the shield.
+class _ShieldPill extends StatelessWidget {
+  const _ShieldPill({required this.on, required this.label, required this.onTap});
+  final bool on;
+  final String label;
+  final VoidCallback? onTap;
+  @override
+  Widget build(BuildContext context) {
+    final c = on ? SL.safeD : SL.textMuted;
+    final r = BorderRadius.circular(20);
+    return Semantics(
+      toggled: on,
+      button: true,
+      child: Material(
+        color: on ? SL.safeD.withAlpha(26) : const Color(0x0AFFFFFF),
+        shape: RoundedRectangleBorder(borderRadius: r, side: BorderSide(color: on ? SL.safeD.withAlpha(102) : const Color(0x338CDCFF))),
+        child: InkWell(
+          borderRadius: r,
+          onTap: onTap,
+          child: Container(
+            height: 40,
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              Container(width: 8, height: 8, decoration: BoxDecoration(color: c, shape: BoxShape.circle)),
+              const SizedBox(width: 8),
+              Text(label, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5, color: on ? SL.safeLight : SL.textSecondary)),
+            ]),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// One of the four 88 px tool tiles under the main button.
+class _Tile extends StatelessWidget {
+  const _Tile({required this.icon, required this.label, required this.onTap});
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  @override
+  Widget build(BuildContext context) {
+    final r = BorderRadius.circular(18);
+    return Material(
+      color: SL.glass,
+      shape: RoundedRectangleBorder(borderRadius: r, side: const BorderSide(color: SL.glassBorder)),
+      child: InkWell(
+        borderRadius: r,
+        onTap: onTap,
+        child: SizedBox(
+          height: 88,
+          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Icon(icon, size: 26, color: SL.accent),
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(label, maxLines: 1, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12.5, color: SL.text)),
+              ),
+            ),
+          ]),
+        ),
+      ),
+    );
+  }
+}
+
+/// "Being scammed right now? Get help" — red outline button to the panic steps.
+class _PanicButton extends StatelessWidget {
+  const _PanicButton({required this.onTap});
+  final VoidCallback onTap;
+  @override
+  Widget build(BuildContext context) {
+    final r = BorderRadius.circular(16);
+    return Material(
+      color: SL.dangerD.withAlpha(26),
+      shape: RoundedRectangleBorder(borderRadius: r, side: BorderSide(color: SL.dangerD.withAlpha(115))),
+      child: InkWell(
+        borderRadius: r,
+        onTap: onTap,
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 52),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            const Icon(Icons.warning_amber_rounded, size: 20, color: SL.dangerD),
+            const SizedBox(width: 10),
+            Flexible(
+              child: Text(tr('Being scammed right now? Get help'),
+                  textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: SL.dangerLight)),
+            ),
+          ]),
+        ),
+      ),
+    );
+  }
 }
 
 class _Warn extends StatelessWidget {
@@ -511,20 +507,25 @@ class _Warn extends StatelessWidget {
   final IconData icon;
   final String title, text;
   @override
-  Widget build(BuildContext context) => Panel(
-        color: SL.bg(context, 'danger'),
-        borderColor: SL.fg(context, 'danger').withAlpha(110),
-        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Icon(icon, color: SL.fg(context, 'danger')),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(title, style: TextStyle(fontWeight: FontWeight.w800, color: SL.fg(context, 'danger'))),
-              const SizedBox(height: 3),
-              Text(text, style: const TextStyle(fontSize: 14, height: 1.4)),
-            ]),
-          ),
-        ]),
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.only(top: 14),
+        child: Panel(
+          radius: 20,
+          padding: const EdgeInsets.all(14),
+          color: SL.dangerD.withAlpha(18),
+          borderColor: SL.dangerD.withAlpha(102),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            IconTile(icon, color: SL.dangerD, size: 40),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(title, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15.5, color: SL.dangerLight)),
+                const SizedBox(height: 3),
+                Text(text, style: const TextStyle(fontSize: 13.5, height: 1.4, color: SL.textSoft)),
+              ]),
+            ),
+          ]),
+        ),
       );
 }
 

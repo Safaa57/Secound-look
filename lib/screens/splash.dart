@@ -26,9 +26,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   bool _done = false;
   Timer? _still;
 
-  // The app's deep navy backdrop with a cyan glow.
-  static const _top = SL.bgTop;
-  static const _bottom = Color(0xFF0C1A2E);
+  // The app's near-black navy ground with a soft cyan glow.
+  static const _ground = SL.ground;
   static const _glow = SL.accent;
   static const _tick = SL.safeD;
 
@@ -89,8 +88,12 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
         child: Material(
           type: MaterialType.transparency,
           child: Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [_top, _bottom]),
+            decoration: BoxDecoration(
+              gradient: RadialGradient(
+                center: const Alignment(0, -0.25),
+                radius: 0.9,
+                colors: [Color.alphaBlend(SL.accent.withAlpha(28), _ground), _ground],
+              ),
             ),
             child: SafeArea(
               child: AnimatedBuilder(
@@ -114,8 +117,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                           opacity: title,
                           child: Transform.translate(
                             offset: Offset(0, 8 * (1 - title)),
-                            child: const Text('Second Look',
-                                style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w900, letterSpacing: -0.5)),
+                            child: Text('Second Look', style: SL.h(30, spacing: 0.3)),
                           ),
                         ),
                         const SizedBox(height: 26),
@@ -140,16 +142,16 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
             margin: const EdgeInsets.symmetric(vertical: 5),
             padding: const EdgeInsets.fromLTRB(10, 7, 16, 7),
             decoration: BoxDecoration(
-              color: Colors.white.withAlpha(12),
-              borderRadius: BorderRadius.circular(999),
-              border: Border.all(color: Colors.white.withAlpha(24)),
+              color: SL.glass,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: SL.glassBorder),
             ),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
               SizedBox(width: 22, height: 22, child: CustomPaint(painter: _TickPainter(t, _tick))),
               const SizedBox(width: 10),
               Flexible(
                 child: Text(text,
-                    style: TextStyle(color: Colors.white.withAlpha(235), fontSize: 15, fontWeight: FontWeight.w600, height: 1.3)),
+                    style: const TextStyle(fontFamily: SL.body, color: SL.text, fontSize: 15, fontWeight: FontWeight.w600, height: 1.3)),
               ),
             ]),
           ),
@@ -211,7 +213,7 @@ class _ShieldPainter extends CustomPainter {
       ..strokeWidth = 4
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round
-      ..color = const Color(0xFFCFF7FF);
+      ..color = SL.accentLight;
     for (final m in path.computeMetrics()) {
       canvas.drawPath(m.extractPath(0, m.length * draw), stroke);
     }

@@ -30,7 +30,7 @@ const stringsKnC = <String, String>{
   'Job offer or loan letters that ask for a fee or deposit first.': 'ಮೊದಲು ಶುಲ್ಕ ಅಥವಾ ಠೇವಣಿ ಕೇಳುವ ಉದ್ಯೋಗ ಅಥವಾ ಸಾಲದ ಪತ್ರಗಳು.',
   'The file': 'ಫೈಲ್',
   'Checked as': 'ಯಾವುದಾಗಿ ಪರಿಶೀಲಿಸಲಾಗಿದೆ',
-  'File': 'ಫೈಲ್ ಹೆಸರು',
+  'File': 'ಫೈಲ್',
   'Photo': 'ಫೋಟೋ',
   'Program recorded in the file': 'ಫೈಲ್‌ನಲ್ಲಿ ದಾಖಲಾದ ಪ್ರೋಗ್ರಾಂ',
   'None recorded': 'ಏನೂ ದಾಖಲಾಗಿಲ್ಲ',

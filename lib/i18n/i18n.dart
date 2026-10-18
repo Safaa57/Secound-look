@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../native.dart';
+import '../theme.dart';
 import 'reasons.dart';
 import 'strings_hi.dart';
 import 'strings_kn.dart';
@@ -85,6 +86,9 @@ String trLevel(Map level, {String? kind}) {
 /// A compact language switch for the top of each screen.
 class LanguageButton extends StatelessWidget {
   const LanguageButton({super.key});
+
+  static const supported = L10n.supported;
+
   @override
   Widget build(BuildContext context) => ValueListenableBuilder<String>(
         valueListenable: L10n.lang,
@@ -101,17 +105,29 @@ class LanguageButton extends StatelessWidget {
               ])),
           ],
           child: Container(
+            height: 44,
+            constraints: const BoxConstraints(minWidth: 64),
             margin: const EdgeInsets.symmetric(horizontal: 4),
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary.withAlpha(26),
-              borderRadius: BorderRadius.circular(999),
+              color: SL.accent.withAlpha(20),
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: SL.accent.withAlpha(89)),
             ),
-            child: Row(mainAxisSize: MainAxisSize.min, children: [
-              Icon(Icons.translate_rounded, size: 17, color: Theme.of(context).colorScheme.primary),
-              const SizedBox(width: 6),
-              Text(L10n.names[code]!, style: TextStyle(fontWeight: FontWeight.w700, color: Theme.of(context).colorScheme.primary)),
-            ]),
+            // "EN · हि · ಕ", with the current language brighter.
+            child: Text.rich(
+              TextSpan(children: [
+                for (var i = 0; i < supported.length; i++) ...[
+                  if (i > 0) const TextSpan(text: ' · ', style: TextStyle(color: SL.textMuted)),
+                  TextSpan(
+                    text: L10n.short[supported[i]],
+                    style: TextStyle(color: supported[i] == code ? SL.text : SL.textMuted, fontWeight: supported[i] == code ? FontWeight.w800 : FontWeight.w600),
+                  ),
+                ],
+              ]),
+              style: const TextStyle(fontFamily: SL.body, fontSize: 14, fontWeight: FontWeight.w700, color: SL.text),
+            ),
           ),
         ),
       );

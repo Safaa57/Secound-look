@@ -251,7 +251,7 @@ class _ScanPainter extends CustomPainter {
       final r = 15.0 * Curves.easeOutBack.transform(shown.clamp(0.0, 1.0).toDouble());
       canvas.drawCircle(c, r, Paint()..color = danger);
       final tp = TextPainter(
-        text: TextSpan(text: '!', style: TextStyle(color: Colors.white, fontSize: r * 1.3, fontWeight: FontWeight.w900)),
+        text: TextSpan(text: '!', style: TextStyle(color: SL.onDanger, fontSize: r * 1.3, fontWeight: FontWeight.w900)),
         textDirection: TextDirection.ltr,
       )..layout();
       tp.paint(canvas, c - Offset(tp.width / 2, tp.height / 2));

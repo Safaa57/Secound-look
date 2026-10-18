@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 import 'dart:ui' show FontFeature;
 
 import 'package:flutter/material.dart';
@@ -29,13 +28,20 @@ const _kindIcons = <String, IconData>{
 String _kindLevel(String kind) =>
     {'scam': 'danger', 'spoofed': 'danger', 'bot': 'warning', 'foreign': 'warning', 'telemarketer': 'warning'}[kind] ?? 'safe';
 
-/// One check at a glance: a verdict ring with a one-word verdict, the top reasons, big action buttons,
-/// then who sent it, community reports and what to do. Details sit behind "Learn more".
+/// One check at a glance: a glowing verdict mark, the verdict in two words and one plain sentence, risk and
+/// community chips, up to three reasons, then the actions (Block / Report / Call 1930). Community reports,
+/// the online Deep check and the full details sit below.
 class VerdictView extends StatelessWidget {
-  const VerdictView({super.key, required this.result, this.trustedName, this.trustedNumber, this.onChanged});
+  const VerdictView({super.key, required this.result, this.trustedName, this.trustedNumber, this.onChanged, this.onBack, this.title});
   final Map<String, dynamic> result;
   final String? trustedName, trustedNumber;
   final VoidCallback? onChanged;
+
+  /// Set on the full-page result: shows the back button and lets the glow run to the top of the screen.
+  final VoidCallback? onBack;
+
+  /// A short caption at the top of the full-page result (English; shown with tr()).
+  final String? title;
 
   @override
   Widget build(BuildContext context) {
@@ -44,72 +50,123 @@ class VerdictView extends StatelessWidget {
     final label = trLevel((result['level'] as Map?) ?? const {'key': 'safe'}, kind: kind);
     final score = ((result['score'] as num?) ?? 0).toInt();
     final info = (result['info'] as Map?)?.cast<String, dynamic>() ?? {};
-    final reasons = (result['reasons'] as List? ?? []).whereType<Map>().where((r) => ((r['weight'] as num?) ?? 0) != 0).toList();
+    final reasons = [
+      for (final r in (result['reasons'] as List? ?? []).whereType<Map>())
+        if (((r['weight'] as num?) ?? 0) != 0) r.cast<String, dynamic>(),
+    ];
     final advice = (result['advice'] as List? ?? []).map((e) => '$e').toList();
     final number = (info['numberDetails'] as Map?)?.cast<String, dynamic>();
     final caller = (info['caller'] as Map?)?.cast<String, dynamic>();
     final sender = (info['sender'] as Map?)?.cast<String, dynamic>();
     final senderNumber = (sender?['number'] as Map?)?.cast<String, dynamic>();
-    final phones = (info['phones'] as List? ?? []).whereType<Map>();
+    final phones = (info['phones'] as List? ?? []).whereType<Map>().toList();
     final phoneDetails = number ?? senderNumber;
     final e164 = '${phoneDetails?['e164'] ?? ''}';
     final hasNumber = e164.replaceAll(RegExp(r'\D'), '').length >= 7;
+    final senderRaw = '${sender?['raw'] ?? ''}'.trim();
+    final community = info['community'] is Map ? (info['community'] as Map).cast<String, dynamic>() : null;
+    final reported = (community?['total'] as num?)?.toInt() ?? 0;
+    final full = onBack != null;
+    final hasDetails = advice.isNotEmpty || caller != null || number != null || sender != null || phones.isNotEmpty;
 
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      _VerdictHero(result: result, level: level, kind: kind, score: score),
-      const SizedBox(height: 12),
-      _Actions(level: level, e164: hasNumber ? e164 : null, onChanged: onChanged),
-      SectionLabel(tr('Why'), icon: Icons.insights_rounded),
-      if (reasons.isEmpty)
-        Panel(
-          child: Row(children: [
-            Icon(Icons.check_circle_rounded, color: SL.fg(context, 'safe')),
-            const SizedBox(width: 12),
-            Expanded(child: Text(tr('None of the known scam patterns matched.'), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withAlpha(190)))),
-          ]),
-        )
-      else
-        _ReasonList(reasons: [for (final r in reasons) r.cast<String, dynamic>()]),
-      if (info['community'] is Map) ...[
-        const SizedBox(height: 12),
-        CommunityCard(key: ValueKey('${(info['community'] as Map)['number']}'), summary: (info['community'] as Map).cast<String, dynamic>()),
-      ],
-      if (caller != null || number != null) ...[
-        const SizedBox(height: 12),
-        CallerCard(details: number, caller: caller, onChanged: onChanged),
-      ],
-      if (sender != null) ...[
-        const SizedBox(height: 12),
-        _SenderCard(sender: sender),
-        if (senderNumber != null) ...[const SizedBox(height: 12), CallerCard(details: senderNumber, caller: null, onChanged: onChanged)],
-      ],
-      for (final p in phones) ...[const SizedBox(height: 12), CallerCard(details: p.cast<String, dynamic>(), caller: null, compact: true, onChanged: onChanged)],
-      DeepCheckCard(key: ValueKey(Cloud.linksIn(result).join('|')), urls: Cloud.linksIn(result)),
-      if (advice.isNotEmpty) ...[
-        SectionLabel(tr('What to do now'), icon: Icons.checklist_rounded),
-        Panel(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            for (var i = 0; i < advice.length && i < 2; i++) _AdviceRow(i + 1, advice[i]),
-            if (advice.length > 2)
-              LearnMore(
-                label: tr('Show all steps'),
-                child: Column(children: [for (var i = 2; i < advice.length; i++) _AdviceRow(i + 1, advice[i])]),
-              ),
-          ]),
-        ),
-      ],
-      if (level != 'safe' && (trustedNumber ?? '').isNotEmpty) ...[
-        const SizedBox(height: 12),
-        OutlinedButton.icon(
-          onPressed: () => Native.instance.smsTo(trustedNumber!,
-              tr('Second Look flagged something on my phone as "{label}". Can you check it with me before I do anything?', {'label': label.toLowerCase()})),
-          icon: const Icon(Icons.family_restroom_rounded),
-          label: Text(tr('Ask {name} to check', {'name': trustedName?.isNotEmpty == true ? trustedName : tr('my trusted person')})),
-        ),
-      ],
+      _VerdictHero(
+        result: result,
+        level: level,
+        kind: kind,
+        score: score,
+        reported: reported,
+        sentence: _sentence(level, kind, reasons),
+        caption: title != null ? tr(title!) : _kindTitle(kind),
+        onBack: onBack,
+      ),
+      Padding(
+        padding: EdgeInsets.symmetric(horizontal: full ? 20 : 0),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          SizedBox(height: full ? 4 : 18),
+          Text(tr('Why').toUpperCase(), style: SL.h(15, color: SL.textSecondary, weight: FontWeight.w600, spacing: 0.6)),
+          const SizedBox(height: 10),
+          if (reasons.isEmpty)
+            _ReasonBox(
+              icon: Icons.check_circle_outline_rounded,
+              color: SL.safeD,
+              title: tr('None of the known scam patterns matched.'),
+            )
+          else
+            _ReasonList(reasons: reasons),
+          const SizedBox(height: 8),
+          _Actions(
+            level: level,
+            kind: kind,
+            e164: hasNumber ? e164 : null,
+            blockTarget: hasNumber ? e164 : (senderRaw.isNotEmpty ? senderRaw : null),
+            fromSender: sender != null,
+            onChanged: onChanged,
+          ),
+          const SizedBox(height: 14),
+          Text(tr('Automated opinion, not a guarantee. Not affiliated with any company named.'),
+              textAlign: TextAlign.center, style: const TextStyle(fontSize: 12.5, color: SL.textMuted, height: 1.4)),
+          if (community != null) ...[
+            const SizedBox(height: 18),
+            CommunityCard(key: ValueKey('${community['number']}'), summary: community),
+          ],
+          DeepCheckCard(key: ValueKey(Cloud.linksIn(result).join('|')), urls: Cloud.linksIn(result)),
+          if (hasDetails) ...[
+            const SizedBox(height: 8),
+            LearnMore(
+              label: tr('More details'),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                if (advice.isNotEmpty) ...[
+                  SectionLabel(tr('What to do now')),
+                  Panel(
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      for (var i = 0; i < advice.length; i++) _AdviceRow(i + 1, advice[i]),
+                    ]),
+                  ),
+                ],
+                if (caller != null || number != null) ...[
+                  const SizedBox(height: 12),
+                  CallerCard(details: number, caller: caller, onChanged: onChanged),
+                ],
+                if (sender != null) ...[
+                  const SizedBox(height: 12),
+                  _SenderCard(sender: sender),
+                  if (senderNumber != null) ...[const SizedBox(height: 12), CallerCard(details: senderNumber, caller: null, onChanged: onChanged)],
+                ],
+                for (final p in phones) ...[const SizedBox(height: 12), CallerCard(details: p.cast<String, dynamic>(), caller: null, compact: true, onChanged: onChanged)],
+              ]),
+            ),
+          ],
+          if (level != 'safe' && (trustedNumber ?? '').isNotEmpty) ...[
+            const SizedBox(height: 12),
+            SoftButton(
+              icon: Icons.family_restroom_rounded,
+              onPressed: () => Native.instance.smsTo(trustedNumber!,
+                  tr('Second Look flagged something on my phone as "{label}". Can you check it with me before I do anything?', {'label': label.toLowerCase()})),
+              label: tr('Ask {name} to check', {'name': trustedName?.isNotEmpty == true ? trustedName : tr('my trusted person')}),
+            ),
+          ],
+        ]),
+      ),
     ]);
   }
+}
+
+/// The one sentence under the verdict: the main reason in plain words when it's short, otherwise what to do.
+/// Documents and payment screenshots always get their own fixed wording.
+String _sentence(String level, String? kind, List<Map<String, dynamic>> reasons) {
+  if (kind == 'document' || kind == 'payment' || level == 'safe') return verdictLine(level, kind);
+  Map<String, dynamic>? top;
+  for (final r in reasons) {
+    final w = ((r['weight'] as num?) ?? 0).toInt();
+    if (w > 0 && (top == null || w > ((top['weight'] as num?) ?? 0).toInt())) top = r;
+  }
+  if (top != null) {
+    final d = trReasonDetail(top).trim();
+    if (d.isNotEmpty && d.length <= 160) return d;
+  }
+  return verdictLine(level, kind);
 }
 
 /// One plain sentence under the verdict: what it means for the person right now.
@@ -145,127 +202,175 @@ String verdictWord(String level, String? kind) {
 String _kindTitle(String? k) =>
     tr({'sms': 'SMS', 'message': 'Message', 'link': 'Link', 'number': 'Phone number', 'call': 'Call', 'upi': 'UPI ID', 'payment': 'Payment screenshot', 'document': 'Document'}[k] ?? (k ?? ''));
 
+/// The top of a result: a radial glow in the verdict colour, back + Listen, the 132 px mark, the verdict word
+/// (Sora 36), one sentence and the chips.
 class _VerdictHero extends StatelessWidget {
-  const _VerdictHero({required this.result, required this.level, required this.kind, required this.score});
+  const _VerdictHero({
+    required this.result,
+    required this.level,
+    required this.kind,
+    required this.score,
+    required this.reported,
+    required this.sentence,
+    required this.caption,
+    this.onBack,
+  });
   final Map<String, dynamic> result;
   final String level;
   final String? kind;
-  final int score;
+  final int score, reported;
+  final String sentence, caption;
+  final VoidCallback? onBack;
 
   @override
   Widget build(BuildContext context) {
-    final fg = SL.fg(context, level);
-    final muted = Theme.of(context).colorScheme.onSurface.withAlpha(150);
-    return Panel(
-      padding: const EdgeInsets.fromLTRB(18, 20, 12, 8),
-      borderColor: fg.withAlpha(90),
-      gradient: LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [fg.withAlpha(46), Colors.white.withAlpha(8)],
-      ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          VerdictRing(level: level, size: 104),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(verdictWord(level, kind), style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: fg, letterSpacing: -0.6, height: 1.1)),
-              const SizedBox(height: 6),
-              Text(verdictLine(level, kind), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, height: 1.35)),
-              const SizedBox(height: 8),
-              Text('${tr('Risk {n} / 100', {'n': score})} · ${_kindTitle(kind)}',
-                  style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: muted, fontFeatures: const [FontFeature.tabularFigures()])),
-            ]),
-          ),
-        ]),
-        const SizedBox(height: 6),
-        Row(children: [
-          Expanded(
-            child: Text(tr('Automated opinion, not a guarantee. Not affiliated with any company named.'),
-                style: TextStyle(fontSize: 11.5, color: Theme.of(context).colorScheme.onSurface.withAlpha(130))),
-          ),
-          ListenButton(key: ObjectKey(result), result: result, color: fg),
-        ]),
-      ]),
-    );
-  }
-}
-
-/// A glowing ring in the verdict colour that sweeps in, with ✓ / ! / ✕ in the middle.
-class VerdictRing extends StatelessWidget {
-  const VerdictRing({super.key, required this.level, this.size = 104});
-  final String level;
-  final double size;
-  @override
-  Widget build(BuildContext context) {
-    final fg = SL.fg(context, level);
-    final noMotion = MediaQuery.of(context).disableAnimations;
-    return SizedBox(
-      width: size,
-      height: size,
-      child: TweenAnimationBuilder<double>(
-        key: ValueKey(level),
-        tween: Tween<double>(begin: noMotion ? 1.0 : 0.0, end: 1.0),
-        duration: const Duration(milliseconds: 750),
-        curve: Curves.easeOutCubic,
-        builder: (context, v, _) => CustomPaint(
-          painter: _VerdictRingPainter(v, fg),
-          child: Center(
-            child: Transform.scale(
-              scale: 0.7 + 0.3 * v,
-              child: Container(
-                width: size * 0.5,
-                height: size * 0.5,
-                decoration: BoxDecoration(color: fg.withAlpha(40), shape: BoxShape.circle, border: Border.all(color: fg.withAlpha(110), width: 1.5)),
-                child: Icon(SL.mark(level), color: fg, size: size * 0.32),
-              ),
-            ),
-          ),
+    final fg = SL.fgOf(level);
+    final full = onBack != null;
+    final chipText = SL.pale(level);
+    final top = Row(children: [
+      if (full) BackCircle(onPressed: onBack, border: const Color(0x2EFFFFFF)) else const SizedBox(width: 4),
+      Expanded(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Text(caption,
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: SL.textSecondary)),
         ),
       ),
+      ListenButton(key: ObjectKey(result), result: result),
+    ]);
+    final body = Column(children: [
+      top,
+      const SizedBox(height: 12),
+      _VerdictMark(level: level),
+      const SizedBox(height: 16),
+      Text(verdictWord(level, kind), textAlign: TextAlign.center, style: SL.h(36, color: SL.pale(level), height: 1.12)),
+      const SizedBox(height: 6),
+      ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 310),
+        child: Text(sentence, textAlign: TextAlign.center, style: const TextStyle(fontSize: 16, height: 1.45, color: Color(0xFFE2E8F0), fontWeight: FontWeight.w500)),
+      ),
+      const SizedBox(height: 14),
+      Wrap(alignment: WrapAlignment.center, spacing: 8, runSpacing: 8, children: [
+        Pill(tr('Risk {n} / 100', {'n': score}), fg: fg, bg: fg.withAlpha(36), textColor: chipText),
+        if (reported > 0) Pill(tr('Reported by {n} people', {'n': reported}), fg: fg, bg: fg.withAlpha(36), textColor: chipText),
+      ]),
+    ]);
+    final glow = RadialGradient(
+      center: Alignment.topCenter,
+      radius: 1.15,
+      colors: [fg.withAlpha(71), fg.withAlpha(0)],
+      stops: const [0.0, 0.7],
+    );
+    if (full) {
+      return Container(
+        padding: EdgeInsets.fromLTRB(20, MediaQuery.paddingOf(context).top + 14, 20, 20),
+        decoration: BoxDecoration(gradient: glow),
+        child: body,
+      );
+    }
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 20),
+      decoration: BoxDecoration(
+        gradient: glow,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: fg.withAlpha(56)),
+      ),
+      child: body,
     );
   }
 }
 
-class _VerdictRingPainter extends CustomPainter {
-  _VerdictRingPainter(this.v, this.color);
-  final double v;
-  final Color color;
+/// ✕ / ! / ✓ in a 116 px circle with a glow, and a ring that keeps expanding outwards (1.8 s).
+/// Holds still when the phone asks for reduced motion.
+class _VerdictMark extends StatefulWidget {
+  const _VerdictMark({required this.level});
+  final String level;
   @override
-  void paint(Canvas canvas, Size s) {
-    final c = s.center(Offset.zero);
-    final stroke = s.width * 0.07;
-    canvas.drawCircle(
-      c,
-      s.width * 0.34,
-      Paint()
-        ..color = color.withAlpha((70 * v).round())
-        ..maskFilter = MaskFilter.blur(BlurStyle.normal, s.width * 0.14),
-    );
-    final r = Rect.fromCircle(center: c, radius: s.width / 2 - stroke);
-    canvas.drawArc(r, 0, math.pi * 2, false, Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = stroke
-      ..color = Colors.white.withAlpha(16));
-    if (v > 0) {
-      canvas.drawArc(r, -math.pi / 2, math.pi * 2 * v, false, Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = stroke
-        ..strokeCap = StrokeCap.round
-        ..color = color);
+  State<_VerdictMark> createState() => _VerdictMarkState();
+}
+
+class _VerdictMarkState extends State<_VerdictMark> with SingleTickerProviderStateMixin {
+  late final AnimationController ring = AnimationController(vsync: this, duration: const Duration(milliseconds: 1800));
+  bool still = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    still = MediaQuery.of(context).disableAnimations;
+    if (still) {
+      ring.stop();
+      ring.value = 0.25;
+    } else if (!ring.isAnimating) {
+      ring.repeat();
     }
   }
 
   @override
-  bool shouldRepaint(_VerdictRingPainter o) => o.v != v || o.color != color;
+  void dispose() {
+    ring.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final fg = SL.fgOf(widget.level);
+    final centre = Container(
+      width: 116,
+      height: 116,
+      decoration: BoxDecoration(
+        color: SL.deep(widget.level),
+        shape: BoxShape.circle,
+        border: Border.all(color: fg, width: 3),
+        boxShadow: [BoxShadow(color: fg.withAlpha(128), blurRadius: 50)],
+      ),
+      child: Icon(SL.mark(widget.level), size: 56, color: fg),
+    );
+    return ExcludeSemantics(
+      child: SizedBox(
+        width: 132,
+        height: 132,
+        child: Stack(alignment: Alignment.center, children: [
+          AnimatedBuilder(
+            animation: ring,
+            builder: (context, _) {
+              final t = Curves.easeOut.transform(ring.value);
+              final op = 0.8 * (1 - t);
+              return Transform.scale(
+                scale: 0.9 + 0.45 * t,
+                child: Container(
+                  width: 132,
+                  height: 132,
+                  decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: fg.withAlpha((153 * op).round()), width: 2)),
+                ),
+              );
+            },
+          ),
+          TweenAnimationBuilder<double>(
+            key: ValueKey(widget.level),
+            tween: Tween<double>(begin: still ? 1.0 : 0.8, end: 1.0),
+            duration: const Duration(milliseconds: 450),
+            curve: Curves.easeOutBack,
+            builder: (context, v, child) => Transform.scale(scale: v, child: child),
+            child: centre,
+          ),
+        ]),
+      ),
+    );
+  }
 }
 
-/// The big buttons under the verdict: Block / Report for a phone number, and 1930 when something looks wrong.
+/// The main action, full width, then Report and Call 1930.
+/// Block for anything with a sender (SMS or number); otherwise the most useful "don't" for that kind of check.
 class _Actions extends StatelessWidget {
-  const _Actions({required this.level, required this.e164, this.onChanged});
+  const _Actions({required this.level, required this.kind, required this.e164, required this.blockTarget, required this.fromSender, this.onChanged});
   final String level;
-  final String? e164;
+  final String? kind;
+  final String? e164; // a real phone number (for reports)
+  final String? blockTarget; // phone number or SMS sender ID
+  final bool fromSender;
   final VoidCallback? onChanged;
 
   Future<void> _block(BuildContext context, String n) async {
@@ -279,55 +384,58 @@ class _Actions extends StatelessWidget {
     await showBlockedSheet(context, n);
   }
 
+  String _dontLabel() {
+    switch (kind) {
+      case 'payment':
+      case 'upi':
+      case 'document':
+        return tr('Don\'t pay');
+      case 'link':
+        return tr('Don\'t open the link');
+      default:
+        return tr('Don\'t reply or share codes');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final n = e164;
     final bad = level != 'safe';
-    final callHelp = OutlinedButton.icon(
-      style: OutlinedButton.styleFrom(foregroundColor: SL.fg(context, 'danger'), side: BorderSide(color: SL.fg(context, 'danger').withAlpha(110))),
-      onPressed: () => Native.instance.dial('1930'),
-      icon: const Icon(Icons.call_rounded),
-      label: Text(tr('Lost money? Call 1930 now')),
-    );
-    if (n == null) return bad ? callHelp : const SizedBox.shrink();
-    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      if (bad)
-        FilledButton.icon(
-          style: FilledButton.styleFrom(backgroundColor: SL.dangerFill, foregroundColor: Colors.white),
-          onPressed: () => _block(context, n),
-          icon: const Icon(Icons.block_rounded),
-          label: Text(tr('Block this number')),
+    final n = e164;
+    final b = blockTarget;
+    if (!bad && n == null) return const SizedBox(height: 4);
+    final children = <Widget>[];
+    if (bad) {
+      children.add(GlowButton(
+        label: b != null ? (fromSender ? tr('Block sender') : tr('Block this number')) : _dontLabel(),
+        color: SL.fgOf(level),
+        textColor: SL.on(level),
+        height: 60,
+        radius: 18,
+        fontSize: 17,
+        glow: false,
+        onPressed: b != null ? () => _block(context, b) : () => Navigator.of(context).maybePop(),
+      ));
+      children.add(const SizedBox(height: 10));
+    }
+    children.add(Row(children: [
+      Expanded(
+        child: SoftButton(
+          label: tr('Report'),
+          onPressed: n != null ? () => reportNumber(context, n, onChanged: onChanged) : () => Native.instance.openUrl('https://sancharsaathi.gov.in'),
         ),
-      if (bad) const SizedBox(height: 10),
-      Row(children: [
-        Expanded(
-          child: OutlinedButton.icon(
-            onPressed: () => reportNumber(context, n, onChanged: onChanged),
-            icon: const Icon(Icons.flag_rounded),
-            label: Text(tr('Report')),
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: bad
-              ? OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(foregroundColor: SL.fg(context, 'danger')),
-                  onPressed: () => Native.instance.dial('1930'),
-                  icon: const Icon(Icons.call_rounded),
-                  label: const Text('1930'),
-                )
-              : OutlinedButton.icon(
-                  onPressed: () => _block(context, n),
-                  icon: const Icon(Icons.block_rounded),
-                  label: Text(tr('Block')),
-                ),
-        ),
-      ]),
-    ]);
+      ),
+      const SizedBox(width: 10),
+      Expanded(
+        child: bad
+            ? SoftButton(label: tr('Call 1930'), onPressed: () => Native.instance.dial('1930'))
+            : SoftButton(label: tr('Block'), onPressed: () => _block(context, n!)),
+      ),
+    ]));
+    return Padding(padding: const EdgeInsets.only(top: 10), child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: children));
   }
 }
 
-/// Top reasons as compact rows; tap a row for the detail. More than three sit behind "Show more".
+/// Up to three reasons as separate rows; tap one for the detail. More sit behind "Show n more".
 class _ReasonList extends StatefulWidget {
   const _ReasonList({required this.reasons});
   final List<Map<String, dynamic>> reasons;
@@ -341,21 +449,31 @@ class _ReasonListState extends State<_ReasonList> {
   Widget build(BuildContext context) {
     final r = widget.reasons;
     final shown = all ? r : r.take(3).toList();
-    return Panel(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        for (var i = 0; i < shown.length; i++) ...[
-          if (i > 0) Divider(height: 1, indent: 52, color: Colors.white.withAlpha(16)),
-          _ReasonRow(shown[i]),
-        ],
-        if (r.length > 3)
-          TextButton(
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      for (final x in shown) _ReasonRow(x),
+      if (r.length > 3)
+        Align(
+          alignment: Alignment.centerLeft,
+          child: TextButton(
             onPressed: () => setState(() => all = !all),
             child: Text(all ? tr('Show less') : tr('Show {n} more', {'n': r.length - 3})),
           ),
-      ]),
-    );
+        ),
+    ]);
   }
+}
+
+/// An icon that fits the reason (link, time pressure, codes, money, calls, apps), coloured by how much it weighs.
+IconData _reasonIcon(Map<String, dynamic> r, int w, String lv) {
+  if (w < 0) return Icons.check_circle_outline_rounded;
+  final k = '${r['id'] ?? ''} ${r['title'] ?? ''}'.toLowerCase();
+  if (RegExp(r'link|url|domain|site|web|http').hasMatch(k)) return Icons.link_rounded;
+  if (RegExp(r'urgen|today|hour|immediat|deadline|expire|time').hasMatch(k)) return Icons.schedule_rounded;
+  if (RegExp(r'otp|pin|cvv|password|kyc|bank|card').hasMatch(k)) return Icons.lock_outline_rounded;
+  if (RegExp(r'upi|pay|money|refund|prize|lottery|reward|loan|₹').hasMatch(k)) return Icons.currency_rupee_rounded;
+  if (RegExp(r'call|number|phone|dial|sender|caller').hasMatch(k)) return Icons.call_outlined;
+  if (RegExp(r'app|apk|install|screen|remote').hasMatch(k)) return Icons.install_mobile_rounded;
+  return lv == 'danger' ? Icons.error_outline_rounded : Icons.info_outline_rounded;
 }
 
 class _ReasonRow extends StatefulWidget {
@@ -371,39 +489,60 @@ class _ReasonRowState extends State<_ReasonRow> {
   Widget build(BuildContext context) {
     final r = widget.r;
     final w = ((r['weight'] as num?) ?? 0).toInt();
-    final lv = w < 0 ? 'safe' : (w >= 35 ? 'danger' : (w >= 15 ? 'warning' : 'safe'));
-    final icon = w < 0 ? Icons.check_circle_rounded : (lv == 'danger' ? Icons.error_rounded : (lv == 'warning' ? Icons.warning_amber_rounded : Icons.info_rounded));
-    final fg = SL.fg(context, lv);
+    final lv = w < 0 ? 'safe' : (w >= 35 ? 'danger' : 'warning');
+    final color = w > 0 && w < 15 ? SL.accent : SL.fgOf(lv);
     final detail = trReasonDetail(r);
-    final muted = Theme.of(context).colorScheme.onSurface.withAlpha(140);
-    return InkWell(
-      borderRadius: BorderRadius.circular(14),
+    return _ReasonBox(
+      icon: _reasonIcon(r, w, lv),
+      color: color,
+      title: trReasonTitle(r),
+      detail: open && detail.isNotEmpty ? detail : null,
+      expandable: detail.isNotEmpty,
+      open: open,
       onTap: detail.isEmpty ? null : () => setState(() => open = !open),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 11),
-        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          IconTile(icon, color: fg, size: 34),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 6),
-                child: Text(trReasonTitle(r), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15, height: 1.3)),
+    );
+  }
+}
+
+/// One reason row: a 22 px icon and a short line on a faint card; the detail opens underneath.
+class _ReasonBox extends StatelessWidget {
+  const _ReasonBox({required this.icon, required this.color, required this.title, this.detail, this.expandable = false, this.open = false, this.onTap});
+  final IconData icon;
+  final Color color;
+  final String title;
+  final String? detail;
+  final bool expandable, open;
+  final VoidCallback? onTap;
+  @override
+  Widget build(BuildContext context) {
+    final r = BorderRadius.circular(16);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Material(
+        color: SL.glass,
+        shape: RoundedRectangleBorder(borderRadius: r, side: const BorderSide(color: SL.hairline)),
+        child: InkWell(
+          borderRadius: r,
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Icon(icon, size: 22, color: color),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15, height: 1.35, color: SL.text)),
+                  if (detail != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(detail!, style: const TextStyle(fontSize: 14, height: 1.4, color: SL.textSoft)),
+                    ),
+                ]),
               ),
-              if (open && detail.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(top: 4),
-                  child: Text(detail, style: TextStyle(fontSize: 14, height: 1.4, color: Theme.of(context).colorScheme.onSurface.withAlpha(175))),
-                ),
+              if (expandable) Icon(open ? Icons.expand_less_rounded : Icons.expand_more_rounded, size: 20, color: SL.textMuted),
             ]),
           ),
-          const SizedBox(width: 6),
-          Padding(
-            padding: const EdgeInsets.only(top: 7),
-            child: Text(w > 0 ? '+$w' : '$w', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12, color: fg.withAlpha(220))),
-          ),
-          if (detail.isNotEmpty) Padding(padding: const EdgeInsets.only(top: 4), child: Icon(open ? Icons.expand_less_rounded : Icons.expand_more_rounded, color: muted)),
-        ]),
+        ),
       ),
     );
   }

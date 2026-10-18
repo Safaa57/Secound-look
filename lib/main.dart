@@ -272,30 +272,141 @@ class _ShellState extends State<Shell> {
   int tab = 0;
   final _homeKey = GlobalKey<HomeScreenState>();
 
+  /// Likely-scam alerts the user hasn't looked at yet (a dot on the Alerts tab). Kept for this session only:
+  /// at launch, scams from the last 24 hours count as unseen until the Alerts tab is opened.
+  int _unseen = 0;
+  int _seenAt = DateTime.now().subtract(const Duration(hours: 24)).millisecondsSinceEpoch;
+
+  @override
+  void initState() {
+    super.initState();
+    alertsVersion.addListener(_countUnseen);
+    _countUnseen();
+  }
+
+  @override
+  void dispose() {
+    alertsVersion.removeListener(_countUnseen);
+    super.dispose();
+  }
+
+  Future<void> _countUnseen() async {
+    List<Map<String, dynamic>> h;
+    try {
+      h = await Native.instance.history();
+    } catch (_) {
+      return;
+    }
+    if (!mounted) return;
+    int ms(Object? v) => v is num ? v.toInt() : int.tryParse('$v') ?? 0;
+    final n = tab == 2 ? 0 : h.where((a) => a['level'] == 'danger' && ms(a['at']) > _seenAt).length;
+    if (n != _unseen) setState(() => _unseen = n);
+  }
+
+  void _select(int i) {
+    setState(() {
+      tab = i;
+      if (i == 2) {
+        _seenAt = DateTime.now().millisecondsSinceEpoch;
+        _unseen = 0;
+      }
+    });
+    if (i == 0) _homeKey.currentState?.refresh();
+    if (i == 2) notifyAlertsChanged(); // new SMS/calls may have been checked while the app was open
+  }
+
   @override
   Widget build(BuildContext context) {
     final pages = [
-      HomeScreen(key: _homeKey, onCheck: () => setState(() => tab = 1), onAlerts: () => setState(() => tab = 2)),
-      const CheckScreen(),
+      HomeScreen(key: _homeKey, onCheck: () => _select(1), onAlerts: () => _select(2)),
+      CheckScreen(onBack: () => _select(0)),
       const AlertsScreen(),
       const SettingsScreen(),
     ];
     return Scaffold(
-      backgroundColor: SL.bgBottom,
-      body: Backdrop(child: IndexedStack(index: tab, children: pages)),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: tab,
-        onDestinationSelected: (i) {
-          setState(() => tab = i);
-          if (i == 0) _homeKey.currentState?.refresh();
-          if (i == 2) notifyAlertsChanged(); // new SMS/calls may have been checked while the app was open
-        },
-        destinations: [
-          NavigationDestination(icon: const Icon(Icons.home_outlined), selectedIcon: const Icon(Icons.home_rounded), label: tr('Home')),
-          NavigationDestination(icon: const Icon(Icons.search_rounded), selectedIcon: const Icon(Icons.manage_search_rounded), label: tr('Check')),
-          NavigationDestination(icon: const Icon(Icons.notifications_none_rounded), selectedIcon: const Icon(Icons.notifications_rounded), label: tr('Alerts')),
-          NavigationDestination(icon: const Icon(Icons.settings_outlined), selectedIcon: const Icon(Icons.settings_rounded), label: tr('Settings')),
-        ],
+      backgroundColor: SL.ground,
+      extendBody: true,
+      body: Backdrop(
+        child: IndexedStack(index: tab, children: [
+          // Only the visible tab animates (the Home radar keeps still while you're elsewhere).
+          for (var i = 0; i < pages.length; i++) TickerMode(enabled: i == tab, child: pages[i]),
+        ]),
+      ),
+      bottomNavigationBar: _NavBar(
+        index: tab,
+        alertDot: _unseen > 0,
+        onSelect: _select,
+      ),
+    );
+  }
+}
+
+/// The floating bottom bar: Home / Check / Alerts / Me, the current one in cyan.
+class _NavBar extends StatelessWidget {
+  const _NavBar({required this.index, required this.onSelect, this.alertDot = false});
+  final int index;
+  final ValueChanged<int> onSelect;
+  final bool alertDot;
+
+  @override
+  Widget build(BuildContext context) {
+    final items = [
+      [Icons.shield_outlined, tr('Home')],
+      [Icons.search_rounded, tr('Check')],
+      [Icons.notifications_none_rounded, tr('Alerts')],
+      [Icons.person_outline_rounded, tr('Me')],
+    ];
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 0, 12, 14),
+        child: Container(
+          height: 68,
+          decoration: BoxDecoration(
+            color: SL.navFill,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: SL.glassBorder),
+            boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 24, offset: Offset(0, 8))],
+          ),
+          child: Material(
+            type: MaterialType.transparency,
+            child: Row(children: [
+              for (var i = 0; i < items.length; i++)
+                Expanded(
+                  child: Semantics(
+                    selected: i == index,
+                    button: true,
+                    label: items[i][1] as String,
+                    excludeSemantics: true,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(20),
+                      onTap: () => onSelect(i),
+                      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                        Stack(clipBehavior: Clip.none, children: [
+                          Icon(items[i][0] as IconData, size: 24, color: i == index ? SL.accent : SL.textMuted),
+                          if (i == 2 && alertDot)
+                            Positioned(
+                              right: -2,
+                              top: -1,
+                              child: Container(
+                                width: 9,
+                                height: 9,
+                                decoration: BoxDecoration(color: SL.dangerD, shape: BoxShape.circle, border: Border.all(color: SL.navFill, width: 1.5)),
+                              ),
+                            ),
+                        ]),
+                        const SizedBox(height: 4),
+                        Text(items[i][1] as String,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700, color: i == index ? SL.accent : SL.textMuted)),
+                      ]),
+                    ),
+                  ),
+                ),
+            ]),
+          ),
+        ),
       ),
     );
   }

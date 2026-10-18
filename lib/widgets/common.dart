@@ -5,20 +5,21 @@ import 'package:flutter/material.dart';
 import '../i18n/i18n.dart';
 import '../theme.dart';
 
-/// Glass-like card used for every surface in the app: a faint white fill with a 1px light border.
+/// Glass card used for every surface in the app: white @4% with a 1px cool-cyan hairline.
 /// (No blur: it would be costly inside long scrolling lists.)
 class Panel extends StatelessWidget {
-  const Panel({super.key, required this.child, this.padding = const EdgeInsets.all(18), this.color, this.borderColor, this.onTap, this.gradient});
+  const Panel({super.key, required this.child, this.padding = const EdgeInsets.all(18), this.color, this.borderColor, this.onTap, this.gradient, this.radius});
   final Widget child;
   final EdgeInsets padding;
   final Color? color;
   final Color? borderColor;
   final VoidCallback? onTap;
   final Gradient? gradient;
+  final double? radius;
 
   @override
   Widget build(BuildContext context) {
-    final r = BorderRadius.circular(SL.radius);
+    final r = BorderRadius.circular(radius ?? SL.radius);
     final box = Container(
       padding: padding,
       decoration: BoxDecoration(
@@ -34,7 +35,7 @@ class Panel extends StatelessWidget {
   }
 }
 
-/// The navy gradient behind a screen.
+/// The flat navy ground behind a screen.
 class Backdrop extends StatelessWidget {
   const Backdrop({super.key, required this.child});
   final Widget child;
@@ -42,43 +43,41 @@ class Backdrop extends StatelessWidget {
   Widget build(BuildContext context) => DecoratedBox(decoration: SL.backdrop, child: child);
 }
 
+/// Small spaced capitals in Sora ("WHY", "TOOLS").
 class SectionLabel extends StatelessWidget {
   const SectionLabel(this.text, {super.key, this.icon, this.trailing});
   final String text;
-  final IconData? icon;
+  final IconData? icon; // kept for old call sites; the new design shows no icon
   final Widget? trailing;
   @override
-  Widget build(BuildContext context) {
-    final c = Theme.of(context).colorScheme.onSurface.withAlpha(165);
-    return Padding(
-      padding: EdgeInsets.fromLTRB(4, 24, 4, trailing == null ? 10 : 4),
-      child: Row(children: [
-        if (icon != null) ...[Icon(icon, size: 17, color: SL.accent), const SizedBox(width: 8)],
-        Expanded(child: Text(text.toUpperCase(), style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800, letterSpacing: 1.1, color: c))),
-        if (trailing != null) trailing!,
-      ]),
-    );
-  }
-}
-
-/// Small coloured pill for verdicts and caller types.
-class Pill extends StatelessWidget {
-  const Pill(this.text, {super.key, required this.fg, required this.bg, this.icon});
-  final String text;
-  final Color fg, bg;
-  final IconData? icon;
-  @override
-  Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-        decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(999), border: Border.all(color: fg.withAlpha(70))),
-        child: Row(mainAxisSize: MainAxisSize.min, children: [
-          if (icon != null) ...[Icon(icon, size: 15, color: fg), const SizedBox(width: 5)],
-          Text(text, style: TextStyle(color: fg, fontWeight: FontWeight.w800, fontSize: 12.5)),
+  Widget build(BuildContext context) => Padding(
+        padding: EdgeInsets.fromLTRB(2, 24, 2, trailing == null ? 10 : 4),
+        child: Row(children: [
+          Expanded(child: Text(text.toUpperCase(), style: SL.h(15, color: SL.textSecondary, weight: FontWeight.w600, spacing: 0.6))),
+          if (trailing != null) trailing!,
         ]),
       );
 }
 
-/// A rounded square with a tinted icon (tools, list rows, settings sections).
+/// Small coloured pill for verdicts, risk and report counts.
+class Pill extends StatelessWidget {
+  const Pill(this.text, {super.key, required this.fg, required this.bg, this.icon, this.textColor});
+  final String text;
+  final Color fg, bg;
+  final IconData? icon;
+  final Color? textColor;
+  @override
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(14), border: Border.all(color: fg.withAlpha(102))),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          if (icon != null) ...[Icon(icon, size: 15, color: fg), const SizedBox(width: 5)],
+          Flexible(child: Text(text, style: TextStyle(color: textColor ?? fg, fontWeight: FontWeight.w700, fontSize: 13))),
+        ]),
+      );
+}
+
+/// A round tinted icon (list rows, settings sections, reasons).
 class IconTile extends StatelessWidget {
   const IconTile(this.icon, {super.key, required this.color, this.size = 44});
   final IconData icon;
@@ -88,12 +87,129 @@ class IconTile extends StatelessWidget {
   Widget build(BuildContext context) => Container(
         width: size,
         height: size,
+        decoration: BoxDecoration(color: color.withAlpha(41), shape: BoxShape.circle),
+        child: Icon(icon, color: color, size: size * 0.5),
+      );
+}
+
+/// The big primary button: a solid fill, a Sora label and a soft glow in the same colour.
+class GlowButton extends StatelessWidget {
+  const GlowButton({
+    super.key,
+    required this.label,
+    required this.onPressed,
+    this.icon,
+    this.color = SL.accent,
+    this.textColor = SL.onAccent,
+    this.height = 64,
+    this.radius = 20,
+    this.fontSize = 18,
+    this.glow = true,
+    this.busy = false,
+  });
+  final String label;
+  final VoidCallback? onPressed;
+  final IconData? icon;
+  final Color color, textColor;
+  final double height, radius, fontSize;
+  final bool glow, busy;
+
+  @override
+  Widget build(BuildContext context) {
+    final enabled = onPressed != null && !busy;
+    final r = BorderRadius.circular(radius);
+    return Semantics(
+      button: true,
+      enabled: enabled,
+      child: Container(
+        height: height,
         decoration: BoxDecoration(
-          color: color.withAlpha(34),
-          borderRadius: BorderRadius.circular(size * 0.32),
-          border: Border.all(color: color.withAlpha(60)),
+          borderRadius: r,
+          boxShadow: glow && enabled ? [BoxShadow(color: color.withAlpha(89), blurRadius: 40, offset: const Offset(0, 10))] : null,
         ),
-        child: Icon(icon, color: color, size: size * 0.54),
+        child: Material(
+          color: enabled || busy ? color : color.withAlpha(90),
+          borderRadius: r,
+          child: InkWell(
+            borderRadius: r,
+            onTap: enabled ? onPressed : null,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                if (busy)
+                  SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.4, color: textColor))
+                else if (icon != null)
+                  Icon(icon, size: 24, color: textColor),
+                if (busy || icon != null) const SizedBox(width: 12),
+                Flexible(
+                  child: Text(label,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: SL.h(fontSize, color: textColor, height: 1.15)),
+                ),
+              ]),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A quiet outlined button (white @5%, light border) used beside the primary one.
+class SoftButton extends StatelessWidget {
+  const SoftButton({super.key, required this.label, required this.onPressed, this.icon, this.height = 54, this.radius = 16, this.color, this.fill, this.border, this.fontSize = 15});
+  final String label;
+  final VoidCallback? onPressed;
+  final IconData? icon;
+  final double height, radius, fontSize;
+  final Color? color, fill, border;
+  @override
+  Widget build(BuildContext context) {
+    final r = BorderRadius.circular(radius);
+    final c = color ?? SL.text;
+    return SizedBox(
+      height: height,
+      child: Material(
+        color: fill ?? const Color(0x0DFFFFFF),
+        shape: RoundedRectangleBorder(borderRadius: r, side: BorderSide(color: border ?? const Color(0x33FFFFFF))),
+        child: InkWell(
+          borderRadius: r,
+          onTap: onPressed,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              if (icon != null) ...[Icon(icon, size: 19, color: c), const SizedBox(width: 8)],
+              Flexible(
+                child: Text(label,
+                    maxLines: 2, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.w700, fontSize: fontSize, height: 1.2, color: c)),
+              ),
+            ]),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The 44 px round back button at the top of a screen.
+class BackCircle extends StatelessWidget {
+  const BackCircle({super.key, this.onPressed, this.border = const Color(0x2E8CDCFF)});
+  final VoidCallback? onPressed;
+  final Color border;
+  @override
+  Widget build(BuildContext context) => Tooltip(
+        message: MaterialLocalizations.of(context).backButtonTooltip,
+        child: Material(
+          color: Colors.transparent,
+          shape: CircleBorder(side: BorderSide(color: border)),
+          child: InkWell(
+            customBorder: const CircleBorder(),
+            onTap: onPressed ?? () => Navigator.of(context).maybePop(),
+            child: const SizedBox(width: 44, height: 44, child: Icon(Icons.chevron_left_rounded, size: 26, color: SL.text)),
+          ),
+        ),
       );
 }
 
