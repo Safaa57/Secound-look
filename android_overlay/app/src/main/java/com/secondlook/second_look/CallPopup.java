@@ -1,5 +1,6 @@
 package com.secondlook.second_look;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -8,6 +9,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.RippleDrawable;
 import android.media.AudioManager;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
@@ -25,8 +27,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.secondlook.engine.Json;
+
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -34,8 +41,10 @@ import java.util.Map;
  * number rings, and when a new SMS looks risky or comes from a phone number seen for the first time. Plain Android
  * views, no Flutter. Full width (12dp side margins), placed at about 28% of the screen height so it sits below the
  * heads-up notification and the phone's own incoming-call banner. It shows the verdict, the number, the kind of caller
- * (or a one-line masked SMS preview) and up to two reasons, with buttons Block · Spam · Close (calls) or
- * Open · Block · Close (SMS). It hides itself when the call ends (the phone's audio mode returns to normal) or after
+ * and one detail line (community reports first, then the top reason or the kind of caller; for SMS a one-line masked
+ * preview plus up to two reasons), with buttons Block · Spam · Close (calls) or Open · Block · Close (SMS). Look
+ * follows the owner-approved mockup: dark card, 24dp corners, a level-coloured edge with a soft glow that pulses
+ * gently, Sora / Manrope from the Flutter assets (system font if they can't be loaded). It hides itself when the call ends (the phone's audio mode returns to normal) or after
  * 45 s for calls / 20 s for SMS. Tapping the card opens the alert in Second Look; it can be dragged up or down.
  * Only one card is on screen at a time (a new one replaces the old). Nothing here may crash the caller: every step
  * is guarded, and the notification still shows if the card can't.
@@ -46,11 +55,14 @@ final class CallPopup {
     private static final long POLL_MS = 1_000;
     private static final Handler MAIN = new Handler(Looper.getMainLooper());
 
-    // Colours (dark "premium" card).
+    // Colours (owner-approved mockup Popup.dc.html: dark card, level-coloured edge with a soft pulsing glow).
     private static final int CARD = 0xFF0B1220;
-    private static final int SAFE = 0xFF22C55E, WARNING = 0xFFF59E0B, DANGER = 0xFFEF4444;
-    private static final int TEXT = 0xFFF8FAFC, TEXT2 = 0xFFCBD5E1, MUTED = 0xFF94A3B8;
-    private static final int BTN_BG = 0xFF1E293B, BTN_LINE = 0xFF334155, OPEN = 0xFF2563EB;
+    private static final int SAFE = 0xFF34D399, WARNING = 0xFFFBBF24, DANGER = 0xFFF87171;
+    private static final int SAFE_LIGHT = 0xFFBFF5DE, WARNING_LIGHT = 0xFFFDE68A, DANGER_LIGHT = 0xFFFECACA;
+    private static final int SAFE_ON = 0xFF03140D, WARNING_ON = 0xFF1A1203, DANGER_ON = 0xFF1A0507;
+    private static final int TEXT = 0xFFEAF2FF, TEXT2 = 0xFFCBD5E1, MUTED = 0xFFA9B8D0;
+    private static final int BTN_FILL = 0x0DFFFFFF, BTN_LINE = 0x33FFFFFF, CLOSE_X_BG = 0x0FFFFFFF;
+    private static final String FONT_DIR = "flutter_assets/assets/fonts/";
 
     /** The card on screen now (main thread only). */
     private static Session active;
@@ -63,6 +75,7 @@ final class CallPopup {
         boolean sawCall;
         Runnable timeout;
         Runnable poll;
+        ValueAnimator pulse;
     }
 
     /** Everything the card shows, prepared off the main thread (texts read the language setting). */
@@ -72,8 +85,8 @@ final class CallPopup {
         String header;      // "Second Look · Incoming call"
         String verdict;
         String number;      // as received (used for Block / Spam too)
-        String detail;      // caller kind, or the masked SMS preview
-        List<String> reasons = Collections.emptyList();
+        String detail;      // calls: reports / top reason / caller kind; SMS: the masked preview
+        List<String> reasons = Collections.emptyList();   // SMS only (calls fold them into detail)
         String alertId;
         String block, spam, open, close;
         String blocked, spammed, failed;
@@ -98,7 +111,8 @@ final class CallPopup {
             s.verdict = "danger".equals(s.level) ? I18n.t(app, "Likely scam")
                     : "warning".equals(s.level) ? I18n.t(app, "Be careful")
                     : I18n.t(app, "Looks normal — unknown number");
-            s.detail = Notifier.callerLabel(app, result);
+            s.detail = callDetail(app, result);
+            s.reasons = Collections.emptyList();
             post(app, s);
         } catch (RuntimeException ignored) {
             // the notification still shows
@@ -150,7 +164,93 @@ final class CallPopup {
         return s;
     }
 
+    /** One line for a call: community reports first, then other warning signs, topped up with the kind of caller. */
+    private static String callDetail(Context app, Map<String, Object> result) {
+        List<String> community = new ArrayList<>(), other = new ArrayList<>();
+        try {
+            Object list = result.get("reasons");
+            if (list instanceof List) {
+                for (Object o : (List<?>) list) {
+                    if (!(o instanceof Map)) continue;
+                    Map<String, Object> r = Json.obj(o);
+                    Object id = r.get("id"), title = r.get("title"), w = r.get("weight");
+                    String sid = id == null ? "" : String.valueOf(id);
+                    boolean isCommunity = sid.startsWith("community_");
+                    if (!isCommunity && !(w instanceof Number && ((Number) w).doubleValue() > 0)) continue;
+                    String en = title == null ? "" : String.valueOf(title);
+                    String t = id == null ? en : I18n.reason(app, sid, en);
+                    if (t == null || t.isEmpty()) continue;
+                    (isCommunity ? community : other).add(t);
+                }
+            }
+        } catch (RuntimeException ignored) {
+            // odd shape: fall back to the caller kind below
+        }
+        List<String> parts = new ArrayList<>(community);
+        parts.addAll(other);
+        if (parts.size() > 2) parts = parts.subList(0, 2);
+        if (parts.size() < 2) {
+            String kind = null;
+            try { kind = Notifier.callerLabel(app, result); } catch (RuntimeException ignored) { /* no label */ }
+            if (kind != null && !kind.isEmpty() && !parts.contains(kind)) parts.add(0, kind);
+        }
+        return TextUtils.join(" · ", parts);
+    }
+
+    // ---- fonts (Flutter bundles assets/fonts/ under flutter_assets/ in the APK). Cached; null = use the system font.
+    private static final Map<String, Typeface> FONTS = new HashMap<>();
+
+    /** Sora or Manrope at this weight, or null. Both files are variable fonts, so the weight is set as a variation
+     *  (API 26+). Below that only Sora is used (its default instance is regular, made bold by the system); Manrope's
+     *  default instance is too thin to read, so the system font is used instead. */
+    private static Typeface font(Context c, String name, int weight) {
+        String key = name + weight;
+        synchronized (FONTS) {
+            if (FONTS.containsKey(key)) return FONTS.get(key);
+        }
+        Typeface tf = null;
+        String path = FONT_DIR + name + ".ttf";
+        try {
+            if (Build.VERSION.SDK_INT >= 26) {
+                tf = new Typeface.Builder(c.getAssets(), path).setFontVariationSettings("'wght' " + weight).build();
+            }
+            if (tf == null && "Sora".equals(name)) tf = Typeface.createFromAsset(c.getAssets(), path);
+        } catch (RuntimeException e) {
+            tf = null;   // file missing from this build or unreadable
+        }
+        synchronized (FONTS) {
+            FONTS.put(key, tf);
+        }
+        return tf;
+    }
+
+    private static void face(TextView t, String name, int weight) {
+        try {
+            Typeface tf = font(t.getContext(), name, weight);
+            if (tf == null) {
+                t.setTypeface(weight >= 600 ? Typeface.DEFAULT_BOLD : Typeface.DEFAULT);
+            } else if (Build.VERSION.SDK_INT < 26 && weight >= 600) {
+                t.setTypeface(tf, Typeface.BOLD);
+            } else {
+                t.setTypeface(tf);
+            }
+        } catch (RuntimeException e) {
+            t.setTypeface(Typeface.DEFAULT_BOLD);
+        }
+    }
+
+    private static void warmFonts(Context app) {
+        try {
+            font(app, "Sora", 700);
+            font(app, "Manrope", 700);
+            font(app, "Manrope", 500);
+        } catch (RuntimeException ignored) {
+            // loaded (or not) again when the card is built
+        }
+    }
+
     private static void post(Context app, Spec spec) {
+        warmFonts(app);
         MAIN.post(() -> {
             try {
                 showNow(app, spec);
@@ -168,6 +268,11 @@ final class CallPopup {
         try {
             if (s.timeout != null) MAIN.removeCallbacks(s.timeout);
             if (s.poll != null) MAIN.removeCallbacks(s.poll);
+            if (s.pulse != null) s.pulse.cancel();
+        } catch (RuntimeException ignored) {
+            // animation already stopped
+        }
+        try {
             if (s.root != null) s.wm.removeView(s.root);
         } catch (RuntimeException ignored) {
             // already gone
@@ -183,22 +288,35 @@ final class CallPopup {
         return "danger".equals(level) ? DANGER : "warning".equals(level) ? WARNING : SAFE;
     }
 
-    private static TextView text(Context c, String s, float sp, int color, boolean bold, int maxLines) {
+    private static int lightColor(String level) {
+        return "danger".equals(level) ? DANGER_LIGHT : "warning".equals(level) ? WARNING_LIGHT : SAFE_LIGHT;
+    }
+
+    private static int onColor(String level) {
+        return "danger".equals(level) ? DANGER_ON : "warning".equals(level) ? WARNING_ON : SAFE_ON;
+    }
+
+    /** The colour c with this alpha (0..1). */
+    private static int alpha(int c, float a) {
+        return (c & 0x00FFFFFF) | (Math.round(Math.max(0f, Math.min(1f, a)) * 255) << 24);
+    }
+
+    private static TextView text(Context c, String s, float sp, int color, String font, int weight, int maxLines) {
         TextView t = new TextView(c);
         t.setText(s);
         t.setTextSize(TypedValue.COMPLEX_UNIT_SP, sp);
         t.setTextColor(color);
-        if (bold) t.setTypeface(Typeface.DEFAULT_BOLD);
+        face(t, font, weight);
         t.setMaxLines(maxLines);
         t.setEllipsize(TextUtils.TruncateAt.END);
         return t;
     }
 
-    /** A rounded button: filled (fill != 0) or outlined, with a touch ripple. */
+    /** A rounded button: filled (fill opaque) or outlined, with a touch ripple. */
     private static TextView button(Context c, String label, int fill, int line, int textColor) {
-        TextView b = text(c, label, 16, textColor, true, 1);
+        TextView b = text(c, label, 15, textColor, "Manrope", 700, 1);
         b.setGravity(Gravity.CENTER);
-        b.setPadding(dp(c, 8), 0, dp(c, 8), 0);
+        b.setPadding(dp(c, 6), 0, dp(c, 6), 0);
         GradientDrawable bg = new GradientDrawable();
         bg.setCornerRadius(dp(c, 14));
         bg.setColor(fill);
@@ -208,6 +326,10 @@ final class CallPopup {
         b.setFocusable(true);
         b.setContentDescription(label);
         return b;
+    }
+
+    private static TextView outlined(Context c, String label) {
+        return button(c, label, BTN_FILL, BTN_LINE, TEXT);
     }
 
     private static void openAlert(Context app, String alertId) {
@@ -253,20 +375,30 @@ final class CallPopup {
         final Session s = new Session();
         s.wm = wm;
         final int accent = levelColor(spec.level);
+        final boolean safe = !"danger".equals(spec.level) && !"warning".equals(spec.level);
 
-        // ---- card
+        // ---- card: #0B1220, 24dp corners, 1dp edge in the level colour (pulses with the glow below)
         LinearLayout card = new LinearLayout(app);
         card.setOrientation(LinearLayout.VERTICAL);
         int pad = dp(app, 18);
-        card.setPadding(pad, dp(app, 16), pad, dp(app, 16));
-        GradientDrawable bg = new GradientDrawable();
+        card.setPadding(pad, dp(app, 18), pad, dp(app, 16));
+        final GradientDrawable bg = new GradientDrawable();
         bg.setColor(CARD);
-        bg.setCornerRadius(dp(app, 20));
-        bg.setStroke(dp(app, 1), accent);
+        bg.setCornerRadius(dp(app, 24));
+        final int edge = dp(app, 1);
+        bg.setStroke(edge, alpha(accent, 0.7f));
         card.setBackground(bg);
         card.setElevation(dp(app, 12));
+        if (Build.VERSION.SDK_INT >= 28) {
+            try {
+                card.setOutlineSpotShadowColor(accent);
+                card.setOutlineAmbientShadowColor(accent);
+            } catch (RuntimeException ignored) {
+                // plain grey shadow
+            }
+        }
 
-        // header: shield badge + "Second Look · Incoming call"
+        // header: shield badge · "SECOND LOOK · INCOMING CALL" · close X
         LinearLayout head = new LinearLayout(app);
         head.setOrientation(LinearLayout.HORIZONTAL);
         head.setGravity(Gravity.CENTER_VERTICAL);
@@ -275,54 +407,73 @@ final class CallPopup {
         icon.setColorFilter(accent);
         GradientDrawable badge = new GradientDrawable();
         badge.setShape(GradientDrawable.OVAL);
-        badge.setColor((accent & 0x00FFFFFF) | 0x2E000000);   // the level colour, faint
+        badge.setColor(alpha(accent, 0.15f));
         icon.setBackground(badge);
-        int ip = dp(app, 7);
+        int ip = dp(app, 9);   // 22dp glyph in a 40dp circle
         icon.setPadding(ip, ip, ip, ip);
         icon.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
-        LinearLayout.LayoutParams iconLp = new LinearLayout.LayoutParams(dp(app, 34), dp(app, 34));
+        LinearLayout.LayoutParams iconLp = new LinearLayout.LayoutParams(dp(app, 40), dp(app, 40));
         iconLp.setMargins(0, 0, dp(app, 10), 0);
         head.addView(icon, iconLp);
-        head.addView(text(app, spec.header, 13, MUTED, false, 1),
-                new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        TextView label = text(app, spec.header.toUpperCase(Locale.getDefault()), 13, MUTED, "Manrope", 700, 1);
+        try { label.setLetterSpacing(0.04f); } catch (RuntimeException ignored) { /* default spacing */ }
+        head.addView(label, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        TextView x = text(app, "\u2715", 18, TEXT, "Manrope", 700, 1);
+        x.setTypeface(Typeface.DEFAULT);   // the glyph comes from the system font
+        x.setGravity(Gravity.CENTER);
+        GradientDrawable xbg = new GradientDrawable();
+        xbg.setShape(GradientDrawable.OVAL);
+        xbg.setColor(CLOSE_X_BG);
+        x.setBackground(new RippleDrawable(ColorStateList.valueOf(0x40FFFFFF), xbg, null));
+        x.setClickable(true);
+        x.setFocusable(true);
+        x.setContentDescription(spec.close);
+        x.setOnClickListener(v -> close(s));
+        LinearLayout.LayoutParams xLp = new LinearLayout.LayoutParams(dp(app, 44), dp(app, 44));
+        xLp.setMargins(dp(app, 8), 0, 0, 0);
+        head.addView(x, xLp);
         card.addView(head);
 
-        TextView verdict = text(app, spec.verdict, 22, accent, true, 2);
+        // verdict (Sora 26sp, light level colour), number, detail
+        TextView verdict = text(app, spec.verdict, 26, lightColor(spec.level), "Sora", 700, 2);
         verdict.setPadding(0, dp(app, 12), 0, 0);
         card.addView(verdict);
-        TextView num = text(app, spec.number, 18, TEXT, true, 1);
+        TextView num = text(app, spec.number, 19, TEXT, "Manrope", 700, 1);
         num.setPadding(0, dp(app, 2), 0, 0);
         card.addView(num);
         if (spec.detail != null && !spec.detail.isEmpty()) {
-            TextView d = text(app, spec.detail, 14, TEXT2, false, 1);
-            d.setPadding(0, dp(app, 4), 0, 0);
+            TextView d = text(app, spec.detail, 14.5f, TEXT2, "Manrope", 500, spec.sms ? 1 : 3);
+            d.setPadding(0, dp(app, 6), 0, 0);
+            try { d.setLineSpacing(0f, 1.15f); } catch (RuntimeException ignored) { /* default */ }
             card.addView(d);
         }
-        for (String r : spec.reasons) {
-            TextView t = text(app, "• " + r, 14, TEXT2, false, 2);
+        if (!spec.reasons.isEmpty()) {
+            TextView t = text(app, TextUtils.join(" · ", spec.reasons), 14.5f, TEXT2, "Manrope", 500, 2);
             t.setPadding(0, dp(app, 4), 0, 0);
+            try { t.setLineSpacing(0f, 1.15f); } catch (RuntimeException ignored) { /* default */ }
             card.addView(t);
         }
 
-        // buttons: calls Block · Spam · Close, SMS Open · Block · Close
+        // buttons: calls Block · Spam · Close, SMS Open · Block · Close. The first is filled in the level colour,
+        // except Block on a safe-looking call, which stays outlined like the others.
         LinearLayout row = new LinearLayout(app);
         row.setOrientation(LinearLayout.HORIZONTAL);
-        row.setPadding(0, dp(app, 16), 0, 0);
+        row.setPadding(0, dp(app, 14), 0, 0);
         TextView first, second;
         if (spec.sms) {
-            first = button(app, spec.open, OPEN, 0, TEXT);
+            first = button(app, spec.open, accent, 0, onColor(spec.level));
             first.setOnClickListener(v -> { close(s); openAlert(app, spec.alertId); });
-            second = button(app, spec.block, DANGER, 0, TEXT);
+            second = outlined(app, spec.block);
             second.setOnClickListener(v -> { close(s); mark(app, spec, "block"); });
         } else {
-            first = button(app, spec.block, DANGER, 0, TEXT);
+            first = safe ? outlined(app, spec.block) : button(app, spec.block, accent, 0, onColor(spec.level));
             first.setOnClickListener(v -> { close(s); mark(app, spec, "block"); });
-            second = button(app, spec.spam, BTN_BG, WARNING, WARNING);
+            second = outlined(app, spec.spam);
             second.setOnClickListener(v -> { close(s); mark(app, spec, "spam"); });
         }
-        TextView closeBtn = button(app, spec.close, BTN_BG, BTN_LINE, TEXT2);
+        TextView closeBtn = outlined(app, spec.close);
         closeBtn.setOnClickListener(v -> close(s));
-        int h = dp(app, 48), gap = dp(app, 8);
+        int h = dp(app, 50), gap = dp(app, 8);
         LinearLayout.LayoutParams l1 = new LinearLayout.LayoutParams(0, h, 1f);
         LinearLayout.LayoutParams l2 = new LinearLayout.LayoutParams(0, h, 1f);
         LinearLayout.LayoutParams l3 = new LinearLayout.LayoutParams(0, h, 1f);
@@ -332,12 +483,50 @@ final class CallPopup {
         row.addView(closeBtn, l3);
         card.addView(row);
 
-        // Side margins 12dp; a little room above / below so the shadow isn't cut off.
+        // Soft glow: two slightly larger rounded layers in the level colour at low alpha behind the card.
+        final GradientDrawable glowOuter = new GradientDrawable();
+        glowOuter.setCornerRadius(dp(app, 30));
+        glowOuter.setColor(alpha(accent, 0.10f));
+        final GradientDrawable glowInner = new GradientDrawable();
+        glowInner.setCornerRadius(dp(app, 27));
+        glowInner.setColor(alpha(accent, 0.18f));
+        FrameLayout haloOuter = new FrameLayout(app);
+        int hp = dp(app, 3);
+        haloOuter.setPadding(hp, hp, hp, hp);
+        haloOuter.setBackground(glowOuter);
+        FrameLayout haloInner = new FrameLayout(app);
+        haloInner.setPadding(hp, hp, hp, hp);
+        haloInner.setBackground(glowInner);
+        haloInner.addView(card, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        haloOuter.addView(haloInner, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        // Card edge 12dp from the screen sides (6dp padding + 6dp glow); room above / below for the shadow.
         final FrameLayout root = new FrameLayout(app);
-        int m = dp(app, 12);
-        root.setPadding(m, dp(app, 8), m, dp(app, 16));
-        root.addView(card, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        int m = dp(app, 6);
+        root.setPadding(m, dp(app, 4), m, dp(app, 16));
+        root.addView(haloOuter, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         s.root = root;
+
+        // Gentle pulse, 2 s per cycle: glow and edge brighten and fade. Cancelled in close().
+        try {
+            ValueAnimator pulse = ValueAnimator.ofFloat(0f, 1f);
+            pulse.setDuration(1_000);
+            pulse.setRepeatCount(ValueAnimator.INFINITE);
+            pulse.setRepeatMode(ValueAnimator.REVERSE);
+            pulse.addUpdateListener(a -> {
+                try {
+                    float f = (Float) a.getAnimatedValue();
+                    glowOuter.setAlpha(Math.round(255 * (0.45f + 0.55f * f)));
+                    glowInner.setAlpha(Math.round(255 * (0.55f + 0.45f * f)));
+                    bg.setStroke(edge, alpha(accent, 0.7f + 0.3f * f));
+                } catch (RuntimeException ignored) {
+                    // card going away
+                }
+            });
+            s.pulse = pulse;
+        } catch (RuntimeException ignored) {
+            s.pulse = null;   // static glow
+        }
 
         // ---- window: not focusable, so the phone's own call screen keeps the keyboard and the buttons
         final WindowManager.LayoutParams lp = new WindowManager.LayoutParams(
@@ -355,7 +544,7 @@ final class CallPopup {
         // Tap = open the alert in the app; drag = move the card up or down.
         card.setOnClickListener(v -> { close(s); openAlert(app, spec.alertId); });
         final int slop = ViewConfiguration.get(app).getScaledTouchSlop();
-        final int maxY = Math.max(0, screenH - dp(app, 160));
+        final int maxY = Math.max(0, screenH - dp(app, 180));
         card.setOnTouchListener(new View.OnTouchListener() {
             private float downY;
             private int startY;
@@ -395,6 +584,9 @@ final class CallPopup {
 
         wm.addView(root, lp);
         active = s;
+        if (s.pulse != null) {
+            try { s.pulse.start(); } catch (RuntimeException ignored) { s.pulse = null; }
+        }
 
         s.timeout = () -> close(s);
         MAIN.postDelayed(s.timeout, spec.sms ? SMS_SHOW_MS : SHOW_MS);

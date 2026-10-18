@@ -33,3 +33,12 @@ flutter:
     - assets/legal/
     - assets/i18n/
     - assets/certs/
+    - assets/fonts/OFL-Sora.txt
+    - assets/fonts/OFL-Manrope.txt
+  fonts:
+    - family: Sora
+      fonts:
+        - asset: assets/fonts/Sora.ttf
+    - family: Manrope
+      fonts:
+        - asset: assets/fonts/Manrope.ttf
