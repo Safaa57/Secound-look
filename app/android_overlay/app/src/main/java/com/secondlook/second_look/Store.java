@@ -122,6 +122,24 @@ final class Store {
 
     static synchronized void clearHistory(Context c) { prefs(c).edit().remove("history").apply(); }
 
+    /** Removes the alerts with these ids; returns how many were removed. */
+    static synchronized int deleteHistory(Context c, java.util.Collection<String> ids) {
+        if (ids == null || ids.isEmpty()) return 0;
+        java.util.Set<String> want = new java.util.HashSet<>();
+        for (String id : ids) if (id != null && !id.isEmpty()) want.add(id);
+        if (want.isEmpty()) return 0;
+        List<Object> h = history(c);
+        int before = h.size();
+        h.removeIf(o -> {
+            if (!(o instanceof Map)) return false;
+            Object id = Json.obj(o).get("id");
+            return id instanceof String && want.contains(id);
+        });
+        int deleted = before - h.size();
+        if (deleted > 0) saveHistory(c, h);
+        return deleted;
+    }
+
     // ---------- what the user marked (actions log, newest first) ----------
     static synchronized List<Object> actions(Context c) {
         String s = Security.decrypt(prefs(c).getString("actions", null));
@@ -235,5 +253,9 @@ final class Store {
         return m;
     }
 
-    static void wipe(Context c) { prefs(c).edit().clear().apply(); }
+    /** Deletes everything Second Look stored, including the private crash log. */
+    static void wipe(Context c) {
+        prefs(c).edit().clear().apply();
+        CrashLog.clear(c);
+    }
 }

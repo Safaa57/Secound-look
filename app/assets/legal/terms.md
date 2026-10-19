@@ -34,7 +34,7 @@ These terms are an agreement between you and {{OPERATOR}} ("we"), who runs Secon
 
 - Decisions you make after a check are your own.
 - Only report a number or UPI ID that actually contacted you, and choose the reason honestly. Don't use Second Look to harass, defame or falsely accuse anyone.
-- Don't misuse the service: no reverse engineering to defeat its protections, automated or bulk requests, attempts to get free credits or Plus without paying, ad fraud, or attacks on our servers.
+- Don't misuse the service: no reverse engineering to defeat its protections, automated or bulk requests, attempts to get deep-check credits by fraud, ad fraud (including tapping ads on purpose to inflate them), or attacks on our servers.
 - Don't use Second Look for anything unlawful.
 
 ## 4. Community reports
@@ -45,12 +45,12 @@ These terms are an agreement between you and {{OPERATOR}} ("we"), who runs Secon
 - If a number is yours and the reports are wrong, use "This is my number" or contact our Grievance Officer. We review complaints and may remove reports that are false, abusive or unlawful.
 - We don't check every report and aren't responsible for what users write, but we act on valid complaints as the law requires.
 
-## 5. Free features, deep checks, ads and Plus
+## 5. Free to use, with ads
 
-- The basic check of links, messages, numbers, UPI IDs and payment screenshots, and SMS Shield and Call Shield, are free.
-- **Deep check** (optional) sends only the link you choose to our server to compare it with online lists. Free users get a small number each day. Limits can change.
-- **Ads** are optional. You only see one if you tap to watch it for an extra deep check. Ads are shown by Google AdMob, rated for general audiences and not personalised.
-- **Second Look Plus** is a subscription sold through Google Play or the App Store. Payment, renewal, cancellation and refunds are handled by that store under its rules. Subscriptions renew automatically until you cancel in the store's subscription settings. We'll tell you in advance before a price change applies to you.
+- Second Look is free. There is nothing to buy and no subscription. The basic check of links, messages, numbers, UPI IDs, payment screenshots and documents, and SMS Shield and Call Shield, are free.
+- **Deep check** (optional) sends only the link you choose to our server to compare it with online lists. Everyone gets a small number each day, and can watch a short ad for one more. Limits can change.
+- **Ads** pay for Second Look. They are shown by Google AdMob on phones (not on the laptop version), rated for general audiences, labelled "Sponsored", and requested without personalisation. A full-screen ad may appear when you leave the result of a check you started yourself, but never after your first check, never after a "Likely scam" result and at most once every 2 minutes. Ads never appear on SMS or call warnings, the call popup or "Being scammed?" help.
+- Ads are made by other companies. We don't endorse what they advertise; check any offer as carefully as any other message. Where the law requires it, you're asked for consent and can change it in Me › Privacy › Ad choices.
 - If a feature changes or ends, your basic protection stays available.
 
 ## 6. Other services
@@ -61,12 +61,11 @@ These terms are an agreement between you and {{OPERATOR}} ("we"), who runs Secon
 ## 7. Liability
 
 - Second Look is provided "as is". To the extent the law allows, we are not responsible for losses caused by a scam, a missed warning, a false alarm, or decisions made based on a result.
-- To the extent the law allows, our total liability to you is limited to the amount you paid us for Plus in the 12 months before the claim.
 - Nothing in these terms limits rights you have under laws that can't be excluded, including the Consumer Protection Act, 2019.
 
 ## 8. Children
 
-Second Look is designed to be safe for everyone. If you are under 18, please use it with a parent or guardian's permission. Plus must be bought by an adult.
+Second Look is designed to be safe for everyone. If you are under 18, please use it with a parent or guardian's permission.
 
 ## 9. Ending use
 

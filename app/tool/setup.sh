@@ -9,7 +9,7 @@ if [ ! -d android ] || [ ! -d ios ] || [ ! -d web ]; then
   flutter create --org com.secondlook --project-name second_look --platforms android,ios,web .
 fi
 
-# Google's official TEST ad ids are used unless you pass your own (see docs/ADS_AND_PLUS.md).
+# Google's official TEST ad ids are used unless you pass your own (see docs/ADS.md).
 ADMOB_APP_ID_ANDROID="${ADMOB_APP_ID_ANDROID:-ca-app-pub-3940256099942544~3347511713}"
 ADMOB_APP_ID_IOS="${ADMOB_APP_ID_IOS:-ca-app-pub-3940256099942544~1458002511}"
 

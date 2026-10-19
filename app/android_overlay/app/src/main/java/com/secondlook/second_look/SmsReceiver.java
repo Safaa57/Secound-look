@@ -26,6 +26,8 @@ public class SmsReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        CrashLog.install(context);   // once per process: records native crashes on this phone only
+        if (intent == null) return;
         if (!Telephony.Sms.Intents.SMS_RECEIVED_ACTION.equals(intent.getAction())) return;
         if (!Store.bool(context, "sms_on")) return;
         SmsMessage[] parts;

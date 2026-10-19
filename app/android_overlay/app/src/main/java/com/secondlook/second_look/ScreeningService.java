@@ -43,6 +43,7 @@ public class ScreeningService extends CallScreeningService {
 
     @Override
     public void onCreate() {
+        CrashLog.install(this);   // once per process: records native crashes on this phone only
         super.onCreate();
         // Load the engine as soon as Android binds the service, so the first call is checked quickly.
         final Context app = getApplicationContext();
@@ -51,6 +52,7 @@ public class ScreeningService extends CallScreeningService {
 
     @Override
     public void onScreenCall(Call.Details details) {
+        CrashLog.install(this);
         CallResponse allow = new CallResponse.Builder().build();
         if (details.getCallDirection() != Call.Details.DIRECTION_INCOMING || !Store.bool(this, "call_on")) {
             respondToCall(details, allow);

@@ -89,6 +89,7 @@ public class MainActivity extends FlutterActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        CrashLog.install(this);   // before anything else: native crashes are kept in a private on-device log
         super.onCreate(savedInstanceState);
         applyScreenProtection();
         // Documents are never kept: remove any copy left behind if the app was closed mid-check.
@@ -294,6 +295,51 @@ public class MainActivity extends FlutterActivity {
             // ---- local data ----
             case "history": result.success(Json.stringify(Store.history(this))); return;
             case "clearHistory": Store.clearHistory(this); result.success(null); return;
+            case "deleteHistory": {
+                Object raw = call.argument("ids");
+                List<String> ids = new ArrayList<>();
+                if (raw instanceof List) {
+                    for (Object o : (List<?>) raw) {
+                        if (o instanceof String && ids.size() < 1000) ids.add(Security.capText((String) o, 80));
+                    }
+                }
+                bg(result, () -> Json.map("deleted", Store.deleteHistory(this, ids)));
+                return;
+            }
+
+            // ---- private crash log (on this phone only; the user may share it) ----
+            case "logCrash": {
+                Object src = call.argument("source"), msg = call.argument("message"), stack = call.argument("stack");
+                final String source = "dart".equals(src) ? "dart" : "native";
+                // Cap before handing to the worker; CrashLog cleans and caps again.
+                final String message = msg instanceof String ? Security.capText((String) msg, 4000) : "";
+                final String trace = stack instanceof String ? Security.capText((String) stack, 24000) : "";
+                final Context app = getApplicationContext();
+                try {
+                    worker.execute(() -> CrashLog.record(app, source, message, trace));
+                } catch (RuntimeException e) {
+                    CrashLog.record(app, source, message, trace);
+                }
+                result.success(null);
+                return;
+            }
+            case "crashLog": {
+                final Context app = getApplicationContext();
+                worker.execute(() -> {
+                    String out = CrashLog.listJson(app);
+                    runOnUiThread(() -> result.success(out));
+                });
+                return;
+            }
+            case "clearCrashLog": {
+                final Context app = getApplicationContext();
+                worker.execute(() -> {
+                    CrashLog.clear(app);
+                    runOnUiThread(() -> result.success(null));
+                });
+                return;
+            }
+            case "shareCrashLog": result.success(CrashLog.share(this)); return;
             case "reports": result.success(Json.stringify(Store.reports(this))); return;
             case "report": {
                 String num = call.argument("number"), type = call.argument("type"), label = call.argument("label"), kind = call.argument("kind");
@@ -312,6 +358,7 @@ public class MainActivity extends FlutterActivity {
             }
             case "deleteAllData":
                 Store.wipe(this);
+                CrashLog.clear(this);
                 DocScan.clearCache(this);
                 Security.wipeKey();
                 enableSmsReceiver(false);
@@ -365,7 +412,7 @@ public class MainActivity extends FlutterActivity {
                 return;
             case "setPref": {
                 // Small user preferences only (language, voice read-out and voice, community protection,
-                // listing every checked SMS/call, the on-screen caller card).
+                // listing every checked SMS/call, the on-screen caller card, the ad rules' two counters).
                 String key = call.argument("key"), value = call.argument("value");
                 if (key == null || !PREF_KEYS.contains(key)) {
                     result.error("blocked", "Unknown setting", null);
@@ -375,8 +422,18 @@ public class MainActivity extends FlutterActivity {
                     result.error("blocked", "Use on or off", null);
                     return;
                 }
+                // Lite mode: 'auto' (or '' = auto), 'on', 'off'.
+                if ("lite_mode".equals(key) && value != null && !value.isEmpty()
+                        && !"auto".equals(value) && !"on".equals(value) && !"off".equals(value)) {
+                    result.error("blocked", "Use auto, on or off", null);
+                    return;
+                }
+                if (NUMBER_KEYS.contains(key) && (value == null || !value.matches("[0-9]{0,20}"))) {
+                    result.error("blocked", "Use a number", null);
+                    return;
+                }
                 try {
-                    Store.put(this, "pref_" + key, Security.capText(value == null ? "" : value, "voice_name".equals(key) ? 120 : 40));
+                    Store.put(this, "pref_" + key, Security.capText(value == null ? "" : value, "voice_name".equals(key) ? 120 : NUMBER_KEYS.contains(key) ? 20 : 40));
                 } catch (RuntimeException e) {
                     result.error("storage", "Couldn't save securely on this phone", null);
                     return;
@@ -408,7 +465,7 @@ public class MainActivity extends FlutterActivity {
                 return;
             }
             case "installId": {
-                // Random id for this install, used only for the deep-check quota and Plus. Not linked to the person.
+                // Random id for this install, used only for the deep-check quota and community reports. Not linked to the person.
                 String id = Store.str(this, "install_id");
                 if (id == null || id.isEmpty()) { id = java.util.UUID.randomUUID().toString(); Store.put(this, "install_id", id); }
                 result.success(id);
@@ -706,7 +763,10 @@ public class MainActivity extends FlutterActivity {
 
     // ------------------------------------------------------------------ Shield health / setup checker
     private static final Set<String> PREF_KEYS = new HashSet<>(Arrays.asList(
-            "language", "voice", "community_off", "community_sync", "voice_name", "log_all", "call_popup", "voice_rate", "sms_popup"));
+            "language", "voice", "community_off", "community_sync", "voice_name", "log_all", "call_popup", "voice_rate", "sms_popup", "lite_mode",
+            "checks_done", "last_ad_at"));
+    /** Ad rules (manual-check counter, last full-screen ad time in ms): digits only, at most 20. */
+    private static final Set<String> NUMBER_KEYS = new HashSet<>(Arrays.asList("checks_done", "last_ad_at"));
     private static final Set<String> ON_OFF_KEYS = new HashSet<>(Arrays.asList("voice", "log_all", "call_popup", "sms_popup"));
     private static final Set<String> MARK_ACTIONS = new HashSet<>(Arrays.asList("block", "spam", "fraud", "safe", "comment", "unblock"));
     private long roleAskedAt;
@@ -1010,8 +1070,11 @@ public class MainActivity extends FlutterActivity {
                         "log_all", Store.prefOn(this, "log_all", true) ? "on" : "off",
                         "call_popup", Store.prefOn(this, "call_popup", true) ? "on" : "off",
                         "sms_popup", Store.prefOn(this, "sms_popup", true) ? "on" : "off",
+                        "lite_mode", liteModePref(),
                         "community_off", Store.str(this, "pref_community_off"),
-                        "community_sync", Store.str(this, "pref_community_sync")),
+                        "community_sync", Store.str(this, "pref_community_sync"),
+                        "checks_done", Store.str(this, "pref_checks_done"),
+                        "last_ad_at", Store.str(this, "pref_last_ad_at")),
                 "communityCount", EngineHolder.communityCount(this),
                 "smsShield", smsWanted && smsGranted(),
                 "smsNeedsPermission", smsWanted && !smsGranted(),
@@ -1022,7 +1085,33 @@ public class MainActivity extends FlutterActivity {
                 "screenProtection", !Store.bool(this, "screen_unprotected"),
                 "trustedName", Store.str(this, "trusted_name"),
                 "trustedNumber", Store.str(this, "trusted_number"),
-                "overlayAllowed", CallPopup.allowed(this));
+                "overlayAllowed", CallPopup.allowed(this),
+                "device", deviceInfo());
+    }
+
+    /** 'auto' | 'on' | 'off' as saved, or '' (= auto) when never set. */
+    private String liteModePref() {
+        String v;
+        try { v = Store.str(this, "pref_lite_mode"); } catch (RuntimeException e) { v = ""; }
+        return "auto".equals(v) || "on".equals(v) || "off".equals(v) ? v : "";
+    }
+
+    /** For lite mode: {lowRam, ramMb, sdk}. Unknown values fall back to "not low" / 0. */
+    private Map<String, Object> deviceInfo() {
+        boolean lowRam = false;
+        long ramMb = 0;
+        try {
+            android.app.ActivityManager am = getSystemService(android.app.ActivityManager.class);
+            if (am != null) {
+                lowRam = am.isLowRamDevice();
+                android.app.ActivityManager.MemoryInfo mi = new android.app.ActivityManager.MemoryInfo();
+                am.getMemoryInfo(mi);
+                if (mi.totalMem > 0) ramMb = mi.totalMem / (1024L * 1024L);
+            }
+        } catch (RuntimeException ignored) {
+            // unknown: Dart treats ramMb 0 as "don't know"
+        }
+        return Json.map("lowRam", lowRam, "ramMb", (int) Math.min(ramMb, Integer.MAX_VALUE), "sdk", Build.VERSION.SDK_INT);
     }
 
     private void enableSmsReceiver(boolean on) {

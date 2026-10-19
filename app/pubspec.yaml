@@ -1,15 +1,16 @@
 name: second_look
 description: Second Look — on-device scam protection for SMS, links and calls.
 publish_to: "none"
-version: 1.5.0+15
+version: 1.7.0+17
 
 environment:
-  sdk: ">=3.3.0 <4.0.0"
-  flutter: ">=3.22.0"
+  sdk: ">=3.5.0 <4.0.0"
+  flutter: ">=3.35.1" # google_mobile_ads 7.x needs 3.35.1 (8.x/9.x need 3.38.1); PopScope.onPopInvokedWithResult (v1.6)
 
 # Everything sensitive (SMS, calls, storage) is handled by our own native code on the device.
 # The only packages are official ones from the Dart and Flutter teams and Google, used for the
-# optional online deep check (http), the optional rewarded ad (google_mobile_ads), Plus (in_app_purchase), choosing a screenshot (image_picker) and on-device photo forensics (image).
+# optional online deep check (http), the ads that keep the app free (google_mobile_ads, with Google's consent form),
+# choosing a screenshot (image_picker) and on-device photo forensics (image). No purchases or subscriptions.
 dependencies:
   flutter:
     sdk: flutter
@@ -17,7 +18,6 @@ dependencies:
     sdk: flutter
   http: ^1.2.0
   google_mobile_ads: ">=7.0.0 <10.0.0"
-  in_app_purchase: ^3.2.0
   image_picker: ^1.1.0
   image: ^4.2.0
   secondlook_ios:

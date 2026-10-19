@@ -601,6 +601,170 @@ final class SLDocPicker: NSObject, UIDocumentPickerDelegate {
     func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) { finish(nil) }
 }
 
+/// Private crash log (v1.6). Kept only on this iPhone in Application Support/crash_log.json (newest 20 entries,
+/// file protection on, excluded from backups) and never uploaded; the user can share it from Settings.
+/// Messages and stacks are cleaned before they are stored: links, e-mail addresses, phone-like numbers and any run
+/// of 6+ digits are replaced, so no SMS text, codes or numbers end up in the report. Nothing here throws or traps.
+enum SLCrashLog {
+    static let appVersion = "1.6.0"
+    private static let maxEntries = 20
+    private static let maxMessage = 500
+    private static let maxStack = 6000
+    private static let maxFileBytes = 512 * 1024
+    /// All file access happens on this serial queue.
+    static let queue = DispatchQueue(label: "secondlook.crashlog", qos: .utility)
+
+    private static var fileURL: URL? {
+        guard let dir = try? FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask,
+                                                     appropriateFor: nil, create: true) else { return nil }
+        return dir.appendingPathComponent("crash_log.json", isDirectory: false)
+    }
+
+    // MARK: redaction
+
+    private static let patterns: [(NSRegularExpression?, String)] = [
+        (try? NSRegularExpression(pattern: #"\b(?:[a-z][a-z0-9+.\-]{1,15}://|www\.)[^\s"'<>()\[\]{}]+"#, options: [.caseInsensitive]), "[link]"),
+        (try? NSRegularExpression(pattern: #"[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}"#), "[email]"),
+        // Bare web addresses; lower-case only and without io/app/me/co/net so Swift/Dart symbols stay readable.
+        (try? NSRegularExpression(pattern: #"\b[a-z0-9\-]+(?:\.[a-z0-9\-]+)*\.(?:com|in|org|info|top|xyz|online|site|live|club|shop|link|ly|biz|cc|tk|ml|ga|cf|gq|icu|vip|buzz|cn|ru|store|website|space|fun|click|page|co\.in|org\.in|net\.in)\b(?:/[^\s"'<>]*)?"#), "[link]"),
+        // Phone numbers written with spaces/dashes ("+91 98765 43210"): 8+ digits with separators in between.
+        (try? NSRegularExpression(pattern: #"\+?\d(?:[ \-().]{0,2}\d){7,}"#), "[number]"),
+        (try? NSRegularExpression(pattern: #"\d{6,}"#), "[number]"),
+    ]
+
+    /// Removes links, e-mail addresses, phone-like numbers and runs of 6+ digits.
+    static func redact(_ s: String) -> String {
+        if s.isEmpty { return "" }
+        var out = s
+        for (re, replacement) in patterns {
+            guard let re = re else {
+                // A pattern failed to compile (should not happen): mask every digit rather than keep them.
+                out = String(out.map { (ch: Character) -> Character in ch.isASCII && ch.isNumber ? Character("#") : ch })
+                continue
+            }
+            let range = NSRange(out.startIndex..<out.endIndex, in: out)
+            out = re.stringByReplacingMatches(in: out, options: [], range: range,
+                                              withTemplate: NSRegularExpression.escapedTemplate(for: replacement))
+        }
+        return out
+    }
+
+    private static func cap(_ s: String, _ n: Int) -> String { s.count <= n ? s : String(s.prefix(n)) }
+
+    static var osLabel: String {
+        let v = ProcessInfo.processInfo.operatingSystemVersion
+        return "iOS \(v.majorVersion).\(v.minorVersion).\(v.patchVersion)"
+    }
+
+    /// "Apple iPhone14,2" (the hardware model id; no name or identifier of the person).
+    static var deviceLabel: String {
+        var u = utsname()
+        guard uname(&u) == 0 else { return "Apple" }
+        var chars: [Character] = []
+        for child in Mirror(reflecting: u.machine).children {
+            guard let c = child.value as? CChar, c != 0, chars.count < 64 else { break }
+            chars.append(Character(UnicodeScalar(UInt8(bitPattern: c))))
+        }
+        let machine = String(chars).trimmingCharacters(in: .whitespaces)
+        return machine.isEmpty ? "Apple" : "Apple \(machine)"
+    }
+
+    // MARK: file (call on `queue`)
+
+    private static func readList() -> [[String: Any]] {
+        guard let url = fileURL,
+              let attrs = try? FileManager.default.attributesOfItem(atPath: url.path),
+              let size = (attrs[.size] as? NSNumber)?.intValue, size > 0, size <= maxFileBytes,
+              let data = try? Data(contentsOf: url),
+              let arr = (try? JSONSerialization.jsonObject(with: data)) as? [Any] else { return [] }
+        return Array(arr.compactMap { $0 as? [String: Any] }.prefix(maxEntries))
+    }
+
+    private static func writeList(_ list: [[String: Any]]) {
+        guard var url = fileURL, JSONSerialization.isValidJSONObject(list),
+              let data = try? JSONSerialization.data(withJSONObject: list) else { return }
+        // .atomic writes a temporary file and renames it over the old one.
+        guard (try? data.write(to: url, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])) != nil else { return }
+        var rv = URLResourceValues()
+        rv.isExcludedFromBackup = true
+        try? url.setResourceValues(rv)
+    }
+
+    // MARK: API (never throws)
+
+    /// Adds one entry (source "dart" or "native").
+    static func record(source: String, message: String, stack: String) {
+        let entry: [String: Any] = [
+            "at": Int(Date().timeIntervalSince1970 * 1000),
+            "source": source == "dart" ? "dart" : "native",
+            // Cut very long input first so cleaning stays quick, then clean and cap.
+            "message": cap(redact(String(message.prefix(maxMessage * 8))), maxMessage),
+            "stack": cap(redact(String(stack.prefix(maxStack * 4))), maxStack),
+            "app": appVersion,
+            "os": osLabel,
+            "device": deviceLabel,
+        ]
+        SLCrashLog.queue.async {
+            var entries = SLCrashLog.readList()
+            entries.insert(entry, at: 0)
+            SLCrashLog.writeList(Array(entries.prefix(SLCrashLog.maxEntries)))
+        }
+    }
+
+    /// Entries, newest first. Delivered on the main queue.
+    static func list(_ done: @escaping ([[String: Any]]) -> Void) {
+        SLCrashLog.queue.async {
+            let l = SLCrashLog.readList()
+            DispatchQueue.main.async { done(l) }
+        }
+    }
+
+    /// Removes the log. Delivered on the main queue.
+    static func clear(_ done: (() -> Void)? = nil) {
+        SLCrashLog.queue.async {
+            if let url = SLCrashLog.fileURL { try? FileManager.default.removeItem(at: url) }
+            if let done = done { DispatchQueue.main.async { done() } }
+        }
+    }
+
+    /// Plain-text report (already redacted; cleaned again here to be safe).
+    static func report(_ entries: [[String: Any]]) -> String {
+        let fmt = DateFormatter()
+        fmt.locale = Locale(identifier: "en_US_POSIX")
+        fmt.timeZone = TimeZone(identifier: "UTC")
+        fmt.dateFormat = "yyyy-MM-dd HH:mm:ss 'UTC'"
+        var out = "Second Look crash report\n"
+        out += "App \(appVersion) | \(osLabel) | \(deviceLabel)\n"
+        out += "Entries: \(entries.count) (newest first)\n"
+        out += "This report contains no messages, numbers or links.\n"
+        for (i, e) in entries.enumerated() {
+            let s = { (k: String) -> String in SLCrashLog.redact((e[k] as? String) ?? "") }
+            var when = "?"
+            if let at = e["at"] as? NSNumber { when = fmt.string(from: Date(timeIntervalSince1970: at.doubleValue / 1000)) }
+            out += "\n#\(i + 1) | \(when) | \(s("source")) | app \(s("app")) | \(s("os")) | \(s("device"))\n"
+            out += cap(s("message"), maxMessage) + "\n"
+            let st = cap(s("stack"), maxStack)
+            if !st.isEmpty { out += st + "\n" }
+        }
+        return out
+    }
+
+    /// Opens the share sheet with the report. false if there is nothing to share or no screen to show it on.
+    static func share(_ done: @escaping (Bool) -> Void) {
+        SLCrashLog.list { entries in
+            guard !entries.isEmpty, let top = SLDocPicker.topViewController() else { done(false); return }
+            let vc = UIActivityViewController(activityItems: [SLCrashLog.report(entries)], applicationActivities: nil)
+            if let pop = vc.popoverPresentationController { // iPad: anchor the sheet
+                pop.sourceView = top.view
+                pop.sourceRect = CGRect(x: top.view.bounds.midX, y: top.view.bounds.midY, width: 0, height: 0)
+                pop.permittedArrowDirections = []
+            }
+            top.present(vc, animated: true)
+            done(true)
+        }
+    }
+}
+
 public class SecondLookPlugin: NSObject, FlutterPlugin {
     private var channel: FlutterMethodChannel?
     private let speech = AVSpeechSynthesizer()
@@ -725,8 +889,11 @@ public class SecondLookPlugin: NSObject, FlutterPlugin {
                 "log_all": d.string(forKey: "pref_log_all") ?? "",
                 "call_popup": d.string(forKey: "pref_call_popup") ?? "",
                 "sms_popup": d.string(forKey: "pref_sms_popup") ?? "",
+                "lite_mode": d.string(forKey: "pref_lite_mode") ?? "", // '' = auto
                 "community_off": d.string(forKey: "pref_community_off") ?? "",
                 "community_sync": d.string(forKey: "pref_community_sync") ?? "",
+                "checks_done": d.string(forKey: "pref_checks_done") ?? "",
+                "last_ad_at": d.string(forKey: "pref_last_ad_at") ?? "",
             ],
             "overlayAllowed": false, // iOS never lets an app draw over a call
             "smsShield": d.bool(forKey: "sms_on"),
@@ -736,6 +903,7 @@ public class SecondLookPlugin: NSObject, FlutterPlugin {
             "screenCaptured": UIScreen.main.isCaptured,
             "trustedName": secret("trusted_name"),
             "trustedNumber": secret("trusted_number"),
+            "device": Self.deviceInfo(),
         ]
         let wanted = d.bool(forKey: "call_on")
         CXCallDirectoryManager.sharedInstance.getEnabledStatusForExtension(withIdentifier: SLShared.callDirectoryId) { st, _ in
@@ -746,6 +914,12 @@ public class SecondLookPlugin: NSObject, FlutterPlugin {
                 done(self.json(s))
             }
         }
+    }
+
+    /// For lite mode: {lowRam, ramMb, sdk}. iOS has no SDK level (0); "low" means under 3 GB of memory.
+    private static func deviceInfo() -> [String: Any] {
+        let mb = Int(min(ProcessInfo.processInfo.physicalMemory / (1024 * 1024), UInt64(Int32.max)))
+        return ["lowRam": mb > 0 && mb < 3 * 1024, "ramMb": mb, "sdk": 0]
     }
 
     private func reloadCallDirectory() {
@@ -914,6 +1088,30 @@ public class SecondLookPlugin: NSObject, FlutterPlugin {
         case "clearHistory":
             d.removeObject(forKey: "history")
             result(nil)
+        case "deleteHistory":
+            let ids = Set((a["ids"] as? [Any] ?? []).compactMap { $0 as? String }.filter { !$0.isEmpty })
+            var h = list("history")
+            let before = h.count
+            if !ids.isEmpty {
+                h.removeAll { entry in
+                    guard let id = entry["id"] as? String else { return false }
+                    return ids.contains(id)
+                }
+            }
+            let deleted = before - h.count
+            if deleted > 0 { saveList("history", h) }
+            result(json(["deleted": deleted]))
+
+        // ---- v1.6: private crash log (on this iPhone only; the user may share it) ----
+        case "logCrash":
+            SLCrashLog.record(source: str("source"), message: str("message"), stack: str("stack"))
+            result(nil)
+        case "crashLog":
+            SLCrashLog.list { result(self.json($0)) }
+        case "clearCrashLog":
+            SLCrashLog.clear { result(nil) }
+        case "shareCrashLog":
+            SLCrashLog.share { result($0) }
         case "reports":
             result(json(list("reports")))
         case "report":
@@ -931,8 +1129,10 @@ public class SecondLookPlugin: NSObject, FlutterPlugin {
             reloadCallDirectory()
             result(nil)
         case "deleteAllData":
-            for k in ["history", "reports", "number_actions", "sms_on", "call_on", "trusted_name", "trusted_number", "app_lock"] { d.removeObject(forKey: k) }
+            for k in ["history", "reports", "number_actions", "sms_on", "call_on", "trusted_name", "trusted_number", "app_lock",
+                      "pref_checks_done", "pref_last_ad_at"] { d.removeObject(forKey: k) }
             SLDocs.clear()
+            SLCrashLog.clear()
             SLSecurity.wipeKey()
             reloadCallDirectory()
             result(nil)
@@ -953,8 +1153,17 @@ public class SecondLookPlugin: NSObject, FlutterPlugin {
             result(nil)
         case "setPref":
             let key = str("key")
-            guard ["language", "voice", "voice_name", "log_all", "call_popup", "sms_popup", "voice_rate", "community_off", "community_sync"].contains(key) else {
+            guard ["language", "voice", "voice_name", "log_all", "call_popup", "sms_popup", "voice_rate", "community_off", "community_sync", "lite_mode",
+                   "checks_done", "last_ad_at"].contains(key) else {
                 result(FlutterError(code: "blocked", message: "Unknown setting", details: nil)); return
+            }
+            // Lite mode: 'auto' (or '' = auto), 'on', 'off'.
+            if key == "lite_mode" && !["", "auto", "on", "off"].contains(str("value")) {
+                result(FlutterError(code: "blocked", message: "Use auto, on or off", details: nil)); return
+            }
+            // Ad rules (manual-check counter, last full-screen ad time in ms): digits only, at most 20.
+            if ["checks_done", "last_ad_at"].contains(key) && (str("value").count > 20 || !str("value").allSatisfy({ $0.isASCII && $0.isNumber })) {
+                result(FlutterError(code: "blocked", message: "Use a number", details: nil)); return
             }
             // Voice ids (e.g. "com.apple.voice.enhanced.en-IN.Rishi") are longer than the other values.
             d.set(String(str("value").prefix(key == "voice_name" ? 200 : 40)), forKey: "pref_" + key)
@@ -1117,7 +1326,7 @@ public class SecondLookPlugin: NSObject, FlutterPlugin {
             }
 
         case "installId":
-            // Random id for this install, used only for the deep-check quota and Plus. Not linked to the person.
+            // Random id for this install, used only for the deep-check quota and community reports. Not linked to the person.
             var id = secret("install_id")
             if id.isEmpty { id = UUID().uuidString.lowercased(); setSecret("install_id", id) }
             result(id)

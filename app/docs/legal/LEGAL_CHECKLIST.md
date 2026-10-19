@@ -64,11 +64,12 @@ Shared "reported as scam" labels on phone numbers could be called defamatory by 
 
 - [ ] **Google Play SMS permission:** submit the Permissions Declaration (see `docs/PLAY_STORE.md`) with the demo video
       showing the in-app disclosure, agreeing, declining and the shield working.
-- [ ] **Data safety form:** fill it exactly as in `docs/PLAY_STORE.md` (install ID, links for Deep check, purchases,
+- [ ] **Data safety form:** fill it exactly as in `docs/PLAY_STORE.md` (install ID, links for Deep check,
       AdMob and ML Kit diagnostics). It must match the Privacy Policy.
 - [ ] **Ads:** declare "Contains ads". Target audience 18+ unless you join Google's Families programme.
-- [ ] **Subscriptions:** the Plus screen shows the price and "Cancel any time in Google Play / App Store". Don't use
-      fake timers or pre-ticked boxes (India's Dark Patterns Guidelines, 2023, ban these).
+      Publish the consent messages in AdMob → Privacy & messaging (see `docs/ADS.md`). Ads must stay clearly
+      labelled "Sponsored" and never look like a warning or a check result; no fake close buttons or timers
+      (India's Dark Patterns Guidelines, 2023).
 - [ ] **Apple:** App Privacy "nutrition label" to match the Privacy Policy; link the Terms (Apple's standard EULA
       also applies).
 - [ ] **Google Web Risk:** keep "Advisory provided by Google" and the "may not be complete" wording (Google's terms
@@ -77,7 +78,7 @@ Shared "reported as scam" labels on phone numbers could be called defamatory by 
 ## 6. Money and tax
 
 - [ ] Fill in tax details (PAN, and GST if registered) in AdMob, Play Console and App Store Connect.
-- [ ] Ask a CA how to treat ad and subscription income and whether you need GST registration.
+- [ ] Ask a CA how to treat ad income and whether you need GST registration.
 
 ## 7. Licences
 

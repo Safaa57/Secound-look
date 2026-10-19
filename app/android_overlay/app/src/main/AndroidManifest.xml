@@ -10,8 +10,8 @@
          at install; the user switches it on in Settings from Shield health, and can switch the card off in the app.
          The card is our own window only; it can't read the screen or other apps. -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <!-- Internet is used ONLY for things the user starts: an optional "Deep check" of a link
-         (just the link is sent), an optional rewarded ad, and Plus. SMS text, callers' numbers and
+    <!-- Internet is used for an optional "Deep check" of a link (just the link is sent), community reports, and the
+         ads that keep the app free (Google AdMob; ad requests carry no app content). SMS text, callers' numbers and
          contacts are never sent by the app (a "Chat on WhatsApp" tap hands that one number to WhatsApp or the
          browser). Cleartext (http://) traffic is blocked below. -->
     <uses-permission android:name="android.permission.INTERNET" />
