@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../i18n/i18n.dart';
+import '../perf.dart';
 import '../theme.dart';
 
 /// Glass card used for every surface in the app: white @4% with a 1px cool-cyan hairline.
@@ -226,17 +227,18 @@ class ShieldRing extends StatefulWidget {
   State<ShieldRing> createState() => _ShieldRingState();
 }
 
-class _ShieldRingState extends State<ShieldRing> with SingleTickerProviderStateMixin {
+class _ShieldRingState extends State<ShieldRing> with SingleTickerProviderStateMixin, LoopMotion<ShieldRing> {
   late final AnimationController pulse = AnimationController(vsync: this, duration: const Duration(milliseconds: 2600));
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (MediaQuery.of(context).disableAnimations) {
+  void applyMotion({required bool still, required bool run}) {
+    if (still) {
       pulse.stop();
       pulse.value = 0.5;
-    } else if (!pulse.isAnimating) {
-      pulse.repeat(reverse: true);
+    } else if (run) {
+      if (!pulse.isAnimating) pulse.repeat(reverse: true);
+    } else {
+      pulse.stop();
     }
   }
 

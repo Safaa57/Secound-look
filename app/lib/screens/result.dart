@@ -1,26 +1,40 @@
 import 'package:flutter/material.dart';
 
 import '../i18n/i18n.dart';
+import '../monetize/monetize.dart';
 import '../native.dart';
 import '../theme.dart';
 import '../widgets/common.dart';
 import '../widgets/verdict.dart';
 
 class ResultScreen extends StatefulWidget {
-  const ResultScreen({super.key, required this.result, required this.title});
+  const ResultScreen({super.key, required this.result, required this.title, this.manual = false});
   final Map<String, dynamic> result;
   final String title;
+
+  /// A check the user started (Check anything, paste, share). Only these can be followed by an ad, and only
+  /// after the user leaves the result (see AdRules). Alerts and shields are never manual.
+  final bool manual;
   @override
   State<ResultScreen> createState() => _ResultScreenState();
 }
 
 class _ResultScreenState extends State<ResultScreen> {
   Map<String, dynamic> status = {};
+  AdTicket? _ad;
 
   @override
   void initState() {
     super.initState();
+    if (widget.manual) _ad = AdRules.manualCheck(widget.result);
     Native.instance.status().then((s) => mounted ? setState(() => status = s) : null);
+  }
+
+  /// The result is shown first; any ad comes only once the user has left it (back or done).
+  @override
+  void dispose() {
+    AdRules.leaving(_ad);
+    super.dispose();
   }
 
   @override

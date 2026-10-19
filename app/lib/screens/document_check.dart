@@ -11,6 +11,7 @@ import '../checks/image_meta.dart';
 import '../checks/pdf_meta.dart';
 import '../checks/picker.dart';
 import '../i18n/i18n.dart';
+import '../monetize/monetize.dart';
 import '../native.dart';
 import '../theme.dart';
 import '../widgets/common.dart';
@@ -51,6 +52,17 @@ class _DocumentCheckScreenState extends State<DocumentCheckScreen> {
   bool busy = false;
   String Function()? note; // built with tr() when shown, so it follows the language
 
+  /// This visit counts as one manual check (however often it's re-run); any ad comes after the user leaves.
+  AdTicket? _ad;
+  void _counted(Map<String, dynamic> r) {
+    final t = _ad;
+    if (t == null) {
+      _ad = AdRules.manualCheck(r);
+    } else {
+      AdRules.update(t, r);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -82,6 +94,7 @@ class _DocumentCheckScreenState extends State<DocumentCheckScreen> {
     qr = null;
     preview = null;
     Native.instance.clearDocCache();
+    AdRules.leaving(_ad);
     super.dispose();
   }
 
@@ -373,7 +386,10 @@ class _DocumentCheckScreenState extends State<DocumentCheckScreen> {
               },
       };
       final r = await Native.instance.analyzeDocument(input);
-      if (mounted) setState(() => result = r['level'] is Map ? r : null);
+      if (mounted) {
+        setState(() => result = r['level'] is Map ? r : null);
+        if (r['level'] is Map) _counted(r);
+      }
     } on PlatformException {
       if (mounted) setState(() => note = () => tr('The check failed.'));
     } catch (_) {

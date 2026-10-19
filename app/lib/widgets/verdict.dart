@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import '../cloud.dart';
 import '../i18n/i18n.dart';
 import '../i18n/reasons.dart';
+import '../monetize/ad_rules.dart';
 import '../native.dart';
+import '../perf.dart';
 import 'block_sheet.dart';
 import 'community_card.dart';
 import 'deep_check.dart';
@@ -292,19 +294,21 @@ class _VerdictMark extends StatefulWidget {
   State<_VerdictMark> createState() => _VerdictMarkState();
 }
 
-class _VerdictMarkState extends State<_VerdictMark> with SingleTickerProviderStateMixin {
+class _VerdictMarkState extends State<_VerdictMark> with SingleTickerProviderStateMixin, LoopMotion<_VerdictMark> {
   late final AnimationController ring = AnimationController(vsync: this, duration: const Duration(milliseconds: 1800));
-  bool still = false;
 
+  bool get still => motionStill;
+
+  /// No ring animation in the battery saver look or with reduced motion; paused while the app is in the background.
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    still = MediaQuery.of(context).disableAnimations;
+  void applyMotion({required bool still, required bool run}) {
     if (still) {
       ring.stop();
       ring.value = 0.25;
-    } else if (!ring.isAnimating) {
-      ring.repeat();
+    } else if (run) {
+      if (!ring.isAnimating) ring.repeat();
+    } else {
+      ring.stop();
     }
   }
 
@@ -374,6 +378,7 @@ class _Actions extends StatelessWidget {
   final VoidCallback? onChanged;
 
   Future<void> _block(BuildContext context, String n) async {
+    AdRules.acted(); // someone acting on a result is never interrupted by an ad afterwards
     final ok = await Native.instance.markNumber(n, 'block');
     if (!context.mounted) return;
     if (!ok) {
@@ -421,13 +426,25 @@ class _Actions extends StatelessWidget {
       Expanded(
         child: SoftButton(
           label: tr('Report'),
-          onPressed: n != null ? () => reportNumber(context, n, onChanged: onChanged) : () => Native.instance.openUrl('https://sancharsaathi.gov.in'),
+          onPressed: () {
+            AdRules.acted();
+            if (n != null) {
+              reportNumber(context, n, onChanged: onChanged);
+            } else {
+              Native.instance.openUrl('https://sancharsaathi.gov.in');
+            }
+          },
         ),
       ),
       const SizedBox(width: 10),
       Expanded(
         child: bad
-            ? SoftButton(label: tr('Call 1930'), onPressed: () => Native.instance.dial('1930'))
+            ? SoftButton(
+                label: tr('Call 1930'),
+                onPressed: () {
+                  AdRules.acted();
+                  Native.instance.dial('1930');
+                })
             : SoftButton(label: tr('Block'), onPressed: () => _block(context, n!)),
       ),
     ]));

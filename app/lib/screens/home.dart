@@ -3,7 +3,9 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../i18n/i18n.dart';
+import '../monetize/monetize.dart';
 import '../native.dart';
+import '../perf.dart';
 import '../theme.dart';
 import '../widgets/alert_card.dart';
 import '../widgets/common.dart';
@@ -191,6 +193,9 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             // ---- help now
             const SizedBox(height: 12),
             _PanicButton(onTap: () => _open(const PanicScreen())),
+            // ---- one sponsored card under the tools (after the help button, so help is never pushed down).
+            // Takes no space unless an ad loads.
+            const NativeAdCard(margin: EdgeInsets.only(top: 16)),
           ]),
         ),
       ),
@@ -282,7 +287,8 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 }
 
 /// 236 px status orb: a thin outer ring, a dashed inner ring, a rotating radar sweep (4 s), a breathing glow (3 s)
-/// and a 112 px centre with the shield in the status colour. Holds still when the phone asks for reduced motion.
+/// and a 112 px centre with the shield in the status colour. Holds still (rings + glow only) in the battery saver
+/// look or when the phone asks for reduced motion.
 class _StatusOrb extends StatefulWidget {
   const _StatusOrb({required this.level});
   final String level;
@@ -290,21 +296,25 @@ class _StatusOrb extends StatefulWidget {
   State<_StatusOrb> createState() => _StatusOrbState();
 }
 
-class _StatusOrbState extends State<_StatusOrb> with TickerProviderStateMixin {
+class _StatusOrbState extends State<_StatusOrb> with TickerProviderStateMixin, LoopMotion<_StatusOrb> {
   late final AnimationController sweep = AnimationController(vsync: this, duration: const Duration(seconds: 4));
   late final AnimationController pulse = AnimationController(vsync: this, duration: const Duration(milliseconds: 1500));
 
+  /// Battery saver look / reduced motion: static rings and glow, no sweep. Paused (not reset) while the app is
+  /// in the background or the Home tab isn't showing.
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (MediaQuery.of(context).disableAnimations) {
+  void applyMotion({required bool still, required bool run}) {
+    if (still) {
       sweep.stop();
       pulse.stop();
       sweep.value = 0.0;
       pulse.value = 1.0;
-    } else {
+    } else if (run) {
       if (!sweep.isAnimating) sweep.repeat();
       if (!pulse.isAnimating) pulse.repeat(reverse: true);
+    } else {
+      sweep.stop();
+      pulse.stop();
     }
   }
 
@@ -323,7 +333,7 @@ class _StatusOrbState extends State<_StatusOrb> with TickerProviderStateMixin {
         width: 236,
         height: 236,
         child: Stack(alignment: Alignment.center, children: [
-          Positioned.fill(child: RepaintBoundary(child: CustomPaint(painter: _OrbPainter(c, sweep, pulse)))),
+          Positioned.fill(child: RepaintBoundary(child: CustomPaint(painter: _OrbPainter(c, sweep, pulse, showSweep: !motionStill)))),
           AnimatedContainer(
             duration: const Duration(milliseconds: 400),
             width: 112,
@@ -343,9 +353,10 @@ class _StatusOrbState extends State<_StatusOrb> with TickerProviderStateMixin {
 }
 
 class _OrbPainter extends CustomPainter {
-  _OrbPainter(this.color, this.sweep, this.pulse) : super(repaint: Listenable.merge([sweep, pulse]));
+  _OrbPainter(this.color, this.sweep, this.pulse, {this.showSweep = true}) : super(repaint: Listenable.merge([sweep, pulse]));
   final Color color;
   final Animation<double> sweep, pulse;
+  final bool showSweep;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -372,17 +383,20 @@ class _OrbPainter extends CustomPainter {
     }
 
     // Radar sweep: a 60° wedge that fades in to a sharp leading edge, turning once every 4 s.
-    final full = Rect.fromCircle(center: c, radius: r);
-    canvas.drawCircle(
-      c,
-      r,
-      Paint()
-        ..shader = SweepGradient(
-          colors: [color.withAlpha(0), color.withAlpha(89), color.withAlpha(0), color.withAlpha(0)],
-          stops: const [0.0, 60 / 360, 61 / 360, 1.0],
-          transform: GradientRotation(-math.pi / 2 + sweep.value * 2 * math.pi),
-        ).createShader(full),
-    );
+    // (Not drawn in the battery saver look or with reduced motion: the orb is just rings and glow.)
+    if (showSweep) {
+      final full = Rect.fromCircle(center: c, radius: r);
+      canvas.drawCircle(
+        c,
+        r,
+        Paint()
+          ..shader = SweepGradient(
+            colors: [color.withAlpha(0), color.withAlpha(89), color.withAlpha(0), color.withAlpha(0)],
+            stops: const [0.0, 60 / 360, 61 / 360, 1.0],
+            transform: GradientRotation(-math.pi / 2 + sweep.value * 2 * math.pi),
+          ).createShader(full),
+      );
+    }
 
     // Breathing glow (inset 48): opacity .55 → 1, scale 1 → 1.04.
     final p = Curves.easeInOut.transform(pulse.value.clamp(0.0, 1.0).toDouble());
@@ -401,7 +415,7 @@ class _OrbPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_OrbPainter o) => o.color != color || o.sweep != sweep || o.pulse != pulse;
+  bool shouldRepaint(_OrbPainter o) => o.color != color || o.sweep != sweep || o.pulse != pulse || o.showSweep != showSweep;
 }
 
 /// "SMS shield on" — a pill with a status dot; tapping it switches the shield.

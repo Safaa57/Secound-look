@@ -78,7 +78,7 @@ bool whatsAppAllowed(Map<String, dynamic> a, {required bool installed, Map<Strin
 }
 
 /// The number to open a chat with: the full international form when the lookup has it.
-String _chatNumber(Map<String, dynamic> a) {
+String alertChatNumber(Map<String, dynamic> a) {
   final e = '${alertNumberDetails(a)?['e164'] ?? ''}';
   return e.startsWith('+') ? e : alertSender(a);
 }
@@ -121,19 +121,35 @@ IconData markIcon(String action) {
 
 String markLevel(String action) => action == 'safe' || action == 'comment' || action == 'unblock' ? 'safe' : (action == 'spam' ? 'warning' : 'danger');
 
+/// The snack bar text after marking a number.
+String markDoneText(String action) {
+  switch (action) {
+    case 'block':
+      return tr('Blocked. When Call Shield is on, calls from this number are rejected, and its SMS won\'t notify you.');
+    case 'spam':
+      return tr('Marked as spam.');
+    case 'fraud':
+      return tr('Marked as fraud. Call Shield will warn you if it calls again.');
+    case 'safe':
+      return tr('Marked as safe.');
+    default:
+      return tr('Comment saved on this phone.');
+  }
+}
+
 int _ms(Object? v) => v is num ? v.toInt() : int.tryParse('$v') ?? 0;
 
-void _openResult(BuildContext context, Map<String, dynamic> a) {
+void openAlertResult(BuildContext context, Map<String, dynamic> a) {
   final r = (a['result'] as Map?)?.cast<String, dynamic>();
   if (r != null) Navigator.of(context).push(MaterialPageRoute(builder: (_) => ResultScreen(result: r, title: a['title'] as String? ?? 'Alert')));
 }
 
-Widget _levelPill(BuildContext context, String level) => Pill(level == 'danger' ? tr('Scam') : level == 'warning' ? tr('Suspicious') : tr('OK'),
+Widget alertLevelPill(BuildContext context, String level) => Pill(level == 'danger' ? tr('Scam') : level == 'warning' ? tr('Suspicious') : tr('OK'),
     icon: SL.mark(level), fg: SL.fg(context, level), bg: SL.bg(context, level));
 
 /// A small grey or coloured badge ("New sender", "Test").
-class _Badge extends StatelessWidget {
-  const _Badge(this.text, {this.icon, this.color});
+class AlertBadge extends StatelessWidget {
+  const AlertBadge(this.text, {this.icon, this.color});
   final String text;
   final IconData? icon;
   final Color? color;
@@ -161,7 +177,7 @@ class AlertTile extends StatelessWidget {
     final sender = alertSender(a);
     return Panel(
       padding: const EdgeInsets.fromLTRB(12, 12, 14, 12),
-      onTap: () => _openResult(context, a),
+      onTap: () => openAlertResult(context, a),
       child: Row(children: [
         IconTile(a['kind'] == 'call' ? Icons.call_rounded : Icons.sms_rounded, color: SL.fg(context, level), size: 42),
         const SizedBox(width: 12),
@@ -174,7 +190,7 @@ class AlertTile extends StatelessWidget {
         ),
         const SizedBox(width: 8),
         Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-          _levelPill(context, level),
+          alertLevelPill(context, level),
           const SizedBox(height: 4),
           Text(timeAgo(_ms(a['at'])), style: TextStyle(fontSize: 11.5, color: Theme.of(context).colorScheme.onSurface.withAlpha(130))),
         ]),
@@ -240,7 +256,7 @@ class _AlertCardState extends State<AlertCard> {
       return;
     }
     messenger.showSnackBar(SnackBar(
-      content: Text(_doneText(action)),
+      content: Text(markDoneText(action)),
       action: action == 'comment'
           ? null
           : SnackBarAction(
@@ -255,21 +271,6 @@ class _AlertCardState extends State<AlertCard> {
     ));
   }
 
-  static String _doneText(String action) {
-    switch (action) {
-      case 'block':
-        return tr('Blocked. When Call Shield is on, calls from this number are rejected, and its SMS won\'t notify you.');
-      case 'spam':
-        return tr('Marked as spam.');
-      case 'fraud':
-        return tr('Marked as fraud. Call Shield will warn you if it calls again.');
-      case 'safe':
-        return tr('Marked as safe.');
-      default:
-        return tr('Comment saved on this phone.');
-    }
-  }
-
   /// Clock time for today's alerts ("9:41 am"), otherwise "2 d ago".
   String _when(BuildContext context, int ms) {
     if (ms <= 0) return '';
@@ -282,7 +283,7 @@ class _AlertCardState extends State<AlertCard> {
   }
 
   Future<void> _chat() async {
-    final ok = await Native.instance.openChat(_chatNumber(widget.a));
+    final ok = await Native.instance.openChat(alertChatNumber(widget.a));
     if (!ok && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr('Couldn\'t open WhatsApp.'))));
     }
@@ -419,7 +420,7 @@ class _AlertCardState extends State<AlertCard> {
       shape: RoundedRectangleBorder(borderRadius: r, side: BorderSide(color: edge)),
       child: InkWell(
         borderRadius: r,
-        onTap: () => _openResult(context, a),
+        onTap: () => openAlertResult(context, a),
         child: Padding(
           padding: const EdgeInsets.all(14),
           child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
@@ -435,8 +436,8 @@ class _AlertCardState extends State<AlertCard> {
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(children: [
                     Flexible(child: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: SL.text))),
-                    if (a['firstTime'] == true) ...[const SizedBox(width: 8), _Tag(tr('NEW'), color: SL.accentLight, bg: SL.accent.withAlpha(36))],
-                    if (a['test'] == true) ...[const SizedBox(width: 6), _Tag(tr('Test'), color: SL.textSecondary, bg: const Color(0x14FFFFFF))],
+                    if (a['firstTime'] == true) ...[const SizedBox(width: 8), AlertTag(tr('NEW'), color: SL.accentLight, bg: SL.accent.withAlpha(36))],
+                    if (a['test'] == true) ...[const SizedBox(width: 6), AlertTag(tr('Test'), color: SL.textSecondary, bg: const Color(0x14FFFFFF))],
                   ]),
                   const SizedBox(height: 2),
                   Text(line, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13.5, color: SL.textSoft)),
@@ -447,7 +448,7 @@ class _AlertCardState extends State<AlertCard> {
             ]),
             if (m != null && (mAction != 'block' || !bad)) ...[
               const SizedBox(height: 8),
-              Align(alignment: Alignment.centerLeft, child: _Badge(markLabel(mAction), icon: markIcon(mAction), color: SL.fgOf(markLevel(mAction)))),
+              Align(alignment: Alignment.centerLeft, child: AlertBadge(markLabel(mAction), icon: markIcon(mAction), color: SL.fgOf(markLevel(mAction)))),
             ],
             if (mComment.isNotEmpty) ...[
               const SizedBox(height: 6),
@@ -529,8 +530,8 @@ class _AlertCardState extends State<AlertCard> {
 }
 
 /// A tiny label next to the sender ("NEW", "Test").
-class _Tag extends StatelessWidget {
-  const _Tag(this.text, {required this.color, required this.bg});
+class AlertTag extends StatelessWidget {
+  const AlertTag(this.text, {required this.color, required this.bg});
   final String text;
   final Color color, bg;
   @override
@@ -598,4 +599,374 @@ class _CommentSheetState extends State<_CommentSheet> {
           ),
         ]),
       );
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// Alerts grouped by sender: many SMS (and calls) from the same number or SMS header show as one conversation.
+
+/// Clock time for today's alerts ("9:41 am"), otherwise "2 d ago".
+String alertWhen(BuildContext context, int ms) {
+  if (ms <= 0) return '';
+  final d = DateTime.fromMillisecondsSinceEpoch(ms);
+  final now = DateTime.now();
+  if (d.year == now.year && d.month == now.month && d.day == now.day) {
+    return MaterialLocalizations.of(context).formatTimeOfDay(TimeOfDay.fromDateTime(d));
+  }
+  return timeAgo(ms);
+}
+
+/// The time of an alert in milliseconds (0 if unknown).
+int alertAt(Map<String, dynamic> a) => _ms(a['at']);
+
+/// 'safe' | 'warning' | 'danger' for an alert.
+String alertLevel(Map<String, dynamic> a) {
+  final raw = '${a['level'] ?? 'safe'}';
+  return raw == 'danger' || raw == 'warning' ? raw : 'safe';
+}
+
+int _rank(String level) => level == 'danger' ? 2 : (level == 'warning' ? 1 : 0);
+
+/// Which conversation an alert belongs to. Phone numbers match on their last 10 digits (so +91 98xx…, 098xx… and
+/// 98xx… are the same sender); SMS headers match ignoring case and spaces. SMS and calls from one number share a group.
+String alertGroupKey(Map<String, dynamic> a) {
+  final sender = alertSender(a);
+  if (sender.isEmpty) return 'id:${a['id'] ?? a['at'] ?? ''}';
+  if (alertFromNumber(a)) {
+    final e164 = '${alertNumberDetails(a)?['e164'] ?? ''}';
+    final digits = (e164.isNotEmpty ? e164 : sender).replaceAll(RegExp(r'\D'), '');
+    if (digits.isNotEmpty) return 'n:${digits.length > 10 ? digits.substring(digits.length - 10) : digits}';
+  }
+  return 'h:${sender.toLowerCase().replaceAll(RegExp(r'\s+'), '')}';
+}
+
+/// One sender's alerts, newest first.
+class AlertGroup {
+  AlertGroup(this.key, this.items);
+  final String key;
+  final List<Map<String, dynamic>> items;
+
+  Map<String, dynamic> get latest => items.first;
+
+  /// The sender as received on the newest alert.
+  String get sender => alertSender(latest);
+  bool get fromNumber => alertFromNumber(latest);
+  int get at => alertAt(latest);
+  int get count => items.length;
+  int get smsCount => items.where((a) => a['kind'] != 'call').length;
+  int get callCount => items.where((a) => a['kind'] == 'call').length;
+  bool get hasCall => callCount > 0;
+  bool get hasSms => smsCount > 0;
+  bool get isTest => items.any((a) => a['test'] == true);
+  List<String> get ids => [for (final a in items) if (a['id'] != null) '${a['id']}'];
+
+  /// The worst verdict in the conversation.
+  String get level {
+    var best = 'safe';
+    for (final a in items) {
+      final l = alertLevel(a);
+      if (_rank(l) > _rank(best)) best = l;
+    }
+    return best;
+  }
+
+  int countOf(String level) => items.where((a) => alertLevel(a) == level).length;
+
+  /// "NEW": the first alert from this sender was the first time Second Look saw it.
+  bool get isNew => items.last['firstTime'] == true;
+
+  /// The newest mark the user gave this sender (on any of its alerts), or null.
+  Map<String, dynamic>? get mark {
+    Map<String, dynamic>? best;
+    var bestAt = -1;
+    for (final a in items) {
+      final u = a['userAction'];
+      if (u is! Map) continue;
+      final t = _ms(u['at']);
+      if (t > bestAt) {
+        bestAt = t;
+        best = u.cast<String, dynamic>();
+      }
+    }
+    final act = '${best?['action'] ?? ''}';
+    if (act.isEmpty || act == 'unblock') return null;
+    return best;
+  }
+
+  /// The alert used for the sender's number facts (the newest one that has them).
+  Map<String, dynamic> get numberSource => items.firstWhere((a) => alertNumberDetails(a) != null, orElse: () => latest);
+
+  /// The newest alert, with the conversation's worst verdict (for rules like the WhatsApp button).
+  Map<String, dynamic> get summary => {...numberSource, 'level': level, 'number': latest['number'], 'senderType': latest['senderType'], 'title': latest['title']};
+
+  /// A short line: the newest SMS preview, or what the newest call was.
+  String get previewLine => alertPreview(latest);
+}
+
+/// The text shown for one alert: the SMS preview, else the summary, else "Call" / "SMS".
+String alertPreview(Map<String, dynamic> a) {
+  final preview = '${a['preview'] ?? ''}'.trim();
+  if (preview.isNotEmpty) return preview;
+  final summary = '${a['summary'] ?? ''}'.trim();
+  if (summary.isNotEmpty) return summary;
+  return a['kind'] == 'call' ? tr('Call') : 'SMS';
+}
+
+/// Groups alerts by sender. Newest conversation first; each group's alerts newest first.
+List<AlertGroup> groupAlerts(List<Map<String, dynamic>> items) {
+  final map = <String, List<Map<String, dynamic>>>{};
+  for (final a in items) {
+    map.putIfAbsent(alertGroupKey(a), () => []).add(a);
+  }
+  final groups = <AlertGroup>[];
+  map.forEach((k, v) {
+    v.sort((x, y) => alertAt(y).compareTo(alertAt(x)));
+    groups.add(AlertGroup(k, v));
+  });
+  groups.sort((x, y) => y.at.compareTo(x.at));
+  return groups;
+}
+
+/// "5 messages", "2 calls" or "3 messages · 1 call".
+String alertCountLabel(int sms, int calls) {
+  final m = sms == 1 ? tr('1 message') : tr('{n} messages', {'n': sms});
+  final c = calls == 1 ? tr('1 call') : tr('{n} calls', {'n': calls});
+  if (calls == 0) return m;
+  if (sms == 0) return c;
+  return '$m · $c';
+}
+
+/// The round avatar of a conversation: the SMS / call icon (both when mixed) in the worst verdict's colour.
+class SenderAvatar extends StatelessWidget {
+  const SenderAvatar({super.key, required this.level, required this.sms, required this.call, this.size = 48});
+  final String level;
+  final bool sms, call;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final fg = SL.fgOf(level);
+    final disc = fg.withAlpha(level == 'safe' ? 36 : 46);
+    final both = sms && call;
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: disc,
+        shape: BoxShape.circle,
+        border: Border.all(color: fg.withAlpha(level == 'safe' ? 60 : 110)),
+        boxShadow: level == 'danger' ? [BoxShadow(color: fg.withAlpha(60), blurRadius: 16)] : null,
+      ),
+      child: both
+          ? Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Icon(Icons.chat_bubble_outline_rounded, size: size * 0.32, color: fg),
+              SizedBox(width: size * 0.04),
+              Icon(Icons.phone_outlined, size: size * 0.32, color: fg),
+            ])
+          : Icon(call ? Icons.phone_outlined : Icons.chat_bubble_outline_rounded, size: size * 0.46, color: fg),
+    );
+  }
+}
+
+/// A round check for selection mode.
+class SelectDot extends StatelessWidget {
+  const SelectDot({super.key, required this.selected, this.size = 26});
+  final bool selected;
+  final double size;
+  @override
+  Widget build(BuildContext context) => Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          color: selected ? SL.accent : Colors.transparent,
+          shape: BoxShape.circle,
+          border: Border.all(color: selected ? SL.accent : const Color(0x668CDCFF), width: 2),
+        ),
+        child: selected ? Icon(Icons.check_rounded, size: size * 0.7, color: SL.onAccent) : null,
+      );
+}
+
+/// One conversation in the Alerts tab: avatar, sender, newest message and time, how many, the worst verdict and NEW.
+/// In selection mode a check replaces the avatar.
+class AlertGroupCard extends StatelessWidget {
+  const AlertGroupCard({
+    super.key,
+    required this.group,
+    required this.onTap,
+    this.onLongPress,
+    this.selecting = false,
+    this.selected = false,
+  });
+  final AlertGroup group;
+  final VoidCallback onTap;
+  final VoidCallback? onLongPress;
+  final bool selecting, selected;
+
+  @override
+  Widget build(BuildContext context) {
+    final g = group;
+    final level = g.level;
+    final bad = level != 'safe';
+    final fg = SL.fgOf(level);
+    final Color fill, edge;
+    if (selected) {
+      fill = SL.accent.withAlpha(22);
+      edge = SL.accent;
+    } else if (level == 'danger') {
+      fill = fg.withAlpha(18);
+      edge = fg.withAlpha(102);
+    } else if (level == 'warning') {
+      fill = fg.withAlpha(15);
+      edge = fg.withAlpha(89);
+    } else {
+      fill = SL.glass;
+      edge = SL.glassBorder;
+    }
+    final who = g.sender.isEmpty ? tr('Unknown sender') : g.sender;
+    final m = g.mark;
+    final mAction = '${m?['action'] ?? ''}';
+    final r = BorderRadius.circular(20);
+    return Semantics(
+      selected: selecting ? selected : null,
+      button: true,
+      child: Material(
+        color: fill,
+        shape: RoundedRectangleBorder(borderRadius: r, side: BorderSide(color: edge, width: selected ? 1.5 : 1)),
+        child: InkWell(
+          borderRadius: r,
+          onTap: onTap,
+          onLongPress: onLongPress,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              SizedBox(
+                width: 48,
+                height: 48,
+                child: Center(
+                  child: selecting ? SelectDot(selected: selected) : SenderAvatar(level: level, sms: g.hasSms, call: g.hasCall),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Row(children: [
+                    Expanded(
+                      child: Row(children: [
+                        Flexible(
+                          child: Text(who, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: SL.text)),
+                        ),
+                        if (g.isNew) ...[const SizedBox(width: 8), AlertTag(tr('NEW'), color: SL.accentLight, bg: SL.accent.withAlpha(36))],
+                        if (g.isTest) ...[const SizedBox(width: 6), AlertTag(tr('Test'), color: SL.textSecondary, bg: const Color(0x14FFFFFF))],
+                      ]),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(alertWhen(context, g.at), style: const TextStyle(fontSize: 12, color: SL.textMuted)),
+                  ]),
+                  const SizedBox(height: 3),
+                  Text(g.previewLine, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13.5, color: SL.textSoft, height: 1.35)),
+                  const SizedBox(height: 10),
+                  Wrap(spacing: 8, runSpacing: 6, crossAxisAlignment: WrapCrossAlignment.center, children: [
+                    if (bad || g.count > 1) alertLevelPill(context, level),
+                    _CountChip(alertCountLabel(g.smsCount, g.callCount), highlight: g.count > 1),
+                    if (m != null) AlertBadge(markLabel(mAction), icon: markIcon(mAction), color: mAction == 'comment' ? SL.accent : SL.fgOf(markLevel(mAction))),
+                  ]),
+                ]),
+              ),
+            ]),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// "5 messages" — a quiet count chip, brighter when there is more than one.
+class _CountChip extends StatelessWidget {
+  const _CountChip(this.text, {this.highlight = false});
+  final String text;
+  final bool highlight;
+  @override
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        decoration: BoxDecoration(
+          color: highlight ? SL.accent.withAlpha(26) : const Color(0x0DFFFFFF),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: highlight ? SL.accent.withAlpha(90) : const Color(0x268CDCFF)),
+        ),
+        child: Text(text, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: highlight ? SL.accentLight : SL.textSecondary)),
+      );
+}
+
+/// A 44 px action button: red filled (Block), quiet outlined, green-tinted (WhatsApp) or highlighted when chosen.
+class AlertActionButton extends StatelessWidget {
+  const AlertActionButton({super.key, required this.label, required this.onTap, this.filled = false, this.tint, this.selected = false, this.selColor, this.icon});
+  final String label;
+  final VoidCallback? onTap;
+  final bool filled, selected;
+  final Color? tint, selColor;
+  final IconData? icon;
+
+  @override
+  Widget build(BuildContext context) {
+    final r = BorderRadius.circular(12);
+    final Color fill, edge, text;
+    if (filled) {
+      fill = SL.dangerD;
+      edge = SL.dangerD;
+      text = SL.onDanger;
+    } else if (tint != null) {
+      fill = tint!.withAlpha(26);
+      edge = tint!.withAlpha(115);
+      text = SL.pale('safe');
+    } else if (selected && selColor != null) {
+      fill = selColor!.withAlpha(36);
+      edge = selColor!;
+      text = SL.text;
+    } else {
+      fill = const Color(0x0AFFFFFF);
+      edge = const Color(0x2EFFFFFF);
+      text = SL.text;
+    }
+    return Material(
+      color: fill,
+      shape: RoundedRectangleBorder(borderRadius: r, side: BorderSide(color: edge)),
+      child: InkWell(
+        borderRadius: r,
+        onTap: onTap,
+        child: Container(
+          height: 44,
+          alignment: Alignment.center,
+          padding: const EdgeInsets.symmetric(horizontal: 6),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              if (icon != null) ...[Icon(icon, size: 17, color: text), const SizedBox(width: 6)],
+              Text(label, maxLines: 1, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: text)),
+            ]),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The 44 px "⋯" button next to the action buttons.
+class AlertMoreButton extends StatelessWidget {
+  const AlertMoreButton({super.key, required this.onTap});
+  final VoidCallback? onTap;
+  @override
+  Widget build(BuildContext context) {
+    final r = BorderRadius.circular(12);
+    return Tooltip(
+      message: tr('More'),
+      child: Material(
+        color: const Color(0x0AFFFFFF),
+        shape: RoundedRectangleBorder(borderRadius: r, side: const BorderSide(color: Color(0x2EFFFFFF))),
+        child: InkWell(
+          borderRadius: r,
+          onTap: onTap,
+          child: const SizedBox(width: 44, height: 44, child: Icon(Icons.more_horiz_rounded, size: 20, color: SL.text)),
+        ),
+      ),
+    );
+  }
 }

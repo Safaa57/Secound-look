@@ -1,17 +1,21 @@
+import 'dart:ui' show PlatformDispatcher;
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-import 'cloud.dart';
 import 'community.dart';
 import 'i18n/i18n.dart';
 import 'i18n/reasons.dart';
 import 'legal/legal.dart';
 import 'monetize/monetize.dart';
 import 'native.dart';
+import 'perf.dart';
 import 'screens/alerts.dart';
 import 'screens/check.dart';
 import 'screens/home.dart';
 import 'screens/lock.dart';
+import 'screens/offers.dart';
 import 'screens/onboarding.dart';
 import 'screens/payment_check.dart';
 import 'screens/result.dart';
@@ -26,13 +30,43 @@ final navKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  _installCrashLog();
   Native.instance.init();
+  Perf.start();
   registerLicences();
   await I18nData.load(); // Hindi and Kannada texts for scam reasons and advice
   L10n.lang.addListener(_relabelAll);
-  // Confirms any Plus purchase that finished while the app was closed (phones only; no-op on a laptop).
-  if (Cloud.configured) Monetize.start();
   runApp(const SecondLookApp());
+}
+
+/// Private crash log: uncaught errors are saved only on this phone (Me → Crash reports). Nothing is sent unless
+/// the user taps Send there. In debug builds the error is still shown as usual.
+void _installCrashLog() {
+  var count = 0;
+  String? last;
+  void save(Object error, StackTrace? stack) {
+    final message = '$error';
+    // Don't flood the log with the same error repeating every frame.
+    if (message == last || count >= 30) return;
+    last = message;
+    count++;
+    Native.instance.logCrash(source: 'dart', message: message, stack: stack?.toString() ?? '');
+  }
+
+  final previous = FlutterError.onError;
+  FlutterError.onError = (details) {
+    if (previous != null) {
+      previous(details);
+    } else {
+      FlutterError.presentError(details);
+    }
+    save(details.exception, details.stack);
+  };
+  PlatformDispatcher.instance.onError = (error, stack) {
+    if (kDebugMode) FlutterError.presentError(FlutterErrorDetails(exception: error, stack: stack, library: 'second look'));
+    save(error, stack);
+    return true;
+  };
 }
 
 /// tr() doesn't depend on an InheritedWidget, so screens that are already built (const widgets, open routes,
@@ -119,6 +153,8 @@ class _RootState extends State<Root> with WidgetsBindingObserver {
     if (state == AppLifecycleState.paused) leftAt = DateTime.now();
     if (state == AppLifecycleState.resumed && leftAt != null && DateTime.now().difference(leftAt!).inSeconds > 30) {
       leftAt = null;
+      // Closing the pages below is not the user leaving a result: no ad while the app locks itself.
+      AdRules.hold();
       // Lock first (synchronously) so app content is never shown while the status reloads.
       navKey.currentState?.popUntil((r) => r.isFirst);
       setState(() => unlocked = false);
@@ -146,6 +182,8 @@ class _RootState extends State<Root> with WidgetsBindingObserver {
       L10n.init(s);
       Voice.init(s);
     }
+    Perf.update(s);
+    AdRules.load(s); // manual-check counter and last ad time
     setState(() => status = s);
     Community.syncIfDue(s); // background download of the community scam list for Call Shield
     final shared = await Native.instance.consumeSharedText();
@@ -194,7 +232,8 @@ class _RootState extends State<Root> with WidgetsBindingObserver {
       _pendingShared = text;
       return;
     }
-    navKey.currentState?.push(MaterialPageRoute(builder: (_) => ResultScreen(result: r, title: 'Shared with Second Look')));
+    // Text shared into Second Look is a check the user started, like pasting it.
+    navKey.currentState?.push(MaterialPageRoute(builder: (_) => ResultScreen(result: r, title: 'Shared with Second Look', manual: true)));
   }
 
   Future<void> _openAlert(String id) async {
@@ -220,7 +259,7 @@ class _RootState extends State<Root> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     final noMotion = MediaQuery.of(context).disableAnimations;
     return AnimatedSwitcher(
-      duration: Duration(milliseconds: noMotion ? 0 : 420),
+      duration: Duration(milliseconds: noMotion ? 0 : (Perf.lite.value ? 150 : 420)),
       switchInCurve: Curves.easeOut,
       switchOutCurve: Curves.easeIn,
       child: _splashDone
@@ -269,6 +308,7 @@ class Shell extends StatefulWidget {
 }
 
 class _ShellState extends State<Shell> {
+  /// 0 Home, 1 Check, 2 Alerts, 3 Offers, 4 Me.
   int tab = 0;
   final _homeKey = GlobalKey<HomeScreenState>();
 
@@ -282,6 +322,11 @@ class _ShellState extends State<Shell> {
     super.initState();
     alertsVersion.addListener(_countUnseen);
     _countUnseen();
+    // Ads: Google's consent check first (it shows its form only where the law requires one), then the ads SDK.
+    // Started here, after onboarding, the Terms and the app lock, so nothing ever covers those.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) Monetize.init();
+    });
   }
 
   @override
@@ -321,8 +366,11 @@ class _ShellState extends State<Shell> {
       HomeScreen(key: _homeKey, onCheck: () => _select(1), onAlerts: () => _select(2)),
       CheckScreen(onBack: () => _select(0)),
       const AlertsScreen(),
+      const OffersScreen(),
       const SettingsScreen(),
     ];
+    // The laptop has no ads, so no Offers tab.
+    final shown = Monetize.adsSupported ? const [0, 1, 2, 3, 4] : const [0, 1, 2, 4];
     return Scaffold(
       backgroundColor: SL.ground,
       extendBody: true,
@@ -332,30 +380,42 @@ class _ShellState extends State<Shell> {
           for (var i = 0; i < pages.length; i++) TickerMode(enabled: i == tab, child: pages[i]),
         ]),
       ),
-      bottomNavigationBar: _NavBar(
-        index: tab,
-        alertDot: _unseen > 0,
-        onSelect: _select,
-      ),
+      bottomNavigationBar: Column(mainAxisSize: MainAxisSize.min, children: [
+        // One banner just above the bar, on Home, Check and Alerts only. Takes no space until an ad loads.
+        if (Monetize.adsSupported && tab <= 2) const Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: AdBanner()),
+        _NavBar(
+          tabs: shown,
+          index: tab,
+          alertDot: _unseen > 0,
+          onSelect: _select,
+        ),
+      ]),
     );
   }
 }
 
-/// The floating bottom bar: Home / Check / Alerts / Me, the current one in cyan.
+/// The floating bottom bar: Home / Check / Alerts / Offers / Me, the current one in cyan.
 class _NavBar extends StatelessWidget {
-  const _NavBar({required this.index, required this.onSelect, this.alertDot = false});
+  const _NavBar({required this.tabs, required this.index, required this.onSelect, this.alertDot = false});
+
+  /// Which tabs to show (page indexes); the laptop has no Offers.
+  final List<int> tabs;
   final int index;
   final ValueChanged<int> onSelect;
   final bool alertDot;
 
   @override
   Widget build(BuildContext context) {
-    final items = [
+    final all = [
       [Icons.shield_outlined, tr('Home')],
       [Icons.search_rounded, tr('Check')],
       [Icons.notifications_none_rounded, tr('Alerts')],
+      [Icons.local_offer_outlined, tr('Offers')],
       [Icons.person_outline_rounded, tr('Me')],
     ];
+    final items = [for (final t in tabs) all[t]];
+    // Five items fit at 390 px with a slightly smaller label; long Hindi/Kannada labels shrink to fit.
+    final labelSize = items.length > 4 ? 10.5 : 11.5;
     return SafeArea(
       top: false,
       child: Padding(
@@ -374,17 +434,17 @@ class _NavBar extends StatelessWidget {
               for (var i = 0; i < items.length; i++)
                 Expanded(
                   child: Semantics(
-                    selected: i == index,
+                    selected: tabs[i] == index,
                     button: true,
                     label: items[i][1] as String,
                     excludeSemantics: true,
                     child: InkWell(
                       borderRadius: BorderRadius.circular(20),
-                      onTap: () => onSelect(i),
+                      onTap: () => onSelect(tabs[i]),
                       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                         Stack(clipBehavior: Clip.none, children: [
-                          Icon(items[i][0] as IconData, size: 24, color: i == index ? SL.accent : SL.textMuted),
-                          if (i == 2 && alertDot)
+                          Icon(items[i][0] as IconData, size: 24, color: tabs[i] == index ? SL.accent : SL.textMuted),
+                          if (tabs[i] == 2 && alertDot)
                             Positioned(
                               right: -2,
                               top: -1,
@@ -396,10 +456,15 @@ class _NavBar extends StatelessWidget {
                             ),
                         ]),
                         const SizedBox(height: 4),
-                        Text(items[i][1] as String,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700, color: i == index ? SL.accent : SL.textMuted)),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 2),
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(items[i][1] as String,
+                                maxLines: 1,
+                                style: TextStyle(fontSize: labelSize, fontWeight: FontWeight.w700, color: tabs[i] == index ? SL.accent : SL.textMuted)),
+                          ),
+                        ),
                       ]),
                     ),
                   ),

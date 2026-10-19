@@ -100,6 +100,17 @@ extension type _Utterance._(JSObject _) implements JSObject {
   external set rate(JSNumber v);
 }
 
+@JS('navigator')
+external _Navigator? get _navigator;
+
+extension type _Navigator._(JSObject _) implements JSObject {
+  external _Clipboard? get clipboard;
+}
+
+extension type _Clipboard._(JSObject _) implements JSObject {
+  external JSPromise<JSAny?> writeText(JSString text);
+}
+
 /// Laptop version of the native bridge. Everything stays in this browser (localStorage);
 /// nothing is sent anywhere. SMS and Call Shield need a phone, so they're reported as off.
 class WebBridge {
@@ -207,9 +218,95 @@ class WebBridge {
         'screenProtection': false,
         'trustedName': _get('trusted_name') ?? '',
         'trustedNumber': _get('trusted_number') ?? '',
+        'device': null, // a browser can't tell how much memory the computer has
       });
 
-  static const _prefKeys = ['language', 'voice', 'voice_name', 'log_all', 'call_popup', 'sms_popup', 'voice_rate', 'community_off', 'community_sync'];
+  static const _prefKeys = [
+    'language', 'voice', 'voice_name', 'log_all', 'call_popup', 'sms_popup', 'voice_rate', 'community_off', 'community_sync', 'lite_mode',
+    'checks_done', 'last_ad_at', // ad rules' counters (the laptop shows no ads; kept so all platforms accept the same keys)
+  ];
+  // ---- v1.6: private crash log (kept in this browser only; the user may copy it) ----
+  static const _crashKey = 'crash_log', _crashMax = 20, _crashMessage = 500, _crashStack = 6000;
+  static final _crashPatterns = <RegExp, String>{
+    RegExp(r'''\b(?:[a-z][a-z0-9+.\-]{1,15}://|www\.)[^\s"'<>()\[\]{}]+''', caseSensitive: false): '[link]',
+    RegExp(r'[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}'): '[email]',
+    // Bare web addresses; lower-case only and without io/app/me/co/net so code names in stacks stay readable.
+    RegExp(r'''\b[a-z0-9\-]+(?:\.[a-z0-9\-]+)*\.(?:com|in|org|info|top|xyz|online|site|live|club|shop|link|ly|biz|cc|tk|ml|ga|cf|gq|icu|vip|buzz|cn|ru|store|website|space|fun|click|page|co\.in|org\.in|net\.in)\b(?:/[^\s"'<>]*)?'''): '[link]',
+    // Phone numbers written with spaces/dashes: 8+ digits with separators in between.
+    RegExp(r'\+?\d(?:[ \-().]{0,2}\d){7,}'): '[number]',
+    RegExp(r'\d{6,}'): '[number]',
+  };
+
+  /// Removes links, e-mail addresses, phone-like numbers and runs of 6+ digits.
+  static String _redact(Object? s) {
+    var out = s is String ? s : '';
+    try {
+      _crashPatterns.forEach((re, rep) => out = out.replaceAll(re, rep));
+      return out;
+    } catch (_) {
+      return out.replaceAll(RegExp(r'[0-9]'), '#');
+    }
+  }
+
+  static String _capChars(String s, int max) {
+    if (s.length <= max) return s;
+    var end = max;
+    final c = s.codeUnitAt(end - 1);
+    if (c >= 0xD800 && c <= 0xDBFF) end--; // don't split an emoji
+    return s.substring(0, end);
+  }
+
+  static void _logCrash(Map<String, dynamic> a) {
+    try {
+      final entry = <String, Object?>{
+        'at': DateTime.now().millisecondsSinceEpoch,
+        'source': a['source'] == 'dart' ? 'dart' : 'native',
+        'message': _capChars(_redact(_cap(a['message'] is String ? a['message'] : '', _crashMessage * 8)), _crashMessage),
+        'stack': _capChars(_redact(_cap(a['stack'] is String ? a['stack'] : '', _crashStack * 4)), _crashStack),
+        'app': '1.6.0',
+        'os': 'Web',
+        'device': 'browser',
+      };
+      final list = _list(_crashKey)..insert(0, entry);
+      _set(_crashKey, jsonEncode(list.take(_crashMax).toList()));
+    } catch (_) {
+      // the crash log must never fail itself
+    }
+  }
+
+  static String _crashReport(List<Map<String, dynamic>> entries) {
+    final b = StringBuffer()
+      ..writeln('Second Look crash report')
+      ..writeln('App 1.6.0 | Web | browser')
+      ..writeln('Entries: ${entries.length} (newest first)')
+      ..writeln('This report contains no messages, numbers or links.');
+    var i = 0;
+    for (final e in entries) {
+      i++;
+      final at = e['at'];
+      final when = at is num ? '${DateTime.fromMillisecondsSinceEpoch(at.toInt(), isUtc: true).toIso8601String()} UTC' : '?';
+      b
+        ..writeln()
+        ..writeln('#$i | $when | ${_redact(e['source'])} | app ${_redact(e['app'])} | ${_redact(e['os'])} | ${_redact(e['device'])}')
+        ..writeln(_capChars(_redact(e['message']), _crashMessage));
+      final st = _capChars(_redact(e['stack']), _crashStack);
+      if (st.isNotEmpty) b.writeln(st);
+    }
+    return b.toString();
+  }
+
+  /// "Share" on the web = copy the report to the clipboard. false if empty or the browser refused.
+  static Future<bool> _shareCrashLog() async {
+    try {
+      final entries = _list(_crashKey);
+      final clip = _navigator?.clipboard;
+      if (entries.isEmpty || clip == null) return false;
+      await clip.writeText(_crashReport(entries).toJS).toDart;
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
 
   static String _langCode(Object? lang) => lang == 'hi' || lang == 'kn' ? lang as String : 'en';
 
@@ -502,6 +599,13 @@ class WebBridge {
         return null; // nothing is kept in the browser
       case 'setPref':
         if (!_prefKeys.contains(a['key'])) throw PlatformException(code: 'blocked', message: 'Unknown setting');
+        // Lite mode: 'auto' (or '' = auto), 'on', 'off'.
+        if (a['key'] == 'lite_mode' && !const ['', 'auto', 'on', 'off'].contains(a['value'] ?? '')) {
+          throw PlatformException(code: 'blocked', message: 'Use auto, on or off');
+        }
+        if ((a['key'] == 'checks_done' || a['key'] == 'last_ad_at') && !RegExp(r'^[0-9]{0,20}$').hasMatch('${a['value'] ?? ''}')) {
+          throw PlatformException(code: 'blocked', message: 'Use a number');
+        }
         _set('pref_${a['key']}', _cap(a['value'], a['key'] == 'voice_name' ? 300 : 40));
         return _status();
       case 'setCommunityList':
@@ -546,6 +650,27 @@ class WebBridge {
       case 'clearHistory':
         _remove('history');
         return null;
+      case 'deleteHistory':
+        final raw = a['ids'];
+        final ids = <String>{if (raw is List) for (final x in raw) if (x is String && x.isNotEmpty) x};
+        final h = _list('history');
+        final before = h.length;
+        if (ids.isNotEmpty) h.removeWhere((e) => ids.contains(e['id']));
+        final deleted = before - h.length;
+        if (deleted > 0) _set('history', jsonEncode(h));
+        return jsonEncode({'deleted': deleted});
+
+      // ---- v1.6: private crash log (this browser only) ----
+      case 'logCrash':
+        _logCrash(a);
+        return null;
+      case 'crashLog':
+        return jsonEncode(_list(_crashKey));
+      case 'clearCrashLog':
+        _remove(_crashKey);
+        return null;
+      case 'shareCrashLog':
+        return _shareCrashLog();
       case 'reports':
         return jsonEncode(_list('reports'));
       case 'report':
@@ -570,7 +695,7 @@ class WebBridge {
         _set('reports', jsonEncode(_list('reports')..removeWhere((r) => r['number'] == a['number'])));
         return null;
       case 'deleteAllData':
-        for (final k in ['history', 'reports', 'number_actions', 'trusted_name', 'trusted_number', 'install_id']) {
+        for (final k in ['history', 'reports', 'number_actions', 'trusted_name', 'trusted_number', 'install_id', _crashKey, 'pref_checks_done', 'pref_last_ad_at']) {
           _remove(k);
         }
         return null;

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../i18n/i18n.dart';
 import '../legal/legal.dart';
+import '../perf.dart';
 import '../theme.dart';
 import '../widgets/common.dart';
 
@@ -160,23 +161,21 @@ class _Page extends StatelessWidget {
 // Illustrations: simple shapes drawn in Flutter, gently looping. They hold still when animations are turned off.
 
 /// Loops a 0..1 value for an illustration; stays at [still] when the phone asks for reduced motion.
-abstract class _ArtState<T extends StatefulWidget> extends State<T> with SingleTickerProviderStateMixin<T> {
+abstract class _ArtState<T extends StatefulWidget> extends State<T> with SingleTickerProviderStateMixin<T>, LoopMotion<T> {
   late final AnimationController c = AnimationController(vsync: this, duration: period);
   Duration get period => const Duration(milliseconds: 2600);
   double get still => 0.6;
-  bool _set = false;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final noMotion = MediaQuery.of(context).disableAnimations;
-    if (noMotion) {
+  void applyMotion({required bool still, required bool run}) {
+    if (still) {
       c.stop();
-      c.value = still;
-    } else if (!_set || !c.isAnimating) {
-      c.repeat();
+      c.value = this.still;
+    } else if (run) {
+      if (!c.isAnimating) c.repeat();
+    } else {
+      c.stop();
     }
-    _set = true;
   }
 
   @override

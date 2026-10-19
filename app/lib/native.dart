@@ -134,7 +134,9 @@ class Native {
   }
 
   /// Small preferences kept on the device: language, voice ('on'|'off', missing = off), voice_name, community_off,
-  /// community_sync, log_all ('on'|'off', default on), call_popup ('on'|'off', default on), sms_popup ('on'|'off', default on).
+  /// community_sync, log_all ('on'|'off', default on), call_popup ('on'|'off', default on), sms_popup ('on'|'off', default on),
+  /// lite_mode ('auto'|'on'|'off', default auto), checks_done and last_ad_at (digits only; the ad rules in
+  /// monetize/ad_rules.dart).
   Future<Map<String, dynamic>> setPref(String key, String value) => _json('setPref', {'key': key, 'value': value});
 
   /// Like [setPref], but never throws (for example when an older build doesn't know the key). Null if not saved.
@@ -213,6 +215,18 @@ class Native {
   // ---- history & personal block list (stored only on this phone) ----
   Future<List<Map<String, dynamic>>> history() => _list('history');
   Future<void> clearHistory() => _call('clearHistory');
+
+  /// Removes only these alerts (by id) from this phone. Returns how many were deleted, or -1 if it failed.
+  Future<int> deleteHistory(List<String> ids) async {
+    if (ids.isEmpty) return 0;
+    try {
+      final m = _asMap(await _call<Object>('deleteHistory', {'ids': ids}));
+      final d = m?['deleted'];
+      return d is num ? d.toInt() : int.tryParse('$d') ?? 0;
+    } catch (_) {
+      return -1;
+    }
+  }
   Future<List<Map<String, dynamic>>> reports() => _list('reports');
   Future<void> report(String number, String type, String label, String kind) =>
       _call('report', {'number': number, 'type': type, 'label': label, 'kind': kind});
@@ -244,6 +258,68 @@ class Native {
     }
   }
 
+  // ---- private crash log (kept only on this phone; sent only if the user taps Send) ----
+  bool _loggingCrash = false;
+
+  /// Saves an error report on the device ('dart' | 'native'). Never throws, never re-enters itself.
+  Future<void> logCrash({required String source, required String message, String stack = ''}) async {
+    if (_loggingCrash) return;
+    _loggingCrash = true;
+    try {
+      final msg = message.length > 500 ? message.substring(0, 500) : message;
+      final st = stack.length > 6000 ? stack.substring(0, 6000) : stack;
+      await _call<Object>('logCrash', {'source': source, 'message': msg, 'stack': st});
+    } catch (_) {
+      // Nothing more to do: the crash log must never cause another error.
+    } finally {
+      _loggingCrash = false;
+    }
+  }
+
+  /// Saved error reports, newest first: [{at, source, message, stack, app, os, device}].
+  Future<List<Map<String, dynamic>>> crashLog() async {
+    try {
+      return _asList(await _call<Object>('crashLog'));
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Future<bool> clearCrashLog() async {
+    try {
+      await _call<Object>('clearCrashLog');
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Opens the share sheet with a plain-text report (on a laptop: copies it). True if it opened.
+  Future<bool> shareCrashLog() async {
+    try {
+      return (await _call<Object>('shareCrashLog')) == true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  // ---- device & battery saver look ----
+
+  /// Saves the battery saver look: 'auto' | 'on' | 'off'. Null if not saved.
+  Future<Map<String, dynamic>?> setLiteMode(String mode) => trySetPref('lite_mode', mode);
+
+  /// The saved battery saver choice from a status map: 'auto' | 'on' | 'off'.
+  static String liteModeOf(Map<String, dynamic>? status) {
+    final v = '${(status?['prefs'] as Map?)?['lite_mode'] ?? ''}';
+    return v == 'on' || v == 'off' ? v : 'auto';
+  }
+
+  /// status.device: {lowRam:bool, ramMb:int, sdk:int}. Null on a laptop or older builds.
+  static Map<String, dynamic>? deviceOf(Map<String, dynamic>? status) {
+    final d = status?['device'];
+    return d is Map ? d.cast<String, dynamic>() : null;
+  }
+
   // ---- security ----
   Future<Map<String, dynamic>> securityStatus() => _json('securityStatus');
   Future<Map<String, dynamic>> setScreenProtection(bool on) => _json('setScreenProtection', {'on': on});
@@ -260,7 +336,7 @@ class Native {
 
   Future<bool> authenticate() async => (await _call<bool>('authenticate')) ?? false;
 
-  /// Random id for this install (no personal data). Used only for the deep-check quota and Plus.
+  /// Random id for this install (no personal data). Used only for the deep-check quota and community reports.
   Future<String> installId() async => (await _call<String>('installId')) ?? '';
 
   // ---- actions ----

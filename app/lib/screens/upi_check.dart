@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 
 import '../checks/picker.dart';
 import '../i18n/i18n.dart';
+import '../monetize/monetize.dart';
 import '../native.dart';
 import '../theme.dart';
 import '../widgets/common.dart';
@@ -22,6 +23,17 @@ class _UpiCheckScreenState extends State<UpiCheckScreen> {
   String? decoded, note; // note is English; shown with tr() so it follows the language
   bool busy = false;
 
+  /// This visit counts as one manual check (however often it's re-run); any ad comes after the user leaves.
+  AdTicket? _ad;
+  void _counted(Map<String, dynamic> r) {
+    final t = _ad;
+    if (t == null) {
+      _ad = AdRules.manualCheck(r);
+    } else {
+      AdRules.update(t, r);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -31,6 +43,7 @@ class _UpiCheckScreenState extends State<UpiCheckScreen> {
   @override
   void dispose() {
     input.dispose();
+    AdRules.leaving(_ad);
     super.dispose();
   }
 
@@ -46,7 +59,10 @@ class _UpiCheckScreenState extends State<UpiCheckScreen> {
       // upi:// links and name@bank go to the UPI check; anything else (a web link in a QR code) to the normal check.
       final isUpi = RegExp(r'^upi:', caseSensitive: false).hasMatch(v) || RegExp(r'^[a-zA-Z0-9._-]{2,64}@[a-zA-Z][a-zA-Z0-9]{1,30}$').hasMatch(v);
       final r = isUpi ? await Native.instance.analyzeUpi(v) : await Native.instance.analyze(v);
-      if (mounted) setState(() => result = r);
+      if (mounted) {
+        setState(() => result = r);
+        _counted(r);
+      }
     } on PlatformException catch (e) {
       if (mounted) setState(() => note = e.message ?? 'The check failed.');
     } finally {

@@ -1,0 +1,63 @@
+// kn translations (part g: v1.6 — battery saver look, crash reports, alerts grouped by sender, select & delete).
+// Keys are the exact English strings passed to tr().
+const stringsKnG = <String, String>{
+  // Appearance / battery saver look
+  'Appearance': 'ನೋಟ',
+  'Battery saver look': 'ಬ್ಯಾಟರಿ ಉಳಿತಾಯ ನೋಟ',
+  'Fewer animations. Saves battery and keeps older phones smooth.': 'ಕಡಿಮೆ ಅನಿಮೇಶನ್. ಬ್ಯಾಟರಿ ಉಳಿಯುತ್ತದೆ ಮತ್ತು ಹಳೆಯ ಫೋನ್‌ಗಳೂ ಸುಗಮವಾಗಿ ನಡೆಯುತ್ತವೆ.',
+  'Auto': 'ಸ್ವಯಂ',
+  'On': 'ಆನ್',
+  'Off': 'ಆಫ್',
+  'Auto: off on this phone.': 'ಸ್ವಯಂ: ಈ ಫೋನ್‌ನಲ್ಲಿ ಆಫ್ ಆಗಿದೆ.',
+  'Auto: on, because this phone has less memory.': 'ಸ್ವಯಂ: ಆನ್ ಆಗಿದೆ, ಏಕೆಂದರೆ ಈ ಫೋನ್‌ನಲ್ಲಿ ಮೆಮೊರಿ ಕಡಿಮೆ ಇದೆ.',
+  'Auto: on, because your phone asks for less motion.': 'ಸ್ವಯಂ: ಆನ್ ಆಗಿದೆ, ಏಕೆಂದರೆ ನಿಮ್ಮ ಫೋನ್‌ನಲ್ಲಿ ಕಡಿಮೆ ಅನಿಮೇಶನ್ ಸೆಟ್ಟಿಂಗ್ ಇದೆ.',
+  'On: animations are switched off.': 'ಆನ್: ಅನಿಮೇಶನ್‌ಗಳು ಆಫ್ ಆಗಿವೆ.',
+  'Off: full animations.': 'ಆಫ್: ಪೂರ್ಣ ಅನಿಮೇಶನ್‌ಗಳು.',
+  // Privacy
+  'Choose what to delete': 'ಏನನ್ನು ಅಳಿಸಬೇಕು ಎಂದು ಆಯ್ಕೆಮಾಡಿ',
+  // Crash reports
+  'Crash reports': 'ಕ್ರ್ಯಾಶ್ ವರದಿಗಳು',
+  'Saved only on this phone. Nothing is sent unless you tap Send.': 'ಈ ಫೋನ್‌ನಲ್ಲಿ ಮಾತ್ರ ಉಳಿಸಲಾಗಿದೆ. ನೀವು ಕಳುಹಿಸಿ ಟ್ಯಾಪ್ ಮಾಡದ ಹೊರತು ಏನನ್ನೂ ಕಳುಹಿಸಲಾಗುವುದಿಲ್ಲ.',
+  'Couldn\'t open sharing. Please try again.': 'ಹಂಚಿಕೆ ತೆರೆಯಲಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.',
+  'Report copied. Paste it in an email to us.': 'ವರದಿ ನಕಲಾಗಿದೆ. ಅದನ್ನು ಇಮೇಲ್‌ನಲ್ಲಿ ಅಂಟಿಸಿ ನಮಗೆ ಕಳುಹಿಸಿ.',
+  'Clear crash reports?': 'ಕ್ರ್ಯಾಶ್ ವರದಿಗಳನ್ನು ತೆಗೆದುಹಾಕಬೇಕೆ?',
+  'This removes the saved crash reports from this phone.': 'ಇದು ಈ ಫೋನ್‌ನಲ್ಲಿ ಉಳಿಸಿದ ಕ್ರ್ಯಾಶ್ ವರದಿಗಳನ್ನು ತೆಗೆದುಹಾಕುತ್ತದೆ.',
+  'Clear': 'ತೆಗೆದುಹಾಕಿ',
+  'When the app runs into a problem, a short technical note is kept here to help us fix it. Long numbers and links are removed from it.':
+      'ಆ್ಯಪ್‌ನಲ್ಲಿ ಸಮಸ್ಯೆ ಬಂದಾಗ, ಅದನ್ನು ಸರಿಪಡಿಸಲು ನಮಗೆ ನೆರವಾಗುವ ಚಿಕ್ಕ ತಾಂತ್ರಿಕ ಟಿಪ್ಪಣಿಯನ್ನು ಇಲ್ಲಿ ಇಡಲಾಗುತ್ತದೆ. ಅದರಿಂದ ಉದ್ದದ ಸಂಖ್ಯೆಗಳು ಮತ್ತು ಲಿಂಕ್‌ಗಳನ್ನು ತೆಗೆದುಹಾಕಲಾಗುತ್ತದೆ.',
+  'No crash reports. Everything has been running fine.': 'ಯಾವುದೇ ಕ್ರ್ಯಾಶ್ ವರದಿಗಳಿಲ್ಲ. ಎಲ್ಲವೂ ಸರಿಯಾಗಿ ನಡೆಯುತ್ತಿದೆ.',
+  'Send report': 'ವರದಿ ಕಳುಹಿಸಿ',
+  'Send opens your phone\'s share options, so you choose where it goes.': 'ಕಳುಹಿಸಿ ಒತ್ತಿದಾಗ ಫೋನ್‌ನ ಹಂಚಿಕೆ ಆಯ್ಕೆಗಳು ತೆರೆಯುತ್ತವೆ, ಅದು ಎಲ್ಲಿಗೆ ಹೋಗಬೇಕು ಎಂದು ನೀವೇ ಆಯ್ಕೆಮಾಡಿ.',
+  '{n} saved': '{n} ಉಳಿಸಲಾಗಿದೆ',
+  'App (system part)': 'ಆ್ಯಪ್ (ಸಿಸ್ಟಮ್ ಭಾಗ)',
+  'App': 'ಆ್ಯಪ್',
+  'Unknown error': 'ಅಪರಿಚಿತ ದೋಷ',
+  // Alerts: grouped by sender, select & delete
+  'Select': 'ಆಯ್ಕೆಮಾಡಿ',
+  'Select all': 'ಎಲ್ಲವನ್ನೂ ಆಯ್ಕೆಮಾಡಿ',
+  'Select none': 'ಯಾವುದೂ ಬೇಡ',
+  '{n} selected': '{n} ಆಯ್ಕೆಯಾಗಿದೆ',
+  'Delete all': 'ಎಲ್ಲವನ್ನೂ ಅಳಿಸಿ',
+  'Select messages': 'ಸಂದೇಶಗಳನ್ನು ಆಯ್ಕೆಮಾಡಿ',
+  'Delete conversation': 'ಸಂಭಾಷಣೆ ಅಳಿಸಿ',
+  'Delete this conversation?': 'ಈ ಸಂಭಾಷಣೆಯನ್ನು ಅಳಿಸಬೇಕೆ?',
+  'This removes every SMS and call from this sender from this phone. Numbers you marked stay marked.':
+      'ಇದು ಈ ಕಳುಹಿಸುವವರ ಎಲ್ಲಾ SMS ಮತ್ತು ಕರೆಗಳನ್ನು ಈ ಫೋನ್‌ನಿಂದ ತೆಗೆದುಹಾಕುತ್ತದೆ. ನೀವು ಗುರುತಿಸಿದ ಸಂಖ್ಯೆಗಳು ಗುರುತಿಸಿದಂತೆಯೇ ಇರುತ್ತವೆ.',
+  'Delete 1 conversation?': '1 ಸಂಭಾಷಣೆ ಅಳಿಸಬೇಕೆ?',
+  'Delete {n} conversations?': '{n} ಸಂಭಾಷಣೆಗಳನ್ನು ಅಳಿಸಬೇಕೆ?',
+  'Delete 1 item?': '1 ಐಟಂ ಅಳಿಸಬೇಕೆ?',
+  'Delete {n} items?': '{n} ಐಟಂಗಳನ್ನು ಅಳಿಸಬೇಕೆ?',
+  'This removes the selected SMS and calls from this phone. Numbers you marked stay marked.':
+      'ಇದು ಆಯ್ಕೆಮಾಡಿದ SMS ಮತ್ತು ಕರೆಗಳನ್ನು ಈ ಫೋನ್‌ನಿಂದ ತೆಗೆದುಹಾಕುತ್ತದೆ. ನೀವು ಗುರುತಿಸಿದ ಸಂಖ್ಯೆಗಳು ಗುರುತಿಸಿದಂತೆಯೇ ಇರುತ್ತವೆ.',
+  'Couldn\'t delete. Please try again.': 'ಅಳಿಸಲಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.',
+  'Deleted.': 'ಅಳಿಸಲಾಗಿದೆ.',
+  'Tap conversations to choose them, then tap Delete.': 'ಸಂಭಾಷಣೆಗಳನ್ನು ಟ್ಯಾಪ್ ಮಾಡಿ ಆಯ್ಕೆಮಾಡಿ, ನಂತರ ಅಳಿಸಿ ಟ್ಯಾಪ್ ಮಾಡಿ.',
+  '1 looks like a scam': '1 ವಂಚನೆಯಂತೆ ಕಾಣುತ್ತದೆ',
+  '{n} look like scams': '{n} ವಂಚನೆಗಳಂತೆ ಕಾಣುತ್ತವೆ',
+  '1 looks suspicious': '1 ಅನುಮಾನಾಸ್ಪದವಾಗಿ ಕಾಣುತ್ತದೆ',
+  '{n} look suspicious': '{n} ಅನುಮಾನಾಸ್ಪದವಾಗಿ ಕಾಣುತ್ತವೆ',
+  'All look normal': 'ಎಲ್ಲವೂ ಸಾಮಾನ್ಯವಾಗಿ ಕಾಣುತ್ತವೆ',
+  'Today': 'ಇಂದು',
+  'Yesterday': 'ನಿನ್ನೆ',
+  'Incoming call': 'ಒಳಬರುವ ಕರೆ',
+};

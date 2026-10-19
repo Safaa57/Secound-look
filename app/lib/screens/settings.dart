@@ -6,7 +6,10 @@ import '../i18n/i18n.dart';
 import '../i18n/reasons.dart';
 import '../native.dart';
 import '../legal/legal.dart';
-import 'plus.dart';
+import '../monetize/monetize.dart';
+import '../perf.dart';
+import 'alerts.dart';
+import 'crash_log.dart';
 import 'shield_health.dart';
 import '../theme.dart';
 import '../voice.dart';
@@ -89,6 +92,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final sc = await Native.instance.securityStatus();
     final hh = await Native.instance.shieldHealth();
     if (!mounted) return;
+    Perf.update(st);
     setState(() {
       s = st;
       sec = sc;
@@ -299,25 +303,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ]),
         ),
-        if (Cloud.configured) ...[
-          const SizedBox(height: 10),
-          Panel(
-            onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PlusScreen())),
-            color: SL.amber.withAlpha(16),
-            borderColor: SL.amber.withAlpha(60),
-            child: Row(children: [
-              const Icon(Icons.workspace_premium_rounded, color: SL.amber, size: 30),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  const Text('Second Look Plus', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
-                  Text(tr('Unlimited deep checks, no ads, more devices'), style: TextStyle(color: cs.onSurface.withAlpha(170))),
-                ]),
-              ),
-              Icon(Icons.chevron_right_rounded, color: cs.onSurface.withAlpha(120)),
-            ]),
-          ),
-        ],
+        // ---- appearance
+        SectionLabel(tr('Appearance'), icon: Icons.palette_outlined),
+        _LitePanel(status: s, onSaved: (st) => setState(() => s = st)),
         if (Cloud.configured) ...[
           SectionLabel(tr('Community protection'), icon: Icons.groups_rounded),
           Panel(
@@ -451,8 +439,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _Promise(Icons.contacts_rounded, tr('Your contacts stay yours'), tr('Second Look never reads or uploads your address book, so it never builds a names database about you or your friends.')),
             _Promise(Icons.toggle_on_rounded, tr('You decide'), tr('Each shield is off until you switch it on, and you can switch it off at any time.')),
             _Promise(Icons.delete_outline_rounded, tr('Delete everything'), tr('One tap removes alerts, marked numbers and settings.')),
+            if (Monetize.adsSupported)
+              _Promise(Icons.campaign_outlined, tr('Ads never see your data'),
+                  tr('Second Look is free because of ads from Google AdMob. Ads never see your SMS, calls, documents or what you check.')),
           ]),
         ),
+        if (Monetize.adsSupported) ...[
+          const SizedBox(height: 10),
+          Panel(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: ListTile(
+              leading: const Icon(Icons.tune_rounded, color: SL.accent),
+              title: Text(tr('Ad choices')),
+              subtitle: Text(tr('Your consent for ads from Google AdMob')),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: () => _adChoices(context),
+            ),
+          ),
+        ],
         const SizedBox(height: 12),
         OutlinedButton.icon(
           style: OutlinedButton.styleFrom(foregroundColor: SL.fg(context, 'danger'), side: BorderSide(color: SL.fg(context, 'danger').withAlpha(110))),
@@ -465,7 +469,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   tr('This removes your alerts, marked numbers, trusted person and settings from {place}.', {'place': here}),
                   if (Cloud.configured) tr('It also deletes your deep-check data on our server.'),
                   if (!web) tr('Shields will be switched off.'),
-                  if (Cloud.configured) tr('If you have Plus, you can get it back later with "Restore purchases".'),
                 ].join(' ')),
                 actions: [
                   TextButton(onPressed: () => Navigator.pop(c, false), child: Text(tr('Cancel'))),
@@ -484,12 +487,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
               }
               await Native.instance.deleteAllData();
               Cloud.instance.reset();
+              AdRules.reset();
               if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${tr('Your data was deleted.')}$serverNote')));
               load();
             }
           },
           icon: const Icon(Icons.delete_forever_rounded),
           label: Text(tr('Delete all my data')),
+        ),
+        const SizedBox(height: 10),
+        OutlinedButton.icon(
+          onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AlertsScreen(asPage: true, startSelecting: true))),
+          icon: const Icon(Icons.checklist_rounded),
+          label: Text(tr('Choose what to delete')),
+        ),
+        const SizedBox(height: 10),
+        Panel(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: ListTile(
+            leading: const Icon(Icons.bug_report_outlined, color: SL.accent),
+            title: Text(tr('Crash reports')),
+            subtitle: Text(tr('Saved only on this phone. Nothing is sent unless you tap Send.')),
+            trailing: const Icon(Icons.chevron_right_rounded),
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CrashLogScreen())),
+          ),
         ),
         // ---- legal & about
         SectionLabel(tr('Legal'), icon: Icons.gavel_rounded),
@@ -534,7 +555,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(tr('Results are automated opinions, not guarantees.'), style: const TextStyle(fontWeight: FontWeight.w600)),
             const SizedBox(height: 4),
-            Text('Version 1.5', style: TextStyle(color: cs.onSurface.withAlpha(170), fontSize: 13)),
+            Text('Version 1.7', style: TextStyle(color: cs.onSurface.withAlpha(170), fontSize: 13)),
             LearnMore(
               child: Text(
                 [
@@ -550,6 +571,74 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ]),
     );
   }
+}
+
+/// "Battery saver look": Auto / On / Off. Auto turns it on for low-memory phones and when the phone asks for
+/// reduced motion.
+class _LitePanel extends StatelessWidget {
+  const _LitePanel({required this.status, required this.onSaved});
+  final Map<String, dynamic> status;
+  final ValueChanged<Map<String, dynamic>> onSaved;
+
+  @override
+  Widget build(BuildContext context) => ValueListenableBuilder<bool>(
+        valueListenable: Perf.lite,
+        builder: (context, lite, _) {
+          final mode = Perf.mode; // kept in step with the saved pref (read at start and on every change)
+          final String note;
+          if (mode == 'auto') {
+            if (!lite) {
+              note = tr('Auto: off on this phone.');
+            } else if (Perf.weakDevice) {
+              note = tr('Auto: on, because this phone has less memory.');
+            } else {
+              note = tr('Auto: on, because your phone asks for less motion.');
+            }
+          } else {
+            note = lite ? tr('On: animations are switched off.') : tr('Off: full animations.');
+          }
+          return Panel(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(children: [
+                const IconTile(Icons.battery_saver_rounded, color: SL.accent, size: 40),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(tr('Battery saver look'), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15.5)),
+                    const SizedBox(height: 2),
+                    Text(tr('Fewer animations. Saves battery and keeps older phones smooth.'),
+                        style: const TextStyle(fontSize: 13, color: SL.textSecondary, height: 1.35)),
+                  ]),
+                ),
+              ]),
+              const SizedBox(height: 14),
+              SizedBox(
+                width: double.infinity,
+                child: SegmentedButton<String>(
+                  showSelectedIcon: false,
+                  segments: [
+                    ButtonSegment(value: 'auto', label: Text(tr('Auto'))),
+                    ButtonSegment(value: 'on', label: Text(tr('On'))),
+                    ButtonSegment(value: 'off', label: Text(tr('Off'))),
+                  ],
+                  selected: {mode},
+                  onSelectionChanged: (v) async {
+                    final st = await Perf.setMode(v.first);
+                    if (!context.mounted) return;
+                    if (st != null) {
+                      onSaved(st);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr('Couldn\'t save. Please try again.'))));
+                    }
+                  },
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(note, style: const TextStyle(fontSize: 12.5, color: SL.textMuted)),
+            ]),
+          );
+        },
+      );
 }
 
 /// The label of a number the user marked (Block / Spam / Fraud / Safe, or an older report type).
@@ -619,6 +708,35 @@ class _PromiseState extends State<_Promise> {
       );
 }
 
+/// Me → Privacy → Ad choices: Google's privacy options form where the law requires a choice, otherwise a short
+/// explanation.
+Future<void> _adChoices(BuildContext context) async {
+  final needed = await Monetize.privacyOptionsRequired();
+  if (!context.mounted) return;
+  void failed() => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr('Couldn\'t open ad choices. Check your internet and try again.'))));
+  if (needed == null) {
+    failed();
+    return;
+  }
+  if (needed) {
+    final shown = await Monetize.showPrivacyOptions();
+    if (!shown && context.mounted) failed();
+    return;
+  }
+  await showDialog<void>(
+    context: context,
+    builder: (c) => AlertDialog(
+      title: Text(tr('Ad choices')),
+      content: Text([
+        tr('Second Look is free because of ads shown by Google AdMob. They never interrupt SMS or call warnings.'),
+        tr('Where you live, no separate ad consent is needed. Google may use your advertising ID and device information to show and measure ads.'),
+        tr('You can reset or delete your advertising ID in your phone\'s settings. Ads never see your SMS, calls, documents or what you check.'),
+      ].join('\n\n')),
+      actions: [TextButton(onPressed: () => Navigator.pop(c), child: Text(tr('OK')))],
+    ),
+  );
+}
+
 Future<void> _showServerData(BuildContext context) async {
   Map<String, dynamic>? d;
   String? err;
@@ -639,12 +757,8 @@ Future<void> _showServerData(BuildContext context) async {
       : [
           [tr('Random install ID'), '${d['installId']}'],
           [tr('First seen'), when(d['created'])],
-          [tr('Plus until'), when(d['plusUntil'])],
           [tr('Extra checks from ads'), '${d['adCredits']}'],
-          [tr('Linked to another device'), d['linkedToAnotherDevice'] == true ? tr('Yes') : tr('No')],
-          [tr('Devices linked to this one'), '${d['devicesLinkedToThis']}'],
           [tr('Deep checks used'), ((d['deepChecksPerDay'] as List?) ?? []).map((e) => '${(e as Map)['day']}: ${e['count']}').join(', ').ifEmpty(tr('none'))],
-          [tr('Purchases recorded'), '${d['purchasesRecorded']}'],
           [tr('Never stored'), '${d['notStored']}'],
         ];
   await showModalBottomSheet<void>(

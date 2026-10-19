@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'i18n/i18n.dart';
 import 'native.dart';
 
-/// Talks to the Second Look cloud service (online deep checks, quota, Plus).
+/// Talks to the Second Look cloud service (online deep checks and their daily quota, community reports).
 /// Sends only links and a random install id: never message text, senders or phone numbers.
 class Cloud {
   Cloud._();
@@ -43,11 +43,6 @@ class Cloud {
   Future<Map<String, dynamic>> deepCheck(List<String> urls) async =>
       _post('/v1/deep-check', {'install_id': await installId(), 'urls': urls.take(5).toList()});
 
-  Future<Map<String, dynamic>> verifyPlus({required String platform, required String productId, required String token}) async =>
-      _post('/v1/plus/verify', {'install_id': await installId(), 'platform': platform, 'product_id': productId, 'token': token});
-
-  Future<String> linkCode() async => (await _post('/v1/plus/link-code', {'install_id': await installId()}))['code'] as String;
-
   // ---- community reports ----
   Future<Map<String, dynamic>> communityLookup(String number) async =>
       _post('/v1/community/lookup', {'install_id': await installId(), 'number': number});
@@ -77,8 +72,6 @@ class Cloud {
     await _post('/v1/forget', {'install_id': await installId()});
   }
 
-  Future<Map<String, dynamic>> claimLink(String code) async => _post('/v1/plus/link', {'install_id': await installId(), 'code': code});
-
   /// Links found by the on-device check, for an optional online deep check.
   static List<String> linksIn(Map<String, dynamic> result) {
     final info = (result['info'] as Map?) ?? {};
@@ -93,7 +86,8 @@ class CloudError implements Exception {
   final int status;
   final dynamic detail;
 
-  bool get needsAdOrPlus => status == 402 && detail is Map && detail['need'] == 'ad_or_plus';
+  /// Today's free deep checks are used up; a rewarded ad adds one. (Older servers say 'ad_or_plus'.)
+  bool get needsAd => status == 402 && detail is Map && (detail['need'] == 'ad' || detail['need'] == 'ad_or_plus');
 
   String get message {
     if (detail is String) return detail as String;

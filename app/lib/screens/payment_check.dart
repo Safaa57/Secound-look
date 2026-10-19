@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 
 import '../checks/picker.dart';
 import '../i18n/i18n.dart';
+import '../monetize/monetize.dart';
 import '../native.dart';
 import '../theme.dart';
 import '../widgets/common.dart';
@@ -34,6 +35,17 @@ class _PaymentCheckScreenState extends State<PaymentCheckScreen> {
   bool busy = false;
   String? note; // English; shown with tr() so it follows the language
 
+  /// This visit counts as one manual check (however often it's re-run); any ad comes after the user leaves.
+  AdTicket? _ad;
+  void _counted(Map<String, dynamic> r) {
+    final t = _ad;
+    if (t == null) {
+      _ad = AdRules.manualCheck(r);
+    } else {
+      AdRules.update(t, r);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -49,6 +61,7 @@ class _PaymentCheckScreenState extends State<PaymentCheckScreen> {
     words.dispose();
     expected.dispose();
     myUpi.dispose();
+    AdRules.leaving(_ad);
     super.dispose();
   }
 
@@ -105,7 +118,10 @@ class _PaymentCheckScreenState extends State<PaymentCheckScreen> {
         myUpi: myUpi.text.trim().isEmpty ? null : myUpi.text.trim(),
         imageEditor: image?.editor,
       );
-      if (mounted) setState(() => result = r);
+      if (mounted) {
+        setState(() => result = r);
+        _counted(r);
+      }
     } on PlatformException catch (e) {
       if (mounted) setState(() => note = e.message ?? 'The check failed.');
     } finally {

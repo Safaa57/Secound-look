@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../i18n/i18n.dart';
+import '../perf.dart';
 import '../theme.dart';
 
 /// Short intro shown on every launch (about 1.4 s): the shield draws in with a soft glow, a lock closes,
@@ -31,17 +32,45 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   static const _glow = SL.accent;
   static const _tick = SL.safeD;
 
+  /// Battery saver look: the finished frame fades in quickly, then the app opens (under 400 ms in all).
+  bool _lite = false;
+  bool _fade = false;
+
+  @override
+  void initState() {
+    super.initState();
+    Perf.lite.addListener(_onLite);
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (_started) return;
     _started = true;
-    if (MediaQuery.of(context).disableAnimations) {
+    if (Perf.lite.value) {
+      _fade = true;
+      _goLite();
+    } else if (MediaQuery.of(context).disableAnimations) {
       c.value = 1;
       _still = Timer(const Duration(milliseconds: 700), _finish);
     } else {
       c.forward().whenComplete(_finish);
     }
+  }
+
+  // The saved choice or the phone's memory may only be known after the intro started.
+  void _onLite() {
+    if (!Perf.lite.value || _lite || _done || !mounted) return;
+    _goLite();
+    setState(() {});
+  }
+
+  void _goLite() {
+    _lite = true;
+    c.stop();
+    c.value = 1;
+    _still?.cancel();
+    _still = Timer(const Duration(milliseconds: 320), _finish);
   }
 
   void _finish() {
@@ -52,6 +81,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
   @override
   void dispose() {
+    Perf.lite.removeListener(_onLite);
     _still?.cancel();
     c.dispose();
     super.dispose();
@@ -73,12 +103,6 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    final web = widget.status?['platform'] == 'web';
-    final rows = [
-      web ? tr('Checks run in this browser') : tr('Checks run on this phone'),
-      tr('Your data is encrypted'),
-      _shieldsLine(),
-    ];
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: _finish,
@@ -96,42 +120,60 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
               ),
             ),
             child: SafeArea(
-              child: AnimatedBuilder(
-                animation: c,
-                builder: (context, _) {
-                  final draw = _seg(0.0, 0.42);
-                  final fill = _seg(0.28, 0.55);
-                  final lock = _seg(0.42, 0.62, Curves.easeOutBack);
-                  final title = _seg(0.40, 0.62);
-                  return Center(
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
-                      child: Column(mainAxisSize: MainAxisSize.min, children: [
-                        SizedBox(
-                          width: 150,
-                          height: 168,
-                          child: CustomPaint(painter: _ShieldPainter(draw: draw, fill: fill, lock: lock, glow: _glow)),
-                        ),
-                        const SizedBox(height: 18),
-                        Opacity(
-                          opacity: title,
-                          child: Transform.translate(
-                            offset: Offset(0, 8 * (1 - title)),
-                            child: Text('Second Look', style: SL.h(30, spacing: 0.3)),
-                          ),
-                        ),
-                        const SizedBox(height: 26),
-                        for (var i = 0; i < rows.length; i++) _row(rows[i], _seg(0.56 + i * 0.12, 0.76 + i * 0.12)),
-                      ]),
-                    ),
-                  );
-                },
-              ),
+              child: _fade ? _fadeIn(_frame()) : _frame(),
             ),
           ),
         ),
       ),
     );
+  }
+
+  /// A quick fade-in for the battery saver look.
+  Widget _fadeIn(Widget child) => TweenAnimationBuilder<double>(
+        tween: Tween<double>(begin: 0, end: 1),
+        duration: const Duration(milliseconds: 200),
+        builder: (context, v, child) => Opacity(opacity: v, child: child),
+        child: child,
+      );
+
+  Widget _frame() {
+    final web = widget.status?['platform'] == 'web';
+    final rows = [
+      web ? tr('Checks run in this browser') : tr('Checks run on this phone'),
+      tr('Your data is encrypted'),
+      _shieldsLine(),
+    ];
+    return AnimatedBuilder(
+      animation: c,
+      builder: (context, _) {
+        final draw = _seg(0.0, 0.42);
+        final fill = _seg(0.28, 0.55);
+        final lock = _seg(0.42, 0.62, Curves.easeOutBack);
+        final title = _seg(0.40, 0.62);
+        return Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              SizedBox(
+                width: 150,
+                height: 168,
+                child: CustomPaint(painter: _ShieldPainter(draw: draw, fill: fill, lock: lock, glow: _glow)),
+              ),
+              const SizedBox(height: 18),
+              Opacity(
+                opacity: title,
+                child: Transform.translate(
+                  offset: Offset(0, 8 * (1 - title)),
+                  child: Text('Second Look', style: SL.h(30, spacing: 0.3)),
+                ),
+              ),
+              const SizedBox(height: 26),
+              for (var i = 0; i < rows.length; i++) _row(rows[i], _seg(0.56 + i * 0.12, 0.76 + i * 0.12)),
+            ]),
+          ),
+        );
+      },
+              );
   }
 
   Widget _row(String text, double t) => Opacity(

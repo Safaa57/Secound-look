@@ -6,7 +6,6 @@ import '../cloud.dart';
 import '../i18n/i18n.dart';
 import '../monetize/monetize.dart';
 import '../native.dart';
-import '../screens/plus.dart';
 import '../theme.dart';
 import 'common.dart';
 
@@ -56,7 +55,7 @@ class _DeepCheckCardState extends State<DeepCheckCard> {
       });
     } on CloudError catch (e) {
       if (!mounted) return;
-      if (e.needsAdOrPlus) {
+      if (e.needsAd) {
         setState(() => quota = (e.detail as Map).cast<String, dynamic>());
         offer = true;
       } else {
@@ -71,6 +70,7 @@ class _DeepCheckCardState extends State<DeepCheckCard> {
     if (offer && mounted) await _offerMore();
   }
 
+  /// Today's 3 free deep checks are used: on a phone, a short ad adds one more. The basic check is always free.
   Future<void> _offerMore() async {
     final choice = await showModalBottomSheet<String>(
       context: context,
@@ -84,29 +84,19 @@ class _DeepCheckCardState extends State<DeepCheckCard> {
             Text(tr('The basic check above is always free and unlimited. Deep checks reset at midnight.'),
                 style: TextStyle(color: Theme.of(c).colorScheme.onSurface.withAlpha(170))),
             const SizedBox(height: 18),
-            if (Monetize.adsSupported) ...[
-              OutlinedButton.icon(
+            if (Monetize.adsSupported)
+              FilledButton.icon(
                 onPressed: () => Navigator.pop(c, 'ad'),
                 icon: const Icon(Icons.play_circle_outline_rounded),
                 label: Text(tr('Watch a short ad for 1 more deep check')),
-              ),
-              const SizedBox(height: 10),
-            ],
-            FilledButton.icon(
-              onPressed: () => Navigator.pop(c, 'plus'),
-              icon: const Icon(Icons.workspace_premium_rounded),
-              label: Text(tr('Get Plus: unlimited, no ads')),
-            ),
+              )
+            else
+              OutlinedButton(onPressed: () => Navigator.pop(c), child: Text(tr('OK'))),
           ]),
         ),
       ),
     );
-    if (!mounted || choice == null) return;
-    if (choice == 'plus') {
-      await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PlusScreen()));
-      await _loadQuota();
-      return;
-    }
+    if (!mounted || choice != 'ad') return;
     // Rewarded ad: the server adds the credit once Google confirms the reward.
     final watched = await Monetize.showRewardedAd(await Cloud.instance.installId());
     if (!mounted) return;
@@ -120,7 +110,7 @@ class _DeepCheckCardState extends State<DeepCheckCard> {
         final q = await Cloud.instance.quota();
         if (!mounted) return;
         setState(() => quota = q);
-        if ((q['credits'] as num? ?? 0) > 0 || q['plus'] == true) {
+        if ((q['credits'] as num? ?? 0) > 0 || (q['freeLeft'] as num? ?? 0) > 0) {
           unawaited(run());
           return;
         }
@@ -132,7 +122,6 @@ class _DeepCheckCardState extends State<DeepCheckCard> {
   String _quotaText() {
     final q = quota;
     if (q == null) return tr('Checks the link against Google Web Risk and known phishing lists.');
-    if (q['plus'] == true) return tr('Plus: unlimited deep checks');
     final free = q['freeLeft'] ?? 0, credits = q['credits'] ?? 0;
     final left = tr('{free} of {total} free left today', {'free': free, 'total': q['freePerDay'] ?? 3});
     return credits is num && credits > 0 ? '$left · ${tr('{n} extra', {'n': credits})}' : left;
@@ -151,7 +140,6 @@ class _DeepCheckCardState extends State<DeepCheckCard> {
             Icon(Icons.travel_explore_rounded, color: cs.primary),
             const SizedBox(width: 10),
             Expanded(child: Text(tr('Deep check online'), style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16))),
-            if (quota?['plus'] == true) Pill('Plus', fg: cs.primary, bg: cs.primary.withAlpha(28), icon: Icons.workspace_premium_rounded),
           ]),
           const SizedBox(height: 4),
           Text(_quotaText(), style: TextStyle(fontSize: 13.5, color: cs.onSurface.withAlpha(160))),

@@ -7,6 +7,7 @@ import '../checks/picker.dart';
 import '../community.dart';
 import '../i18n/i18n.dart';
 import '../native.dart';
+import '../perf.dart';
 import '../theme.dart';
 import '../widgets/common.dart';
 import 'document_check.dart';
@@ -26,7 +27,7 @@ class CheckScreen extends StatefulWidget {
   State<CheckScreen> createState() => _CheckScreenState();
 }
 
-class _CheckScreenState extends State<CheckScreen> with SingleTickerProviderStateMixin {
+class _CheckScreenState extends State<CheckScreen> with SingleTickerProviderStateMixin, LoopMotion<CheckScreen> {
   final text = TextEditingController();
   final sender = TextEditingController();
   Map<String, dynamic> status = {};
@@ -63,14 +64,17 @@ class _CheckScreenState extends State<CheckScreen> with SingleTickerProviderStat
     Native.instance.status().then((s) => mounted ? setState(() => status = s) : null);
   }
 
+  /// The scan line holds still in the middle in the battery saver look or with reduced motion, and pauses while
+  /// the Check tab is hidden or the app is in the background.
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (MediaQuery.of(context).disableAnimations) {
+  void applyMotion({required bool still, required bool run}) {
+    if (still) {
       scan.stop();
-      scan.value = 0.5;
-    } else if (!scan.isAnimating) {
-      scan.repeat();
+      scan.value = 0.25;
+    } else if (run) {
+      if (!scan.isAnimating) scan.repeat();
+    } else {
+      scan.stop();
     }
   }
 
@@ -92,7 +96,7 @@ class _CheckScreenState extends State<CheckScreen> with SingleTickerProviderStat
     await Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => page));
   }
 
-  Future<void> _showResult(Map<String, dynamic> r) => _push(ResultScreen(result: r, title: 'Check result'));
+  Future<void> _showResult(Map<String, dynamic> r) => _push(ResultScreen(result: r, title: 'Check result', manual: true));
 
   /// The normal check (link / SMS / number / UPI ID, worked out by the engine), plus community reports.
   Future<Map<String, dynamic>> _analyze(String t, {String from = ''}) async {

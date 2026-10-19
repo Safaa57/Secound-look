@@ -1,0 +1,63 @@
+// hi translations (part g: v1.6 — battery saver look, crash reports, alerts grouped by sender, select & delete).
+// Keys are the exact English strings passed to tr().
+const stringsHiG = <String, String>{
+  // Appearance / battery saver look
+  'Appearance': 'दिखावट',
+  'Battery saver look': 'बैटरी बचत लुक',
+  'Fewer animations. Saves battery and keeps older phones smooth.': 'कम एनिमेशन। बैटरी बचती है और पुराने फ़ोन भी आराम से चलते हैं।',
+  'Auto': 'ऑटो',
+  'On': 'चालू',
+  'Off': 'बंद',
+  'Auto: off on this phone.': 'ऑटो: इस फ़ोन पर बंद है।',
+  'Auto: on, because this phone has less memory.': 'ऑटो: चालू है, क्योंकि इस फ़ोन में मेमोरी कम है।',
+  'Auto: on, because your phone asks for less motion.': 'ऑटो: चालू है, क्योंकि आपके फ़ोन में कम एनिमेशन की सेटिंग है।',
+  'On: animations are switched off.': 'चालू: एनिमेशन बंद हैं।',
+  'Off: full animations.': 'बंद: पूरे एनिमेशन।',
+  // Privacy
+  'Choose what to delete': 'चुनें कि क्या मिटाना है',
+  // Crash reports
+  'Crash reports': 'क्रैश रिपोर्ट',
+  'Saved only on this phone. Nothing is sent unless you tap Send.': 'सिर्फ़ इसी फ़ोन पर सेव। जब तक आप भेजें पर टैप न करें, कुछ नहीं भेजा जाता।',
+  'Couldn\'t open sharing. Please try again.': 'शेयर नहीं खुल सका। कृपया फिर से कोशिश करें।',
+  'Report copied. Paste it in an email to us.': 'रिपोर्ट कॉपी हो गई। इसे हमें ईमेल में पेस्ट करके भेजें।',
+  'Clear crash reports?': 'क्रैश रिपोर्ट हटाएँ?',
+  'This removes the saved crash reports from this phone.': 'इससे इस फ़ोन पर सेव क्रैश रिपोर्ट हट जाएँगी।',
+  'Clear': 'हटाएँ',
+  'When the app runs into a problem, a short technical note is kept here to help us fix it. Long numbers and links are removed from it.':
+      'जब ऐप में कोई दिक्कत आती है, तो उसे ठीक करने में मदद के लिए एक छोटा तकनीकी नोट यहाँ रखा जाता है। उसमें से लंबे नंबर और लिंक हटा दिए जाते हैं।',
+  'No crash reports. Everything has been running fine.': 'कोई क्रैश रिपोर्ट नहीं। सब ठीक चल रहा है।',
+  'Send report': 'रिपोर्ट भेजें',
+  'Send opens your phone\'s share options, so you choose where it goes.': 'भेजें दबाने पर फ़ोन के शेयर विकल्प खुलते हैं, ताकि आप खुद चुनें कि यह कहाँ जाए।',
+  '{n} saved': '{n} सेव हैं',
+  'App (system part)': 'ऐप (सिस्टम हिस्सा)',
+  'App': 'ऐप',
+  'Unknown error': 'अज्ञात गड़बड़ी',
+  // Alerts: grouped by sender, select & delete
+  'Select': 'चुनें',
+  'Select all': 'सभी चुनें',
+  'Select none': 'कोई नहीं',
+  '{n} selected': '{n} चुने गए',
+  'Delete all': 'सब मिटाएँ',
+  'Select messages': 'मैसेज चुनें',
+  'Delete conversation': 'बातचीत मिटाएँ',
+  'Delete this conversation?': 'यह बातचीत मिटाएँ?',
+  'This removes every SMS and call from this sender from this phone. Numbers you marked stay marked.':
+      'इससे इस भेजने वाले के सभी SMS और कॉल इस फ़ोन से हट जाएँगे। आपने जिन नंबरों को मार्क किया है, वे मार्क ही रहेंगे।',
+  'Delete 1 conversation?': '1 बातचीत मिटाएँ?',
+  'Delete {n} conversations?': '{n} बातचीत मिटाएँ?',
+  'Delete 1 item?': '1 आइटम मिटाएँ?',
+  'Delete {n} items?': '{n} आइटम मिटाएँ?',
+  'This removes the selected SMS and calls from this phone. Numbers you marked stay marked.':
+      'इससे चुने गए SMS और कॉल इस फ़ोन से हट जाएँगे। आपने जिन नंबरों को मार्क किया है, वे मार्क ही रहेंगे।',
+  'Couldn\'t delete. Please try again.': 'मिटाया नहीं जा सका। कृपया फिर से कोशिश करें।',
+  'Deleted.': 'मिटा दिया गया।',
+  'Tap conversations to choose them, then tap Delete.': 'बातचीत पर टैप करके उन्हें चुनें, फिर मिटाएँ पर टैप करें।',
+  '1 looks like a scam': '1 ठगी जैसा लगता है',
+  '{n} look like scams': '{n} ठगी जैसे लगते हैं',
+  '1 looks suspicious': '1 संदिग्ध लगता है',
+  '{n} look suspicious': '{n} संदिग्ध लगते हैं',
+  'All look normal': 'सभी सामान्य लगते हैं',
+  'Today': 'आज',
+  'Yesterday': 'कल',
+  'Incoming call': 'आने वाली कॉल',
+};
